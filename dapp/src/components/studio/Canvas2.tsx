@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/jsx-key */
 "use client";
 
@@ -23,7 +22,6 @@ import PengoContract from "../../constants/PengoContract.json";
 
 const CANVAS_SIZE = 300 * 2;
 const PIXEL_SIZE = 10 * 2;
-const VIEW_BOX: number = 30; // Updated to match the SVG size
 
 interface CanvasProps {
     selectedColor: string;
@@ -397,7 +395,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 <rect x="18" y="22" width="1" height="1" fill="#FFA500"/>
                 \n${svgRects}\n
             </svg>`;
-        const svg = `<svg width="${CANVAS_SIZE}" height="${CANVAS_SIZE}" viewBox="0 0 ${VIEW_BOX} ${VIEW_BOX}" xmlns="http://www.w3.org/2000/svg">\n${svgRects}\n</svg>`;
         setSvgCode(templateSVG);
         setAccessoryCode(svgRects);
     };
