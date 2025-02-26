@@ -1,0 +1,28 @@
+<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#2beda9"/>
+
+  <!-- Pinguin Pixel Art -->
+  <!-- Badan -->
+  <rect x="140" y="100" width="40" height="40" fill="#000000"/>
+  <rect x="130" y="140" width="60" height="40" fill="#000000"/>
+  <rect x="120" y="180" width="80" height="40" fill="#000000"/>
+  <rect x="110" y="220" width="100" height="40" fill="#000000"/>
+
+  <!-- Perut Putih -->
+  <rect x="150" y="140" width="20" height="40" fill="#FFFFFF"/>
+  <rect x="140" y="180" width="40" height="40" fill="#FFFFFF"/>
+  <rect x="130" y="220" width="60" height="20" fill="#FFFFFF"/>
+
+  <!-- Mata -->
+  <rect x="145" y="110" width="10" height="10" fill="#FFFFFF"/>
+  <rect x="165" y="110" width="10" height="10" fill="#FFFFFF"/>
+  <rect x="148" y="113" width="4" height="4" fill="#000000"/>
+  <rect x="168" y="113" width="4" height="4" fill="#000000"/>
+
+  <!-- Paruh -->
+  <rect x="155" y="130" width="10" height="10" fill="#FFA500"/>
+
+  <!-- Kaki -->
+  <rect x="140" y="260" width="20" height="10" fill="#FFA500"/>
+  <rect x="160" y="260" width="20" height="10" fill="#FFA500"/>
+</svg>

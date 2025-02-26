@@ -1,0 +1,543 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/jsx-key */
+"use client";
+
+import React, {
+    useRef,
+    useState,
+    useEffect,
+    MouseEvent,
+    KeyboardEvent
+} from "react";
+import { Address } from "viem";
+import toast, { Toaster } from 'react-hot-toast';
+import {
+    useAccount,
+    useReadContract,
+    useWriteContract,
+    useWaitForTransactionReceipt,
+    type BaseError,
+} from "wagmi";
+import PengoContract from "../../constants/PengoContract.json";
+
+const CANVAS_SIZE = 300 * 2;
+const PIXEL_SIZE = 10 * 2;
+const VIEW_BOX: number = 30; // Updated to match the SVG size
+
+interface CanvasProps {
+    selectedColor: string;
+}
+
+function svgToBytecode(svgString: string) {
+    const rectRegex = /<rect x='(\d+)' y='(\d+)' width='(\d+)' height='(\d+)' fill='(#[0-9A-Fa-f]{3,6})'\/>/g;
+    let match;
+    let bytecode = "";
+
+    while ((match = rectRegex.exec(svgString)) !== null) {
+        const x = parseInt(match[1], 10).toString(16).padStart(2, "0"); // X hex
+        const y = parseInt(match[2], 10).toString(16).padStart(2, "0"); // Y hex
+        const width = parseInt(match[3], 10).toString(16).padStart(2, "0"); // Width
+        const height = parseInt(match[4], 10).toString(16).padStart(2, "0"); // Height
+
+        // Check color must valid 6 char 
+        let color = match[5].replace("#", "").toUpperCase();
+        if (color.length === 3) {
+            // Expand warna shorthand (#F00 -> #FF0000)
+            color = color.split("").map(c => c + c).join("");
+        }
+        color = color.slice(-6);
+        bytecode += `${x}${y}${width}${height}${color}`;
+    }
+
+    // console.log(bytecode);
+    return bytecode;
+}
+
+
+export default function Canvas({ selectedColor }: CanvasProps) {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [rects, setRects] = useState<{ x: number; y: number; color: string }[]>([]);
+    const [history, setHistory] = useState<{ x: number; y: number; color: string }[][]>([]);
+    const [svgCode, setSvgCode] = useState<string>("");
+    const [accessoryCode, setAccessoryCode] = useState<string>("");
+    const [isDrawing, setIsDrawing] = useState<boolean>(false);
+    const { address } = useAccount();
+    const [loading, setLoading] = useState(true);
+
+    const [selectedPengo, setSelectedPengo] = useState("");
+    const [selectedAcc, setSelectedAccessory] = useState("");
+    const [accName, setAccName] = useState("");
+
+    const contractAddress = PengoContract.address as Address;
+    const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment[0];
+    const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
+
+    // Read list of NFT token IDs owned by the user
+    const { data: listOf } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: "tokensOfOwner",
+        args: [address],
+    });
+    const listOfAddress: string[] = (listOf as string[]) || [];
+
+    const { data: allowedPart } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: "getAllAllowedParts",
+    });
+    const allowedAccesories: string[] = (allowedPart as string[]) || [];
+
+    // const { data: tokenURI } = useReadContract({
+    //     address: contractAddress,
+    //     abi,
+    //     functionName: "tokenURI",
+    //     args: [1],
+    // }) || "";
+    // console.log(tokenURI)
+
+    useEffect(() => {
+        if (listOfAddress !== undefined) {
+            setLoading(false);
+        }
+    }, [listOfAddress]);
+
+    useEffect(() => {
+        if (listOfAddress.length > 0) {
+            setSelectedPengo(`${listOfAddress[0]}`); 
+        }
+        if (allowedAccesories.length > 0) {
+            setSelectedAccessory(allowedAccesories[0]);
+        }
+    }, [listOfAddress, allowedAccesories]);
+
+    useEffect(() => {
+        updateSVGCode();
+        drawCanvas();
+    }, [rects]);
+
+    useEffect(() => {
+        const handleUndo = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "z") {
+                e.preventDefault();
+                setRects((prev) => {
+                    if (prev.length === 0) return prev;
+                    const newHistory = [...history, prev];
+                    setHistory(newHistory);
+                    return prev.slice(0, -1);
+                });
+            }
+        };
+
+        const handleRedo = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "y") {
+                e.preventDefault();
+                setRects((prev) => {
+                    if (history.length === 0) return prev;
+                    const newRects = history[history.length - 1];
+                    setHistory((h) => h.slice(0, -1));
+                    return newRects;
+                });
+            }
+        };
+
+        document.addEventListener("keydown", handleUndo as unknown as EventListener);
+        document.addEventListener("keydown", handleRedo as unknown as EventListener);
+        return () => {
+            document.removeEventListener("keydown", handleUndo as unknown as EventListener);
+            document.removeEventListener("keydown", handleRedo as unknown as EventListener);
+        };
+    }, [history]);
+
+    const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+        setIsDrawing(true);
+        handleCanvasClick(e);
+    };
+
+    const handleMouseUp = () => {
+        setIsDrawing(false);
+    };
+
+    const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (!isDrawing) return;
+        handleCanvasClick(e);
+    };
+
+    const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (!canvasRef.current) return;
+
+        const rect = canvasRef.current.getBoundingClientRect();
+        const scaleX = canvasRef.current.width / rect.width;
+        const scaleY = canvasRef.current.height / rect.height;
+        const x = Math.floor((e.clientX - rect.left) * scaleX / PIXEL_SIZE);
+        const y = Math.floor((e.clientY - rect.top) * scaleY / PIXEL_SIZE);
+
+        // Check if the pixel already exists and update its color
+        const existingRectIndex = rects.findIndex((r) => r.x === x && r.y === y);
+        if (existingRectIndex !== -1) {
+            // Update the color of the existing rectangle
+            const updatedRects = [...rects];
+            updatedRects[existingRectIndex].color = selectedColor;
+            setRects(updatedRects);
+        } else {
+            // Add a new rectangle
+            setRects([...rects, { x, y, color: selectedColor }]);
+        }
+    };
+
+    const handleReset = () => {
+        setRects([]);
+        setHistory([]);
+    };
+
+    const drawCanvas = () => {
+        if (!canvasRef.current) return;
+        const ctx = canvasRef.current.getContext("2d");
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.strokeStyle = "#ddd";
+        for (let i = 0; i < CANVAS_SIZE; i += PIXEL_SIZE) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, CANVAS_SIZE);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(CANVAS_SIZE, i);
+            ctx.stroke();
+        }
+
+        rects.forEach(({ x, y, color }) => {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); // Adjusted to draw at the correct position
+        });
+    };
+
+    const updateSVGCode = () => {
+        const svgRects = rects
+            .map(
+                (r) => `<rect x='${r.x}' y='${r.y}' width='1' height='1' fill='${r.color}'/>` // Updated width and height to 1
+            )
+            .join("\n");
+
+        const templateSVG = `<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="none"/>
+            <!-- Pinguin Pixel Art -->
+                <rect x="14" y="10" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="10" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="10" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="10" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="13" y="11" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="11" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="11" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="11" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="11" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="11" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="13" y="12" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="12" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="12" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="12" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="12" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="12" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="13" y="13" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="13" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="13" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="13" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="13" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="13" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="12" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="14" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="14" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="11" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="12" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="15" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="20" y="15" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="10" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="11" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="12" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="20" y="16" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="21" y="16" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="10" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="11" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="12" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="20" y="17" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="21" y="17" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="11" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="12" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="18" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="20" y="18" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="11" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="12" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="19" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="20" y="19" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="12" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="20" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="20" width="1" height="1" fill="#4b4c4f"/>
+
+                <rect x="12" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="13" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="14" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="15" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="16" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="17" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="18" y="21" width="1" height="1" fill="#4b4c4f"/>
+                <rect x="19" y="21" width="1" height="1" fill="#4b4c4f"/>
+
+                <!-- Front Skin -->
+                <rect x="14" y="15" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="15" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="15" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="15" width="1" height="1" fill="#FFFFFF"/>
+
+                <rect x="13" y="16" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="14" y="16" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="16" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="16" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="16" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="18" y="16" width="1" height="1" fill="#FFFFFF"/>
+
+                <rect x="12" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="13" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="14" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="18" y="17" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="19" y="17" width="1" height="1" fill="#FFFFFF"/>
+
+                <rect x="12" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="13" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="14" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="18" y="18" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="19" y="18" width="1" height="1" fill="#FFFFFF"/>
+
+                <rect x="13" y="19" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="14" y="19" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="19" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="19" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="19" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="18" y="19" width="1" height="1" fill="#FFFFFF"/>
+
+                <rect x="14" y="20" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="15" y="20" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="16" y="20" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="20" width="1" height="1" fill="#FFFFFF"/>
+
+                <!-- Eye -->
+                <rect x="14" y="12" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="14" y="13" width="1" height="1" fill="#000"/>
+                <rect x="17" y="12" width="1" height="1" fill="#FFFFFF"/>
+                <rect x="17" y="13" width="1" height="1" fill="#000"/>
+
+                <!-- peck -->
+                <rect x="15.5" y="13" width="1" height="1" fill="#FFA500"/>
+
+                <!-- Feet -->
+                <rect x="13" y="22" width="1" height="1" fill="#FFA500"/>
+                <rect x="14" y="22" width="1" height="1" fill="#FFA500"/>
+                <rect x="17" y="22" width="1" height="1" fill="#FFA500"/>
+                <rect x="18" y="22" width="1" height="1" fill="#FFA500"/>
+                \n${svgRects}\n
+            </svg>`;
+        const svg = `<svg width="${CANVAS_SIZE}" height="${CANVAS_SIZE}" viewBox="0 0 ${VIEW_BOX} ${VIEW_BOX}" xmlns="http://www.w3.org/2000/svg">\n${svgRects}\n</svg>`;
+        setSvgCode(templateSVG);
+        setAccessoryCode(svgRects);
+    };
+
+    // Hook minting transaction
+    const { data: hash, error, isPending, writeContract } = useWriteContract();
+    const { isPending: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
+    
+    React.useEffect(() => {
+        if (error) {
+            toast.error(<p className="text-sm font-mono text-red-900">Error: {(error as BaseError).shortMessage || error.message}</p>)
+        }
+    }, [error]);
+
+    
+    React.useEffect(() => {
+        if (isConfirmed) {
+            if (loadingToast) {
+                setLoadingToast(false);
+            }
+            toast.success(<p className="text-sm font-mono text-black/50 text-[#60ff00">Transaction confirmed!</p>)
+        }
+    }, [isConfirmed, loadingToast]);
+
+
+    React.useEffect(() => {
+        if (hash && networkContract?.explore) {
+            toast.success(
+                <p className="text-sm font-mono text-black/30">
+                    Transaction Hash:<br />
+                    <a
+                        href={`${networkContract.explore}/tx/${hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#60ff00] underline"
+                    >
+                        {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
+                    </a>
+                </p>
+            );
+        }
+    }, [hash, networkContract?.explore]);
+
+    async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        if(accName == ""){
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can't be null</p>)
+        }
+        if(svgToBytecode(accessoryCode) == ""){
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can't be null</p>)
+        }
+        console.log(selectedPengo)
+        console.log(selectedAcc)
+        console.log(svgToBytecode(accessoryCode))
+        console.log(accName)
+
+        writeContract({
+            address: contractAddress as Address,
+            abi,
+            functionName: "addAccessory",
+            args: [
+                selectedPengo,
+                selectedAcc,
+                accName,
+                svgToBytecode(accessoryCode)
+            ]
+        });
+    }
+
+    return (
+        <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
+            {/* <h2 className="text-lg font-bold mb-2">SVG Pixel Editor</h2> */}
+            
+            <Toaster position="bottom-right" reverseOrder={true} />
+            <div className="relative w-fit h-fit mx-auto my-4">
+                <canvas
+                    ref={canvasRef}
+                    width={CANVAS_SIZE}
+                    height={CANVAS_SIZE}
+                    className="border border-[rgba(219, 205, 205, 0.863)] cursor-crosshair w-full"
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseMove={handleMouseMove}
+                />
+            </div>
+            <div className="flex flex-col gap-2 w-full sm:w-[240px] my-4">
+                {/* Display the template SVG below the canvas as a sketch base */}
+                <div className="">
+                    <button onClick={handleReset} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Reset Canvas</button>
+
+                    <h3 className="text-md font-semibold">Sketch</h3>
+                    <div dangerouslySetInnerHTML={{ __html: svgCode }} />
+                    <form onSubmit={handleMintAcc} className="flex flex-col gap-2 justify-center">
+                        <div className="flex flex-col gap-2 items-center my-4">
+                            <select
+                                className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
+                                onChange={(e) => setSelectedPengo(e.target.value)} // Store selected Pengo
+                            >
+                                {!loading && listOfAddress.map((tokenId, index) => (
+                                    <option key={index} value={`${tokenId}`}>Pengo #{tokenId}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
+                                onChange={(e) => setSelectedAccessory(e.target.value)} // Store selected Accessory
+                            >
+                                {allowedAccesories.map((accessory, index) => (
+                                    <option key={index} value={accessory}>
+                                        {accessory}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-2 items-center">
+                            <input
+                                type="text"
+                                placeholder="Enter accessory name"
+                                className="text-xs border font-mono bg-black/60 text-white border-purple-500 p-1 rounded w-40"
+                                required
+                                onChange={(e) => setAccName(e.target.value)}
+                            />
+                            {/* <textarea
+                                className="w-full h-40 border p-2 mt-2 text-black text-xs font-mono"
+                                readOnly
+                                onChange={(e) => setAccByte(svgToBytecode(accessoryCode))}
+                                hidden
+                                value={svgToBytecode(accessoryCode)}
+                                required
+                            /> */}
+                            <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button>
+                            <button
+                                type="submit"
+                                className='text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40'
+                            >Mint Accessory</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+}

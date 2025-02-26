@@ -1,0 +1,48 @@
+{
+  "name": "create-abstract-app-template",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@abstract-foundation/agw-client": "^0.1.0",
+    "@abstract-foundation/agw-react": "^0.1.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.4",
+    "@mui/material": "^6.4.4",
+    "@rainbow-me/rainbowkit": "^2.1.7",
+    "@tanstack/react-query": "^5.56.2",
+    "@uiw/react-color": "^2.3.4",
+    "bcrypt": "^5.1.1",
+    "encoding": "^0.1.13",
+    "ethers": "^6.13.5",
+    "firebase": "^11.1.0",
+    "fs": "^0.0.1-security",
+    "next": "^15.2.0-canary.45",
+    "pino-pretty": "^11.2.2",
+    "react": "^18",
+    "react-component-export-image": "^1.0.6",
+    "react-dom": "^18",
+    "react-hot-toast": "^2.5.1",
+    "viem": "^2.23.5",
+    "wagmi": "^2.14.12",
+    "zksync-ethers": "^6.16.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.13",
+    "postcss": "^8",
+    "sass": "^1.84.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

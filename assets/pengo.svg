@@ -1,0 +1,37 @@
+<svg width="1000" height="1000" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#2beda9"/>
+
+  <!-- Pinguin Pixel Art -->
+  <!-- Badan -->
+  <rect x="140" y="100" width="40" height="15" fill="#4b4c4f"/>
+  <rect x="135" y="110" width="50" height="35" fill="#4b4c4f"/>
+  <rect x="125" y="140" width="70" height="15" fill="#4b4c4f"/>
+  <rect x="115" y="150" width="90" height="15" fill="#4b4c4f"/>
+  <rect x="105" y="160" width="110" height="20" fill="#4b4c4f"/>
+  <rect x="115" y="170" width="90" height="30" fill="#4b4c4f"/>
+  <rect x="125" y="195" width="70" height="30" fill="#4b4c4f"/>
+
+  <!-- Perut Putih Membulat -->
+  <rect x="150" y="150" width="20" height="15" fill="#FFFFFF"/>
+  <rect x="140" y="160" width="40" height="15" fill="#FFFFFF"/>
+  <rect x="130" y="170" width="60" height="25" fill="#FFFFFF"/>
+  <rect x="140" y="190" width="40" height="20" fill="#FFFFFF"/>
+
+  <!-- Mata -->
+  <rect x="145" y="115" width="10" height="10" fill="#FFFFFF"/>
+  <rect x="165" y="115" width="10" height="10" fill="#FFFFFF"/>
+  <rect x="148" y="118" width="4" height="4" fill="#4b4c4f"/>
+  <rect x="168" y="118" width="4" height="4" fill="#4b4c4f"/>
+
+  <!-- Paruh -->
+  <rect x="155" y="130" width="10" height="10" fill="#FFA500"/>
+
+  <!-- Kaki -->
+  <rect x="130" y="220" width="20" height="10" fill="#FFA500"/>
+  <rect x="170" y="220" width="20" height="10" fill="#FFA500"/>
+
+  <!-- Aksesoris Topi Biru -->
+  <rect x="130" y="100" width="60" height="20" fill="#0000FF"/>
+  <rect x="135" y="90" width="50" height="15" fill="#0000FF"/>
+  <rect x="140" y="80" width="40" height="15" fill="#0000FF"/>
+</svg>
