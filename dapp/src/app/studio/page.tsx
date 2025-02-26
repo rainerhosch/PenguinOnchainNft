@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import Image from "next/image";
 import image1 from "@/app/images/pengo-base.svg";
 import AppNavbar from "@/components/AppNavBar";
@@ -18,7 +18,6 @@ function StudioPage(): JSX.Element {
 
     const [hideOptionsNfts, setHideOptionsNfts] = useState(false);
     const [showNftList, setShowNftList] = useState(true);
-    const [isConnected, setConnected] = useState(false);
     // const [pengoBalance, setPengoBalance] = useState(0);
 
     const { address, status } = useAccount(); // Get the connected wallet address
@@ -31,15 +30,6 @@ function StudioPage(): JSX.Element {
         functionName: "balanceOf",
         args: [address],
     });
-
-    useEffect(() => {
-
-        if (status === 'connected') {
-            setConnected(true);
-        } else {
-            setConnected(false);
-        }
-    }, [status]);
 
     const initializeCanvas = () => {
         setHideOptions(!hideOptions);

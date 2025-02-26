@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import * as React from 'react';
 import { Address } from 'viem';
 import Image from "next/image";
 import image1 from "@/app/images/pengo-template.svg";
 import {
-    useReconnect,
     useAccount,
     useReadContract,
     useWriteContract,
@@ -20,9 +18,7 @@ import PengoContract from "../../constants/PengoContract.json";
 
 export default function PengosMintComponent() {
     const { address , status} = useAccount();
-    const { connectors } = useReconnect();
     console.log(status)
-    // const signer = useEthersSigner();
     const contractAddress = PengoContract.address;
     const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment[0];
@@ -54,7 +50,7 @@ export default function PengosMintComponent() {
     // Hook minting transaction
     const { data: hash, error, isPending, writeContract } = useWriteContract();
 
-    const { isPending: isConfirming, isSuccess: isConfirmed } =
+    const { isSuccess: isConfirmed } =
         useWaitForTransactionReceipt({ hash });
 
     // Send mint transaction
@@ -101,12 +97,6 @@ export default function PengosMintComponent() {
         }
     }, [isConfirmed, loadingToast]);
 
-    // React.useEffect(() => {
-    //     if (loadingToast) {
-    //         toast.loading(<p className="text-sm font-mono text-black/50 text-[#60ff00">Waiting for confirmation...</p>)
-    //         // setLoadingToastId(id);
-    //     }
-    // }, [loadingToast]);
 
     React.useEffect(() => {
         if (hash && networkContract?.explore) {

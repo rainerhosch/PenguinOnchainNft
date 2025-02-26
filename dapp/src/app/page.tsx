@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Image from "next/image";
@@ -7,37 +7,8 @@ import image2 from "@/app/images/pengo-2.png"
 import image3 from "@/app/images/pengo-3.png"
 import Navbar from "../components/NavBar";
 import Footer from "../components/Footer";
-// import abiJson from "../constants/erc721abi.json"
-// import { erc721goerli } from "../constants/erc721goerli"
-import {
-  useLoginWithAbstract,
-  useWriteContractSponsored,
-} from "@abstract-foundation/agw-react";
-import { useAccount, useWaitForTransactionReceipt, useContractWrite, useReadContract } from "wagmi";
-import { getGeneralPaymasterInput } from "viem/zksync";
-import { parseAbi } from "viem";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
 
 export default function Home() {
-  // const [maxPerWallet, setMintCount] = useState(0);
-  // const { addToast } = useToasts()
-  // const { address } = useAccount()
-  const [price, setprice] = useState(0)
-  const [value, setvalue] = useState(0)
-  const [mintCount, setMintCount] = useState(0);
-  const [mintNum, setmintNum] = useState(0)
-  const [mintCountdata, setmintCountdata] = useState(0)
-  const [mintLimit, setMintLimit] = useState(0)
-  const [mintCostAmount, setMintCostAmount] = useState("0")
-
-  const { logout } = useLoginWithAbstract();
-  const { address, status } = useAccount();
-  const { writeContractSponsored, data: transactionHash } =
-    useWriteContractSponsored();
-  const { data: transactionReceipt } = useWaitForTransactionReceipt({
-    hash: transactionHash,
-  });
 
 
   return (

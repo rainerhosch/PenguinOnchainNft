@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/jsx-key */
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -22,14 +21,6 @@ export default function NftList() {
         functionName: "tokensOfOwner",
         args: [address],
     });
-    // const { data: metadata } = useReadContract({
-    //     address: contractAddress,
-    //     abi,
-    //     functionName: "tokenUri",
-    //     args: [0],
-    // });
-
-    // console.log(`metadata: ${listOfAddress}`)
 
     useEffect(() => {
         if (listOfAddress !== undefined) {

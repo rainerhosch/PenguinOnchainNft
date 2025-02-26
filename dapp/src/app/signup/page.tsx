@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 
 import { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { signUp, signWithGoogle } from "@/app/firebase/auth/signup";
-import { useRouter } from 'next/navigation';
 
 export default function SignUpPage() {
     const [formData, setFormData] = useState({
@@ -12,12 +11,10 @@ export default function SignUpPage() {
         password: ""
     });
 
-    const router = useRouter();
-
     // Handle form submission
     const handleForm = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
-        const { result, error } = await signUp(formData.email, formData.password);
+        const { error } = await signUp(formData.email, formData.password);
         if (error) {
             // console.log(error);
             if (error === "Firebase: Error (auth/email-already-in-use).") {

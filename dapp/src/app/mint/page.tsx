@@ -3,18 +3,18 @@ import React from "react";
 import AppNavbar from "../../components/AppNavBar";
 import PengosMintComponen from "../../components/mint/PengosMintComponeV2"
 
-const traits = [
-    { category: "Body Color", name: "Zombie", quantity: 300, percentage: "1.5%" },
-    { category: "Body Color", name: "Arctic", quantity: 700, percentage: "3.5%" },
-    { category: "Body Color", name: "Fire", quantity: 1500, percentage: "7.5%" },
-    { category: "Body Color", name: "Female", quantity: 8750, percentage: "43.75%" },
-    { category: "Body Color", name: "Male", quantity: 8750, percentage: "43.75%" },
-    { category: "Top Eye Color", name: "Zombie Eye", quantity: 300, percentage: "1.5%" },
-    { category: "Top Eye Color", name: "Ancestors", quantity: 985, percentage: "5%" },
-    { category: "Top Eye Color", name: "Sleepy", quantity: 1970, percentage: "10%" },
-    { category: "Top Eye Color", name: "Purple Shade", quantity: 5910, percentage: "30%" },
-    { category: "Top Eye Color", name: "Standard", quantity: 10835, percentage: "55%" },
-];
+// const traits = [
+//     { category: "Body Color", name: "Zombie", quantity: 300, percentage: "1.5%" },
+//     { category: "Body Color", name: "Arctic", quantity: 700, percentage: "3.5%" },
+//     { category: "Body Color", name: "Fire", quantity: 1500, percentage: "7.5%" },
+//     { category: "Body Color", name: "Female", quantity: 8750, percentage: "43.75%" },
+//     { category: "Body Color", name: "Male", quantity: 8750, percentage: "43.75%" },
+//     { category: "Top Eye Color", name: "Zombie Eye", quantity: 300, percentage: "1.5%" },
+//     { category: "Top Eye Color", name: "Ancestors", quantity: 985, percentage: "5%" },
+//     { category: "Top Eye Color", name: "Sleepy", quantity: 1970, percentage: "10%" },
+//     { category: "Top Eye Color", name: "Purple Shade", quantity: 5910, percentage: "30%" },
+//     { category: "Top Eye Color", name: "Standard", quantity: 10835, percentage: "55%" },
+// ];
 
 export default function MintPage() {
 

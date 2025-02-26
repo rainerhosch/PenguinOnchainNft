@@ -1,12 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
-
 export default function Footer() {
-    const { address, status } = useAccount();
-    // console.log(status)
     return (
         <>
             <nav className="relative bottom-0 left-0 right-0 bg-black/50 backdrop-blur-md">

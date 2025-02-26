@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-key */
 "use client";
@@ -400,8 +401,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     };
 
     // Hook minting transaction
-    const { data: hash, error, isPending, writeContract } = useWriteContract();
-    const { isPending: isConfirming, isSuccess: isConfirmed } =
+    const { data: hash, error,writeContract } = useWriteContract();
+    const { isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
     
     React.useEffect(() => {

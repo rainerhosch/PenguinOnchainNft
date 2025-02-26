@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { signIn, signWithGoogle } from "@/app/firebase/auth/signIn";
 import { useRouter } from 'next/navigation';
-import { createSession } from '@/app/lib/session'
 
 export default function SignInPage() {
-    const [isSignIn, setIsSignIn] = useState(true);
+    const [isSignIn] = useState(true);
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -19,7 +17,7 @@ export default function SignInPage() {
     // Handle form submission
     const handleForm = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
-        const { result, error } = await signIn(formData.email, formData.password);
+        const { error } = await signIn(formData.email, formData.password);
         if (error) {
             // console.log(error);
             toast.error('Sign in failed or invalid-credential');
@@ -34,7 +32,7 @@ export default function SignInPage() {
 
     const handleGoogleSignIn = async (event: { preventDefault: () => void }) => {
         event.preventDefault();
-        const { result, error } = await signWithGoogle();
+        const { error } = await signWithGoogle();
         if (error) {
             // console.log(error);
             toast.error('Google sign in failed or invalid-credential');
