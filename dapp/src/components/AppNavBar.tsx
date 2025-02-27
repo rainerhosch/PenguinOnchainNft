@@ -78,7 +78,7 @@ export default function AppNavbar() {
 
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
-                            <div className="sm:hidden absolute mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-100">
+                            <div className="sm:hidden fixed mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-1000">
                                 <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
                                     <div className="block px-3 py-2">
                                         {status === "connected" ? (
