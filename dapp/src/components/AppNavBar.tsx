@@ -57,7 +57,6 @@ export default function AppNavbar() {
                         {/* Mobile Menu Button */}
                         <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
                             <button
-                                {/* onClick={() => setMobileMenuOpen(!mobileMenuOpen)} */}
                                 onTouchStart={() => setMobileMenuOpen(!mobileMenuOpen)}
                                 role="button"
                                 className="text-white/50 transition-colors px-6 py-1"
