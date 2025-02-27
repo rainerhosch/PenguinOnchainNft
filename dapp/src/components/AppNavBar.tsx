@@ -4,14 +4,14 @@ import Image from "next/image";
 import { useState } from "react";
 import BrushOutlinedIcon from '@mui/icons-material/BrushOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-import {
-    useLoginWithAbstract
-} from "@abstract-foundation/agw-react";
+// import {
+//     useLoginWithAbstract
+// } from "@abstract-foundation/agw-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 export default function AppNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { logout } = useLoginWithAbstract();
+    // const { logout } = useLoginWithAbstract();
 
     const { address, status } = useAccount();
     return (
@@ -99,7 +99,7 @@ export default function AppNavbar() {
                                                                 <a className="text-white/70 transition-colors w-full font-mono text-left flex items-center justify-between cursor-default">Connected Wallet</a>
                                                                 <a className="text-white/70 text-xs font-light font-mono transition-colors w-full text-left flex items-center justify-between cursor-default">{`${address?.slice(0, 4)}...${address?.slice(-10)}`}</a>
                                                             </div>
-                                                            <button
+                                                            {/* <button
                                                                 className="mt-2 font-mono rounded border border-solid border-white/20 transition-colors flex items-center justify-center bg-white/10 text-white gap-1 hover:bg-white/20 text-xs h-8 px-4"
                                                                 onClick={logout}
                                                             >
@@ -118,7 +118,10 @@ export default function AppNavbar() {
                                                                     />
                                                                 </svg>
                                                                 Disconnect
-                                                            </button>
+                                                            </button> */}
+                                                            <div className="my-4 justify-center text-center">
+                                                                <ConnectButton />
+                                                            </div>
                                                         </div>
 
                                                     </div>
