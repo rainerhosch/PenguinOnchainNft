@@ -37,7 +37,7 @@ body {
 
   .button-press-3d {
     @apply relative transition-all duration-150;
-/*     transform-style: preserve-3d; */
+    transform-style: preserve-3d;
     will-change: transform;
     transform: translateZ(0);
   }
