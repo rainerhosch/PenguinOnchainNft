@@ -57,7 +57,7 @@ export default function AppNavbar() {
                         {/* Mobile Menu Button */}
                         <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
                             <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                {/* onClick={() => setMobileMenuOpen(!mobileMenuOpen)} */}
                                 onTouchStart={() => setMobileMenuOpen(!mobileMenuOpen)}
                                 role="button"
                                 className="text-white/50 transition-colors px-6 py-1"
@@ -79,7 +79,7 @@ export default function AppNavbar() {
 
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
-                            <div className="sm:hidden absolute mobile-menu-animation top-full left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-100">
+                            <div className="sm:hidden absolute mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-100">
                                 <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
                                     <div className="block px-3 py-2">
                                         {status === "connected" ? (
