@@ -39,7 +39,6 @@ const connectors = connectorsForWallets(
     appUrl: "",
   }
 );
-
 export const config = createConfig({
   connectors,
   chains: [sepolia,monadTestnet ],
