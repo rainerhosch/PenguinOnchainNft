@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import NextAbstractWalletProvider from "../components/NextAbstractWalletProvider";
-import { AuthContextProvider } from '@/app/context/AuthContext';
+import NextWalletProvider from "../components/NextWalletProvider"
 
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -52,11 +51,9 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${geistSans.variable} ${geistMono.variable} ${avenueMono.variable} ${roobert.variable} antialiased`}
       >
-        <AuthContextProvider>
-          <NextAbstractWalletProvider>
-            {children}
-          </NextAbstractWalletProvider>
-        </AuthContextProvider>
+        <NextWalletProvider>
+          {children}
+        </NextWalletProvider>
       </body>
     </html>
   );

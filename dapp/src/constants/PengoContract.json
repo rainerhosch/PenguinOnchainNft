@@ -1,9 +1,9 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0xaC8324c9E6F582DFdd4391E6399F358879Ff8855",
-    "factoryAddress": "0xF4795e56DAa7faF69bE4bD42605469D0cD303a7e",
-    "pengoConverter": "0xbF092FC5542fcF6fb913a7A25d92B7E144AC62Ea",
+    "address": "0xa548CF14E23Aa3dC597A1f0c7cc8cB4f55Da7Fed",
+    "factoryAddress": "0x6BA9A75FF17e7eB4C913eB6D264FEC97e7D1229C",
+    "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
     "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
     "constructorArgs": [],
     "txHash": "0xcd772371fb7c72173d0f2f2cfdf1cf5b0b1a04e47f8dfbfedab3a2378fb35550",
@@ -16,6 +16,13 @@
             "chainId": "11124",
             "explore": "https://testnet.monadexplorer.com/",
             "verifyUrl": "https://sourcify-api-monad.blockvision.org",
+            "currency": "MON"
+        },
+        {
+            "name": "Sepolia Testnet",
+            "chainId": "11155111",
+            "explore": "https://sepolia.etherscan.io/",
+            "verifyUrl": "https://api-sepolia.etherscan.io/api",
             "currency": "ETH"
         }
     ],

@@ -1,0 +1,32 @@
+{
+  "name": "penguin_onchain",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "pengo foundation",
+  "license": "MIT",
+  "scripts": {
+    "config": "npx hardhat vars set DEPLOYER_PRIVATE_KEY",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat deploy",
+    "deploy-ign": "npx hardhat ignition deploy ignition/modules/PenguinOnchain.ts",
+    "compile-abs": "npx hardhat compile --network",
+    "deploy-abs": "npx hardhat deploy-zksync --script deploy.ts --network ",
+    "verify": "npx hardhat verify",
+    "verify-abs": "npx hardhat verify --network abstractMainnet YOUR_CONTRACT_ADDRESS",
+    "clean": "npx hardhat clean",
+    "local-node" : "npx hardhat node",
+    "test": "npx hardhat test"
+  },
+  "devDependencies": {
+    "@matterlabs/hardhat-zksync": "^1.3.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^4.7.2",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.18",
+    "zksync-ethers": "^6.16.0"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "erc721a": "^4.2.2"
+  }
+}

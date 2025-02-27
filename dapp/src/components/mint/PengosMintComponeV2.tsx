@@ -151,9 +151,10 @@ export default function PengosMintComponent() {
                             +
                         </button>
                     </div>
-                    {status === 'disconnected' ? (
+                    {(status === 'disconnected' || status == 'connecting' || address == undefined) ? (
                         <div className="flex flex-row gap-2 justify-center">
-                        <ConnectButton /></div>
+                            <ConnectButton />
+                        </div>
                     ) : (
                         <button
                             type="submit"

@@ -423,7 +423,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
 
     React.useEffect(() => {
-        if (hash && networkContract?.explore) {
+        if (isConfirmed && hash && networkContract?.explore) {
             toast.success(
                 <p className="text-sm font-mono text-black/30">
                     Transaction Hash:<br />
@@ -437,6 +437,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                     </a>
                 </p>
             );
+            window.location.reload(); // Reload the page after showing the toast
         }
     }, [hash, networkContract?.explore]);
 

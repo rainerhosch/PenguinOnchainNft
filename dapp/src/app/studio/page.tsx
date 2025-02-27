@@ -5,6 +5,7 @@ import image1 from "@/app/images/pengo-base.svg";
 import AppNavbar from "@/components/AppNavBar";
 import Editor from '@/components/studio/Editor';
 import NftList from '@/components/showcase/ListNfts';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from 'viem';
 import {
     useAccount,
@@ -18,9 +19,9 @@ function StudioPage(): JSX.Element {
 
     const [hideOptionsNfts, setHideOptionsNfts] = useState(false);
     const [showNftList, setShowNftList] = useState(true);
-    // const [pengoBalance, setPengoBalance] = useState(0);
-
     const { address, status } = useAccount(); // Get the connected wallet address
+    // console.log(status)
+    // console.log(address)
     const contractAddress = PengoContract.address;
     const abi = PengoContract.abi;
 
@@ -56,7 +57,7 @@ function StudioPage(): JSX.Element {
             <AppNavbar />
             <main className="relative pt-24 pb-24 px-4 sm:px-4 sm:max-w-7.5xl mx-auto">
                 <div className="relative mb-16">
-                    {status == 'connected' && Number(balanceCount) > 0 && (
+                    {(status == 'connected' || address != undefined) && Number(balanceCount) > 0 && (
                         <div className="bg-white/30 backdrop-blur-sm p-4 sm:p-8 text-white studio-container">
                             <h1 className="text-2xl font-bold mb-1">PENGO <span className="font-extralight">Studio</span></h1>
                             <div className="border border-purple-500 mb-8 rounded flex md:justify-end md:mx-auto">
@@ -109,7 +110,7 @@ function StudioPage(): JSX.Element {
                         </div>
 
                     )}
-                    {status == 'connected' && Number(balanceCount) == 0 && (
+                    {(status == 'connected' || address != undefined) && Number(balanceCount) == 0 && (
                         <div className="bg-[#7556a8]/60 backdrop-blur-sm p-4 sm:p-8 text-white studio-container">
                             <div className="flex flex-col max-h-dvh font-light items-center text-justify">
                                 <div className="">You do not hold any Pengos. Please mint or buy from the marketplace.</div>
@@ -120,10 +121,10 @@ function StudioPage(): JSX.Element {
                             </div>
                         </div>
                     )}
-                    {status == 'disconnected' && (
+                    {(status === 'disconnected' || status === 'connecting' || address === undefined) && (
                         <div className="bg-[#000000]/40 backdrop-blur-sm p-4 sm:p-8 text-white studio-container text-center items-center justify-center h-[900px]">
                             <h1 className="text-2xl font-extralight mb-1 font-mono">Connect your wallet for access, <span className="font-extralight">Pengo Studio</span></h1>
-                            <div className="flex my-20">
+                            <div className="flex my-20 justify-center">
                                 <Image
                                     className="bg-black/20 rounded-md"
                                     src={image1}
@@ -132,6 +133,9 @@ function StudioPage(): JSX.Element {
                                     height={300}
                                 />
                             </div>
+                            <div className="flex flex-row gap-2 justify-center">
+                            <ConnectButton />
+                        </div>
                         </div>
                     )}
                 </div>

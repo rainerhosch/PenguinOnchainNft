@@ -7,33 +7,35 @@ import {
 } from "@rainbow-me/rainbowkit";
 import {
   walletConnectWallet,
+  coinbaseWallet,
+  // zerionWallet, 
+  // bitgetWallet, 
   // metaMaskWallet
 } from '@rainbow-me/rainbowkit/wallets';
 // import { abstractWallet } from "@abstract-foundation/agw-react/connectors";
-import { monadTestnet, sepolia  } from "wagmi/chains";
+import { monadTestnet, sepolia } from "wagmi/chains";
 import { createConfig, WagmiProvider } from "wagmi";
 import { http } from "viem";
 
+if (typeof window !== "undefined") {
+  indexedDB.deleteDatabase("walletconnect");
+}
 const connectors = connectorsForWallets(
   [
     {
-    //   groupName: "Abstract",
-    //   wallets: [
-    //     abstractWallet,
-    //     // metaMaskWallet,
-    //     // walletConnectWallet
-    //   ]
-    // },
-    // {
       groupName: "Others",
       wallets: [
-        walletConnectWallet
+        walletConnectWallet,
+        coinbaseWallet,
+        // zerionWallet, 
+        // bitgetWallet, 
+        // metaMaskWallet
       ]
     },
   ],
   {
     appName: "Rainbowkit Test",
-    projectId: "2942d557e618dbdf5a0d818adb0b190e",
+    projectId: "d841c21dbf51af2d65b5c2cfc5232ee6",
     appDescription: "",
     appIcon: "",
     appUrl: "",
@@ -41,12 +43,12 @@ const connectors = connectorsForWallets(
 );
 export const config = createConfig({
   connectors,
-  chains: [sepolia,monadTestnet ],
+  chains: [sepolia, monadTestnet],
   transports: {
-    [sepolia .id]: http(),
-    [monadTestnet .id]: http(),
+    [sepolia.id]: http(),
+    [monadTestnet.id]: http(),
   },
-  ssr: true,
+  ssr: false,
 });
 
 export default function DynamicWalletProvider({

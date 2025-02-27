@@ -1,0 +1,16 @@
+{
+    "deployments": [
+        {
+            "contractName": "PengoFactory",
+            "contractAddress": "0x421126893Bf1EbE055A6895FF300282327CD1eDc",
+            "explorerLink": "https://sepolia.abscan.org/address/0x421126893Bf1EbE055A6895FF300282327CD1eDc#code"
+        },
+        {
+            "contractName": "PenguinOnchain",
+            "contractAddress": "0xECC64bB18DBf0e2EA8C9E16945896c1F63aD011e",
+            "explorerLink": "https://sepolia.abscan.org/address/0xECC64bB18DBf0e2EA8C9E16945896c1F63aD011e#code"
+        }
+    ],
+    "factoryAddress": "0x421126893Bf1EbE055A6895FF300282327CD1eDc",
+    "nftContractAddress": "0xECC64bB18DBf0e2EA8C9E16945896c1F63aD011e"
+}
