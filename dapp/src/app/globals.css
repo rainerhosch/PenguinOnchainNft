@@ -56,12 +56,12 @@ body {
 }
 
 .mobile-menu-animation {
-/*   @apply transition-all duration-300; */
-/*   animation: menuAppear 0.3s ease-out; */
-  opacity: 0;
+  @apply transition-all duration-300;
+  animation: menuAppear 0.3s ease-out;
+/*   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
-  animation: opacity 0.3s ease-out, transorm 0.3s ease-out, visibility 0.3s;
+  animation: opacity 0.3s ease-out, transorm 0.3s ease-out, visibility 0.3s; */
 }
 
 @keyframes menuAppear {
