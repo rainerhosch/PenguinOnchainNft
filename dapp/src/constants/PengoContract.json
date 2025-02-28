@@ -16,14 +16,22 @@
             "chainId": "11124",
             "explore": "https://testnet.monadexplorer.com/",
             "verifyUrl": "https://sourcify-api-monad.blockvision.org",
-            "currency": "MON"
+            "currency": "MON",
+            "PengoAddress": "0xbCB38b00B1aA63e3c679365aa5509FE5C6C7DE59",
+            "factoryAddress": "0xca4b512d3f36E2679435206Af3240aA114b6A13C",
+            "pengoConverter": "0x9Cb0712Af6c4a0b0c65284F0AcD785E3aa7A3318",
+            "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F"
         },
         {
             "name": "Sepolia Testnet",
             "chainId": "11155111",
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://api-sepolia.etherscan.io/api",
-            "currency": "ETH"
+            "currency": "ETH",
+            "PengoAddress": "0xa548CF14E23Aa3dC597A1f0c7cc8cB4f55Da7Fed",
+            "factoryAddress": "0x6BA9A75FF17e7eB4C913eB6D264FEC97e7D1229C",
+            "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
+            "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F"
         }
     ],
     "abi": [
