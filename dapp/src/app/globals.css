@@ -58,10 +58,6 @@ body {
 .mobile-menu-animation {
   @apply transition-all duration-300;
   animation: menuAppear 0.3s ease-out;
-/*   opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  animation: opacity 0.3s ease-out, transorm 0.3s ease-out, visibility 0.3s; */
 }
 
 @keyframes menuAppear {
@@ -75,10 +71,6 @@ body {
     transform: scale(1) translateY(0);
     pointer-events: auto;
   }
-}
-
-.mobile-menu-exit {
-  animation: menuExit 0.3s ease-in;
 }
 
 @keyframes menuExit {
