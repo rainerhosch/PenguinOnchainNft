@@ -194,8 +194,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
             document.removeEventListener("keydown", handleRedoColor as unknown as EventListener);
         };
     }, [colorHistory, colorRedoStack]);
-    console.log(colorHistory)
-    console.log(colorRedoStack)
 
 
     const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
