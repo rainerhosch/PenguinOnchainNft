@@ -68,34 +68,8 @@ export default function Navbar() {
                                     <a href="#programs" className="block px-4 py-2 text-white/80 hover:text-black">Programs</a>
                                 </button>
                             </div>
-                            {/* <div className="relative group">
-                                <button className="text-white/40 hover:text-black transition-colors">
-                                    <a href="#programs" className="block px-4 py-2 text-white/40 hover:text-black">Testnet</a>
-                                </button>
-                            </div> */}
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        {/* <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-white/10 rounded-full justify-center">
-                            <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="text-white/50 transition-colors px-6 py-1"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    {mobileMenuOpen ? (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    ) : (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                    )}
-                                </svg>
-                            </button>
-                        </div> */}
-                        
                         {/* Mobile Menu Button Fixed */}
                         <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-black/10 rounded-full justify-center">
                             <button

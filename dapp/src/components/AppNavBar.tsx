@@ -14,6 +14,12 @@ export default function AppNavbar() {
         setAccount({ address, status });
     }, [address, status]);
 
+    const toggleMobileMenu = () => {
+        console.log("Before toggle:", mobileMenuOpen);
+        setMobileMenuOpen((prev) => !prev);
+        console.log("After toggle:", !mobileMenuOpen);
+    };
+
     return (
         <>
             {mobileMenuOpen && (
@@ -52,34 +58,11 @@ export default function AppNavbar() {
                                 <ConnectButton />
                             </div>
                         </div>
-
-                        {/* Mobile Menu Button */}
-                        {/* <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
-                            <button
-                                onClick={() => {
-                                    setMobileMenuOpen(!mobileMenuOpen)
-                                }}
-                                role="button"
-                                className="text-white/50 transition-colors px-6 py-1"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    {mobileMenuOpen ? (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    ) : (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                    )}
-                                </svg>
-                            </button>
-                        </div> */}
+                        
                         {/* Mobile Menu Button Fixed */}
                         <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
                             <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                onClick={toggleMobileMenu}
                                 role="button"
                                 className="text-white/50 transition-colors px-6 py-1"
                             >
@@ -98,46 +81,6 @@ export default function AppNavbar() {
                             </button>
                         </div>
 
-
-                        {/* Mobile Menu */}
-                        {/* {mobileMenuOpen && (
-                            <div className="sm:hidden fixed mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-1000">
-                                <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
-                                    <div className="block px-3 py-2">
-                                        {status === "connected" ? (
-                                            <>
-                                                <div className="flex flex-col gap-2 items-left">
-                                                    <div className="relative group w-full h-40 bg-transfarent justify-items-start">
-                                                        <div className="flex flex-col gap-2">
-                                                            <button className="text-white/80 hover:text-black transition-colors text-white gap-1 text-sm rounded-md">
-                                                                <a href="#" className="block px-3 py-2 text-white/80 hover:text-black/30"><StorefrontOutlinedIcon /> Marketplace</a>
-                                                            </button>
-                                                            <button className="text-white/80 hover:text-black transition-colors text-white gap-1 text-sm rounded-md">
-                                                                <a href="/studio" className="block px-3 py-2 text-white/80 hover:text-black/30"><BrushOutlinedIcon /> Pengo Studio</a>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="relative group w-full bg-black/30 rounded-md">
-                                                        <div className="mx-2 py-4">
-                                                            <div className="pl-4 space-y-1 mt-2 border-l-2 border-[#c9ff33]/20">
-                                                                <a className="text-white/70 transition-colors w-full font-mono text-left flex items-center justify-between cursor-default">Connected Wallet</a>
-                                                                <a className="text-white/70 text-xs font-light font-mono transition-colors w-full text-left flex items-center justify-between cursor-default">{`${account.address ? `${account.address.slice(0, 4)}...${account.address.slice(-10)}` : "Not Connected"}`}</a>
-                                                            </div>
-                                                            <div className="my-4 justify-center text-center">
-                                                                <ConnectButton />
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <ConnectButton />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )} */}
                         {/* Mobile Menu Fixed*/}
                         {mobileMenuOpen && (
                             <div
