@@ -90,14 +90,6 @@ body {
   }
 }
 
-.mobile-menu-animation {
-  animation: menuAppear 0.3s ease-out forwards;
-}
-
-.mobile-menu-exit {
-  animation: menuExit 0.3s ease-in forwards;
-}
-
 
 /* .mobile-menu-exit {
   animation: menuExit 0.3s ease-in;
