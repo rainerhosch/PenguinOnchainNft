@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import BrushOutlinedIcon from '@mui/icons-material/BrushOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -12,14 +12,14 @@ export default function AppNavbar() {
     const [account, setAccount] = useState<{ address: string | undefined; status: string }>({ address: undefined, status: "disconnected" });
     useEffect(() => {
         setAccount({ address, status });
-    }, [address, status]); 
+    }, [address, status]);
 
     return (
         <>
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setMobileMenuOpen(false)} />
             )}
-            <nav className="fixed left-2 right-2 z-50 sm:bg-[#563988] bg-[#563988] backdrop-blur-md border-b border-white/10 rounded-b-2xl sm:top-2 sm:rounded-full">
+            <nav className="fixed left-2 right-2 z-50 sm:bg-[#563988] bg-[#563988] border-b border-white/10 rounded-b-2xl sm:top-2 sm:rounded-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-14">
                         <div className="flex items-center gap-4">
@@ -88,10 +88,10 @@ export default function AppNavbar() {
                                                     <div className="relative group w-full h-40 bg-transfarent justify-items-start">
                                                         <div className="flex flex-col gap-2">
                                                             <button className="text-white/80 hover:text-black transition-colors text-white gap-1 text-sm rounded-md">
-                                                                <a href="#" className="block px-3 py-2 text-white/80 hover:text-black/30"><StorefrontOutlinedIcon/> Marketplace</a>
+                                                                <a href="#" className="block px-3 py-2 text-white/80 hover:text-black/30"><StorefrontOutlinedIcon /> Marketplace</a>
                                                             </button>
                                                             <button className="text-white/80 hover:text-black transition-colors text-white gap-1 text-sm rounded-md">
-                                                                <a href="/studio" className="block px-3 py-2 text-white/80 hover:text-black/30"><BrushOutlinedIcon/> Pengo Studio</a>
+                                                                <a href="/studio" className="block px-3 py-2 text-white/80 hover:text-black/30"><BrushOutlinedIcon /> Pengo Studio</a>
                                                             </button>
                                                         </div>
                                                     </div>
