@@ -7,7 +7,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 export default function AppNavbar() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { address, status } = useAccount();
     const [account, setAccount] = useState<{ address: string | undefined; status: string }>({ address: undefined, status: "disconnected" });
     useEffect(() => {
@@ -61,7 +61,7 @@ export default function AppNavbar() {
                         
                         {/* Mobile Menu Button Fixed */}
                         <div className={`sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center 
-                            ${mobileMenuOpen ? "z-9999" : "z-0"}`}>
+                            ${mobileMenuOpen ? "z-9999" : " z-9999"}`}>
                             <button
                                 onClick={toggleMobileMenu}
                                 role="button"
@@ -86,7 +86,7 @@ export default function AppNavbar() {
                         {mobileMenuOpen && (
                             <div
                                 className={`sm:hidden fixed top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
-                                    mobileMenuOpen ? "mobile-menu-animation z-9999" : "mobile-menu-exit z-0"
+                                    mobileMenuOpen ? "mobile-menu-animation  z-9999" : "mobile-menu-exit z-0"
                                 }`}
                             >
                                 <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
