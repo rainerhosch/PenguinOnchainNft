@@ -4,16 +4,9 @@ import Image from "next/image";
 import { useState } from "react";
 import BrushOutlinedIcon from '@mui/icons-material/BrushOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
-// import {
-//     useLoginWithAbstract
-// } from "@abstract-foundation/agw-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
 export default function AppNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    // const { logout } = useLoginWithAbstract();
-
-    const { address, status } = useAccount();
     return (
         <>
             {/* Overlay when mobile menu is open */}
