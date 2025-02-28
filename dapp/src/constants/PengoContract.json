@@ -12,8 +12,8 @@
     "factoryDeps": [],
     "networkDeployment": [
         {
-            "name": "Abstract Testnet",
-            "chainId": "11124",
+            "name": "Monad Testnet",
+            "chainId": "10143",
             "explore": "https://testnet.monadexplorer.com/",
             "verifyUrl": "https://sourcify-api-monad.blockvision.org",
             "currency": "MON",

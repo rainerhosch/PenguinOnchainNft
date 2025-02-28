@@ -6,7 +6,7 @@ import {
     Address
 } from "viem";
 import {
-    // useAccount,
+    useAccount,
     useWriteContract,
     useReadContract,
     useWaitForTransactionReceipt,
@@ -38,6 +38,8 @@ type SpecialTrait = {
 
 
 const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
+
+    const { chain } = useAccount();
     const [nfts, setNfts] = useState<{ id: number; name: string; image: string; traits: unknown }[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -53,6 +55,8 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress as Address;
 
     // Read tokenURIs for each tokenId
     const { data: tokenURI } = useReadContract({
@@ -110,7 +114,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     async function handleFormSellAccessory(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         writeContract({
-            address: contractAddress as Address,
+            address: contractAddress,
             abi,
             functionName: "listAccessoryForSale",
             args: [nftIdSellingAcc, accesoryForSale, parseEther(accPrice.toString())],
@@ -154,7 +158,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             setShowSellAccessoryModal(false);
             setShowModal(false);
         }
-    }, [hash, isConfirmed, networkContract.explore]);
+    }, [hash, isConfirmed, networkContract?.explore]);
 
 
     return (

@@ -16,13 +16,24 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
 
 export default function PengosMintComponent() {
-    const { address , status} = useAccount();
-    console.log(status)
-    const contractAddress = PengoContract.address;
-    const networkContract = PengoContract.networkDeployment[0];
+    const { address, status, chain } = useAccount();
+    const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
+    
+    const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress;
+    
+
+    // Check if the connected user's chain matches the expected chain
+    if (!networkContract) {
+        toast.error("Please connect to the correct network.");
+    }
+
+
 
     // State for contract data
     const [totalMint, setTotalMint] = React.useState(1);
+
 
     // Hooks for read price
     const { data: price } = useReadContract({
@@ -68,16 +79,6 @@ export default function PengosMintComponent() {
         });
     }
 
-    // handle for testnet stage, remove befor launch
-    // async function handleWd() {
-
-    //     writeContract({
-    //         address: `0x96288DcEa56eD2E08c9DfD1cC018b8BCE4c92d28`,
-    //         abi,
-    //         functionName: "withdraw"
-    //     });
-    // }
-
     React.useEffect(() => {
         if (error) {
             toast.error(<p className="text-sm font-mono text-red-900">Error: {(error as BaseError).shortMessage || error.message}</p>)
@@ -87,13 +88,11 @@ export default function PengosMintComponent() {
     React.useEffect(() => {
         if (isConfirmed) {
             if (loadingToast) {
-                // toast.dismiss(loadingToast); // Hapus toast loading
                 setLoadingToast(false);
             }
             toast.success(<p className="text-sm font-mono text-black/50 text-[#60ff00">Transaction confirmed!</p>)
         }
     }, [isConfirmed, loadingToast]);
-
 
     React.useEffect(() => {
         if (hash && networkContract?.explore) {
@@ -112,7 +111,6 @@ export default function PengosMintComponent() {
             );
         }
     }, [hash, networkContract?.explore]);
-
 
     return (
         <div className="bg-black/40 rounded-lg shadow-lg p-6 text-center mx-auto max-w-fit">
@@ -164,13 +162,6 @@ export default function PengosMintComponent() {
                         Price amount {ethers.formatEther(BigInt(Number(price) || 0) * BigInt(totalMint))} ETH
                     </p>
                 </form>
-                {/* <button
-                        type="button"
-                        onClick={handleWd}
-                        className={`bg-black/50 font-mono text-white py-2 px-4 rounded transition duration-200 ${isPending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black'}`}
-                        disabled={isPending}>
-                        {isPending ? 'Confirming...' : 'Withdraw'}
-                    </button> */}
             </div>
         </div>
     );

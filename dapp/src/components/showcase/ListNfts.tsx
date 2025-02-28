@@ -8,11 +8,12 @@ import PengoContract from "../../constants/PengoContract.json";
 import NftCard from "@/components/showcase/NftCard";
 
 export default function NftList() {
-    const { address } = useAccount();
+    const { address, chain } = useAccount();
     const [loading, setLoading] = useState(true);
 
-    const contractAddress = PengoContract.address as Address;
     const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress as Address;
 
     // Read list of NFT token IDs owned by the user
     const { data: listOfAddress } = useReadContract({
@@ -26,6 +27,7 @@ export default function NftList() {
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
+        console.log(listOfAddress)
     }, [listOfAddress]);
 
     return (

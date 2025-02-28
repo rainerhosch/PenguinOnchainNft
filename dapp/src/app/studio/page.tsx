@@ -19,10 +19,12 @@ function StudioPage(): JSX.Element {
 
     const [hideOptionsNfts, setHideOptionsNfts] = useState(false);
     const [showNftList, setShowNftList] = useState(true);
-    const { address, status } = useAccount(); // Get the connected wallet address
+    const { address, status, chain } = useAccount(); // Get the connected wallet address
     // console.log(status)
     // console.log(address)
     const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress;
 
     const { data: balanceCount } = useReadContract({
         address: contractAddress as Address,

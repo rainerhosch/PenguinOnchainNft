@@ -66,7 +66,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [svgCode, setSvgCode] = useState<string>("");
     const [accessoryCode, setAccessoryCode] = useState<string>("");
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
-    const { address } = useAccount();
+    const { address , chain } = useAccount();
     const [loading, setLoading] = useState(true);
 
     const [selectedPengo, setSelectedPengo] = useState("");
@@ -74,9 +74,13 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [accName, setAccName] = useState("");
     // canvas config
     const [showOverlay, setShowOverlay] = useState(false);
-    const contractAddress = PengoContract.address as Address;
+
+
     const abi = PengoContract.abi;
-    const networkContract = PengoContract.networkDeployment[0];
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress as Address;
+
+
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
 
     // Read list of NFT token IDs owned by the user
@@ -105,7 +109,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     
     
     useEffect(() => {
-        // console.log(allowedAccesories)
+        console.log(listOfAddress)
         // console.log(allowedPixelPart)
         if (listOfAddress !== undefined) {
             setLoading(false);

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Address } from "viem";
-import { useReadContract } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
 import CardItem from "@/components/accessory-marketplace/CardItems";
 
@@ -17,11 +17,14 @@ interface Accessory {
 }
 
 export default function ListItems() {
+    const {chain} = useAccount();
     const [loading, setLoading] = useState(true);
     const [accessoryFS, setAccessoryFS] = useState<Accessory[]>([]);
 
 
     const abi = PengoContract.abi;
+    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const contractAddress = networkContract?.PengoAddress as Address;
 
     const { data: AccessoriesForSale } = useReadContract({
         address: contractAddress,
