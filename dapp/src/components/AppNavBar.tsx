@@ -60,8 +60,7 @@ export default function AppNavbar() {
                         </div>
                         
                         {/* Mobile Menu Button Fixed */}
-                        <div className={`sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center 
-                            ${mobileMenuOpen ? "z-9999" : " z-9999"}`}>
+                        <div className={`sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center `}>
                             <button
                                 onClick={toggleMobileMenu}
                                 role="button"
@@ -85,8 +84,8 @@ export default function AppNavbar() {
                         {/* Mobile Menu Fixed*/}
                         {mobileMenuOpen && (
                             <div
-                                className={`sm:hidden fixed top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
-                                    mobileMenuOpen ? "mobile-menu-animation  z-9999" : "mobile-menu-exit z-0"
+                                className={`sm:hidden top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl transition-all duration-300 ${
+                                    mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
                                 }`}
                             >
                                 <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
