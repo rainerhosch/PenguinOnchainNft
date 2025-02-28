@@ -169,7 +169,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 nfts.map((nft) => (
                     <div
                         key={nft.id}
-                        className="flex flex-col bg-white/10 p-8  rounded-2xl text-white hover:transform hover:scale-105 transition-all items-center"
+                        className="flex flex-col bg-white/10 p-2  rounded-2xl text-white hover:transform hover:scale-105 transition-all items-center"
                     >
                         <Image
                             className="bg-black/20 rounded-md"
@@ -180,12 +180,12 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                             quality={75}
                             priority={false} // {false} | {true}
                         />
-                        <h3 className="text-sm sm:text-xl font-mono my-4">{nft.name}</h3>
+                        <h3 className="text-purple-950 text-sm sm:text-lg font-mono my-1">{nft.name}</h3>
                         {listOfAccessories.length > 0 ? (
                             <button
                                 onClick={() => setShowModal(true)}
                                 className="text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 bg-purple-900 rounded-sm hover:bg-black/30 hover:text-white my-2">
-                                View Accessories
+                                View Trait
                             </button>
                         ) : (
                             <p className="text-[8px] sm:text-xs font-mono sm:font-light text-white/20 border border-white/60 py-1 px-2 rounded-sm bg-purple-950/50 my-2 disabled:">No accessories</p>

@@ -47,7 +47,7 @@ export default function AppNavbar() {
                             <div className="hidden sm:flex items-center space-x-8">
                                 <div className="relative group">
                                     <button className="text-white/80 hover:text-black transition-colors">
-                                        <a href="#" className="block px-4 py-2 text-white/80 hover:text-black/30">Marketplace</a>
+                                        <a href="/accessory-marketplace" className="block px-4 py-2 text-white/80 hover:text-black/30">Marketplace</a>
                                     </button>
                                     <button className="text-white/80 hover:text-black transition-colors">
                                         <a href="/studio" className="block px-4 py-2 text-white/80 hover:text-black/30">Studio</a>
@@ -96,7 +96,7 @@ export default function AppNavbar() {
                                                     <div className="relative group w-full h-40 bg-transfarent justify-items-start">
                                                         <div className="flex flex-col gap-2">
                                                             <button className="text-white/80 hover:text-black transition-colors text-white gap-1 text-sm rounded-md">
-                                                                <a href="#" className="block px-3 py-2 text-white/80 hover:text-black/30">
+                                                                <a href="/accessory-marketplace" className="block px-3 py-2 text-white/80 hover:text-black/30">
                                                                     <StorefrontOutlinedIcon /> Marketplace
                                                                 </a>
                                                             </button>

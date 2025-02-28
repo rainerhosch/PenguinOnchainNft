@@ -25,9 +25,9 @@ export default function Editor() {
                     <p className="mx-auto px-8">Draw Instructions:</p>
                     <div className="flex flex-col gap-0 mx-auto px-8">
                         <span className="font-light">Ctrl + Z <a className="text-xs">(Undo last pixel)</a></span> 
-                        <span className="font-light">Ctrl + Y <a className="text-xs">(Redo last pixel)</a></span> 
+                        <span className="font-light">Ctrl + X <a className="text-xs">(Redo last pixel)</a></span> 
                         <span className="font-light">Ctrl + Shift + Z <a className="text-xs">(Undo last color change)</a></span> 
-                        <span className="font-light">Ctrl + Shift + Y <a className="text-xs">(Redo last color change)</a></span>
+                        <span className="font-light">Ctrl + Shift + X <a className="text-xs">(Redo last color change)</a></span>
                     </div>
                 </div>
                 <div className="flex flex-col md:flex-row md:w-full">

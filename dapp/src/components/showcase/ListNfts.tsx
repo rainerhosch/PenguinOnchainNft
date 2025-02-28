@@ -29,7 +29,7 @@ export default function NftList() {
     }, [listOfAddress]);
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
             {!loading &&
                 (listOfAddress as number[])?.map((index, id) => (
                     <NftCard key={index} nftData={id} />

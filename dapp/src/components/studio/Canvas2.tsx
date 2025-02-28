@@ -129,7 +129,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         };
 
         const handleRedo = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.key === "y") {
+            if (e.ctrlKey && e.key === "x") {
                 e.preventDefault();
                 setRects((prev) => {
                     if (history.length === 0) return prev;
@@ -169,7 +169,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         };
 
         const handleRedoColor = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "y") {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x") {
                 e.preventDefault();
                 if (colorRedoStack.length === 0) return;
 

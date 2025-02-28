@@ -161,13 +161,136 @@
                     "type": "uint256"
                 },
                 {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
                     "indexed": false,
                     "internalType": "address",
                     "name": "buyer",
                     "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
                 }
             ],
-            "name": "AccessoryPurchased",
+            "name": "AccessoryOfferCancelled",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "name": "AccessoryOfferMade",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "accessoryOwner",
+                    "type": "address"
+                }
+            ],
+            "name": "AccessorySaleCancelled",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "accessoryType",
+                    "type": "string"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "seller",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "name": "AccessorySold",
             "type": "event"
         },
         {
@@ -463,6 +586,55 @@
             "inputs": [
                 {
                     "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "accessoriesForSale",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "trait_type",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "trait_name",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "bytePixel",
+                    "type": "string"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "sellingPrice",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "lastPrice",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "forSale",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
                     "name": "tokenId",
                     "type": "uint256"
                 },
@@ -527,6 +699,24 @@
         {
             "inputs": [
                 {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "approveOffer",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
                     "internalType": "address",
                     "name": "owner",
                     "type": "address"
@@ -541,6 +731,42 @@
                 }
             ],
             "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "tokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "cancelAccessorySale",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "cancelOffer",
+            "outputs": [],
+            "stateMutability": "nonpayable",
             "type": "function"
         },
         {
@@ -633,6 +859,56 @@
                     "internalType": "contract IPengoFactory",
                     "name": "",
                     "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getAllAccessoriesForSale",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "trait_type",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "bytePixel",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "sellingPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "lastPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "forSale",
+                            "type": "bool"
+                        }
+                    ],
+                    "internalType": "struct IPenguinOnchain.Accessory[]",
+                    "name": "",
+                    "type": "tuple[]"
                 }
             ],
             "stateMutability": "view",
@@ -884,6 +1160,29 @@
             "inputs": [
                 {
                     "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "makeOffer",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
                     "name": "_mintAmount",
                     "type": "uint256"
                 }
@@ -926,6 +1225,64 @@
                     "internalType": "string",
                     "name": "",
                     "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "offerBalances",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "offers",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "active",
+                    "type": "bool"
                 }
             ],
             "stateMutability": "view",
@@ -996,17 +1353,17 @@
             "inputs": [
                 {
                     "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
                     "name": "fromTokenId",
                     "type": "uint256"
                 },
                 {
                     "internalType": "uint256",
                     "name": "toTokenId",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "accessoryId",
                     "type": "uint256"
                 }
             ],
@@ -1261,6 +1618,19 @@
                     "internalType": "uint256[]",
                     "name": "",
                     "type": "uint256[]"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "totalOfferBalance",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
                 }
             ],
             "stateMutability": "view",
