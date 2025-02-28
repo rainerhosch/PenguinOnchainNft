@@ -24,6 +24,7 @@ export default function Editor() {
                 <div className="text-sm font-mono text-purple-950 my-2 sm:text-left text-center  bg-white/40 rounded-md hidden sm:block mx-2">
                     <p className="mx-auto px-8">Draw Instructions:</p>
                     <div className="flex flex-col gap-0 mx-auto px-8">
+                        <span className="font-light">Ctrl + S or Ctrl + S + S <a className="text-xs">(Show Allowed Draw Area)</a></span> 
                         <span className="font-light">Ctrl + Z <a className="text-xs">(Undo last pixel)</a></span> 
                         <span className="font-light">Ctrl + X <a className="text-xs">(Redo last pixel)</a></span> 
                         <span className="font-light">Ctrl + Shift + Z <a className="text-xs">(Undo last color change)</a></span> 

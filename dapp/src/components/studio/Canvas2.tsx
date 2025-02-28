@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/jsx-key */
 "use client";
 
 import React, {
@@ -56,7 +59,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [rects, setRects] = useState<{ x: number; y: number; color: string }[]>([]);
     const [history, setHistory] = useState<{ x: number; y: number; color: string }[][]>([]);
 
-    // Stack untuk menyimpan perubahan warna (undo/redo)
+    // Stack to store color changes (undo/redo)
     const [colorHistory, setColorHistory] = useState<{ x: number; y: number; prevColor: string; newColor: string }[]>([]);
     const [colorRedoStack, setColorRedoStack] = useState<{ x: number; y: number; prevColor: string; newColor: string }[]>([]);
 
@@ -69,7 +72,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [selectedPengo, setSelectedPengo] = useState("");
     const [selectedAcc, setSelectedAccessory] = useState("");
     const [accName, setAccName] = useState("");
-
+    // canvas config
+    const [showOverlay, setShowOverlay] = useState(false);
     const contractAddress = PengoContract.address as Address;
     const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment[0];
@@ -91,8 +95,18 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     });
     const allowedAccesories: string[] = (allowedPart as string[]) || [];
 
-
+    const { data: pixelPart } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: "getPixelPart",
+        args: [selectedAcc],
+    });
+    const allowedPixelPart: string[] = (pixelPart as string[]) || [];
+    
+    
     useEffect(() => {
+        console.log(allowedAccesories)
+        console.log(allowedPixelPart)
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
@@ -207,31 +221,100 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         handleCanvasClick(e);
     };
 
+    useEffect(() => {
+        const handleKeyViewOverlay = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === "s") {
+                e.preventDefault(); // Hindari save file default di browser
+                setShowOverlay((prev) => !prev); // Toggle overlay
+            }
+        };
+    
+        window.addEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
+        return () => window.removeEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
+    }, []);
+
+
+    useEffect(() => {
+        if (!canvasRef.current) return;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+    
+        // Clear the canvas before drawing the overlay
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawCanvas()
+    
+        if (showOverlay && Array.isArray(allowedPixelPart) &&
+            allowedPixelPart.length === 2 &&
+            Array.isArray(allowedPixelPart[0]) &&
+            Array.isArray(allowedPixelPart[1])
+        ) {
+            const xCoords = allowedPixelPart[0].map((val) => Number(val)); 
+            const yCoords = allowedPixelPart[1].map((val) => Number(val));
+    
+            ctx.fillStyle = "rgba(0, 255, 0, 0.3)"; // transnparent color
+    
+            for (let i = 0; i < xCoords.length; i++) {
+                const x = xCoords[i] * PIXEL_SIZE;
+                const y = yCoords[i] * PIXEL_SIZE;
+    
+                // Draw shadow area only if the overlay is activated
+                ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+    }, [showOverlay, allowedPixelPart]);
+    
+
     const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current) return;
+        
 
         const rect = canvasRef.current.getBoundingClientRect();
         const scaleX = canvasRef.current.width / rect.width;
         const scaleY = canvasRef.current.height / rect.height;
         const x = Math.floor((e.clientX - rect.left) * scaleX / PIXEL_SIZE);
         const y = Math.floor((e.clientY - rect.top) * scaleY / PIXEL_SIZE);
+    
+    
+        // **Ensure that allowedPixelPart has the correct data structure**
+        const allowedCoords = new Set<string>();
 
-        // Cari apakah pixel sudah ada
+        if (
+            Array.isArray(allowedPixelPart) && 
+            allowedPixelPart.length === 2 &&
+            Array.isArray(allowedPixelPart[0]) &&
+            Array.isArray(allowedPixelPart[1])
+        ) {
+            const xCoords = allowedPixelPart[0].map((val) => BigInt(val));
+            const yCoords = allowedPixelPart[1].map((val) => BigInt(val));
+
+            for (let i = 0; i < xCoords.length; i++) {
+                allowedCoords.add(`${xCoords[i].toString()},${yCoords[i].toString()}`);
+            }
+        }
+
+        // Check if the coordinates are allowed
+        if (!allowedCoords.has(`${x},${y}`)) {
+            toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 0, 0.5)', color: '#fff', fontFamily: 'monospace' } });
+            return;
+        }
+
+        // Check if the pixel already exists
         const existingRectIndex = rects.findIndex((r) => r.x === x && r.y === y);
         if (existingRectIndex !== -1) {
-            // Simpan perubahan warna ke dalam history
+            // Save color changes to history
             const prevColor = rects[existingRectIndex].color;
             if (prevColor !== selectedColor) {
                 setColorHistory([...colorHistory, { x, y, prevColor, newColor: selectedColor }]);
-                setColorRedoStack([]); // Reset redo stack karena ada perubahan baru
+                setColorRedoStack([]); // Reset redo stack due to new changes
             }
 
-            // Update warna pixel
+            // Update color pixel
             const updatedRects = [...rects];
             updatedRects[existingRectIndex].color = selectedColor;
             setRects(updatedRects);
         } else {
-            // Tambahkan pixel baru
+            // Add new pixel
             setRects([...rects, { x, y, color: selectedColor }]);
         }
     };
@@ -435,10 +518,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         if (svgToBytecode(accessoryCode) == "") {
             toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can't be null</p>)
         }
-        console.log(selectedPengo)
-        console.log(selectedAcc)
-        console.log(svgToBytecode(accessoryCode))
-        console.log(accName)
 
         writeContract({
             address: contractAddress as Address,
@@ -455,7 +534,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     return (
         <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
-            <Toaster position="bottom-right" reverseOrder={true} />
+            <Toaster position="top-right" reverseOrder={true} />
             <div className="relative w-fit h-fit mx-auto my-4">
                 <canvas
                     ref={canvasRef}
@@ -485,7 +564,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                             />
                             <select
                                 className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
-                                onChange={(e) => setSelectedPengo(e.target.value)} // Store selected Pengo
+                                onChange={(e) => setSelectedPengo(e.target.value)}
                             >
                                 {!loading && listOfAddress.map((tokenId, index) => (
                                     <option key={index} value={`${tokenId}`}>Pengo #{tokenId}</option>
@@ -494,7 +573,10 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
                             <select
                                 className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
-                                onChange={(e) => setSelectedAccessory(e.target.value)} // Store selected Accessory
+                                onChange={(e) => {
+                                    setSelectedAccessory(e.target.value);
+                                    handleReset();
+                                }} // Store selected Accessory
                             >
                                 {allowedAccesories.map((accessory, index) => (
                                     <option key={index} value={accessory}>
