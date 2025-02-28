@@ -21,7 +21,6 @@ export default function ListItems() {
     const [accessoryFS, setAccessoryFS] = useState<Accessory[]>([]);
 
 
-    const contractAddress = PengoContract.address as Address;
     const abi = PengoContract.abi;
 
     const { data: AccessoriesForSale } = useReadContract({

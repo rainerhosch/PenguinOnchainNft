@@ -15,14 +15,11 @@ import toast, { Toaster } from 'react-hot-toast';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
 
-
 export default function PengosMintComponent() {
     const { address , status} = useAccount();
     console.log(status)
     const contractAddress = PengoContract.address;
-    const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment[0];
-    const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
 
     // State for contract data
     const [totalMint, setTotalMint] = React.useState(1);

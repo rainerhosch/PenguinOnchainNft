@@ -22,7 +22,6 @@ function StudioPage(): JSX.Element {
     const { address, status } = useAccount(); // Get the connected wallet address
     // console.log(status)
     // console.log(address)
-    const contractAddress = PengoContract.address;
     const abi = PengoContract.abi;
 
     const { data: balanceCount } = useReadContract({

@@ -52,8 +52,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const [accessoryName, setAccessoryName] = useState("");
     const [isHovered, setIsHovered] = useState(false);
 
-    const contractAddress = PengoContract.address as Address;
-    const networkContract = PengoContract.networkDeployment[0];
     const abi = PengoContract.abi;
 
     // Read tokenURIs for each tokenId
