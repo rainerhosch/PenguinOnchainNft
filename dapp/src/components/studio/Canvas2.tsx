@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/jsx-key */
 "use client";
 
 import React, {
