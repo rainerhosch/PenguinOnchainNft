@@ -13,6 +13,7 @@ export default function AppNavbar() {
     useEffect(() => {
         setAccount({ address, status });
     }, [address, status]); 
+
     return (
         <>
             {mobileMenuOpen && (
@@ -55,8 +56,7 @@ export default function AppNavbar() {
                         {/* Mobile Menu Button */}
                         <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
                             <button
-                                onTouchStart={(e) => {
-                                    e.preventDefault();
+                                onClick={() => {
                                     setMobileMenuOpen(!mobileMenuOpen)
                                 }}
                                 role="button"
