@@ -405,8 +405,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     return (
         <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
-            {/* <h2 className="text-lg font-bold mb-2">SVG Pixel Editor</h2> */}
-
             <Toaster position="bottom-right" reverseOrder={true} />
             <div className="relative w-fit h-fit mx-auto my-4">
                 <canvas
