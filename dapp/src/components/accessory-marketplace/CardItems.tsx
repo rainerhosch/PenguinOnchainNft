@@ -28,7 +28,6 @@ const parseBytePixel = (bytePixel: string) => {
         pixels.push({ x, y, w, h, color });
     }
 
-    console.log(pixels);
     return pixels;
 };
 export default function CardItem({ accessoryData }: CardItemProps) {
