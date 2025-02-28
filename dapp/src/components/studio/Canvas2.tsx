@@ -105,8 +105,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     
     
     useEffect(() => {
-        console.log(allowedAccesories)
-        console.log(allowedPixelPart)
+        // console.log(allowedAccesories)
+        // console.log(allowedPixelPart)
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
