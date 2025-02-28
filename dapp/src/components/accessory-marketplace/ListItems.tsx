@@ -37,8 +37,6 @@ export default function ListItems() {
         }
     }, [AccessoriesForSale]);
 
-    console.log(accessoryFS);
-
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
             {!loading &&
