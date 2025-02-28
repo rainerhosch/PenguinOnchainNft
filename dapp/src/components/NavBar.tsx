@@ -10,10 +10,10 @@ export default function Navbar() {
         <>
             {/* Overlay when mobile menu is open */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setMobileMenuOpen(false)} />
             )}
 
-            <nav className="fixed top-2 left-2 right-2 z-50 sm:bg-black/50 bg-black/60 backdrop-blur-md border-b border-white/10 rounded-full">
+            <nav className="fixed top-2 left-2 right-2 z-50 sm:bg-black/70 bg-black/80 border-b border-white/10 rounded-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-14">
                         <div className="flex items-center gap-4">
@@ -76,7 +76,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Mobile Menu Button */}
-                        <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-white/10 rounded-full justify-center">
+                        {/* <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-white/10 rounded-full justify-center">
                             <button
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                                 className="text-white/50 transition-colors px-6 py-1"
@@ -94,11 +94,36 @@ export default function Navbar() {
                                     )}
                                 </svg>
                             </button>
+                        </div> */}
+                        
+                        {/* Mobile Menu Button Fixed */}
+                        <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-black/10 rounded-full justify-center">
+                            <button
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                role="button"
+                                className="text-black/50 transition-colors px-6 py-1"
+                            >
+                                <svg
+                                    className={`h-6 w-6 burger-icon ${mobileMenuOpen ? "open" : ""}`}
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    {mobileMenuOpen ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    )}
+                                </svg>
+                            </button>
                         </div>
 
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
-                            <div className="sm:hidden absolute mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50">
+                            <div className={`sm:hidden fixed top-20 left-4 right-4 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
+                                mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
+                            }`}>
+                            {/* <div className="sm:hidden absolute mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50"> */}
                                 <div className="px-2 pt-2 pb-3 space-y-1">
                                     <div className="block px-3 py-2">
                                         <button className="text-white/80 transition-colors w-full text-left flex items-center justify-between cursor-default">
