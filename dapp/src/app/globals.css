@@ -66,6 +66,11 @@ body {
 .mobile-menu-animation {
   @apply transition-all duration-300;
   animation: menuAppear 0.3s ease-out;
+  position: fixed;
+}
+
+.mobile-menu-exit {
+  animation: menuExit 0.3s ease-in forwards;
 }
 
 @keyframes menuAppear {

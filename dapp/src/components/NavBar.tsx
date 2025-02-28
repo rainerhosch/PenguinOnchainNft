@@ -16,7 +16,7 @@ export default function Navbar() {
         <>
             {/* Overlay when mobile menu is open */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setMobileMenuOpen(false)} />
             )}
 
             <nav className="fixed top-2 left-2 right-2 z-50 sm:bg-black/70 bg-black/80 border-b border-white/10 rounded-full">
@@ -101,7 +101,7 @@ export default function Navbar() {
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
                             <div className={`sm:hidden fixed top-20 left-4 right-4 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
-                                mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
+                                mobileMenuOpen ? "mobile-menu-animation z-9999" : "mobile-menu-exit"
                             }`}>
                                 <div className="px-2 pt-2 pb-3 space-y-1">
                                     <div className="block px-3 py-2">

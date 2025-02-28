@@ -23,7 +23,7 @@ export default function AppNavbar() {
     return (
         <>
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setMobileMenuOpen(false)} />
             )}
             <nav className="fixed left-2 right-2 z-50 sm:bg-[#563988] bg-[#563988] border-b border-white/10 rounded-b-2xl sm:top-2 sm:rounded-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,7 +60,8 @@ export default function AppNavbar() {
                         </div>
                         
                         {/* Mobile Menu Button Fixed */}
-                        <div className="sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center">
+                        <div className={`sm:hidden button-press-3d bg-black/80 border-b border-white/10 rounded-full justify-center 
+                            ${mobileMenuOpen ? "z-9999" : "z-0"}`}>
                             <button
                                 onClick={toggleMobileMenu}
                                 role="button"
@@ -85,7 +86,7 @@ export default function AppNavbar() {
                         {mobileMenuOpen && (
                             <div
                                 className={`sm:hidden fixed top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
-                                    mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
+                                    mobileMenuOpen ? "mobile-menu-animation z-9999" : "mobile-menu-exit z-0"
                                 }`}
                             >
                                 <div className="px-2 pt-2 pb-3 space-y-1 text-sm">
