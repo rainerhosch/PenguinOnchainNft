@@ -7,7 +7,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 export default function AppNavbar() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
     const { address, status } = useAccount();
     const [account, setAccount] = useState<{ address: string | undefined; status: string }>({ address: undefined, status: "disconnected" });
     useEffect(() => {
