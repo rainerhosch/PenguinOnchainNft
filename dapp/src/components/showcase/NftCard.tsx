@@ -211,14 +211,14 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                                                     onMouseEnter={() => setIsHovered(true)}
                                                     onMouseLeave={() => setIsHovered(false)}
                                                     key={index} className={`flex flex-col bg-white/20 p-1 rounded-md ${accessory.forSale ? 'hover:bg-red-500' : 'hover:bg-blue-500'} text-center`}>
-                                                    <span className="text-xs font-mono">
-                                                        <span key={index} className="flex flex-col items-center">
+                                                    <div className="">
+                                                        <div key={index} className="text-xs font-mono flex flex-col items-center">
                                                             {isHovered
                                                                 ? !accessory.forSale ? `Sell ${accessory.trait_type}?` : `Listed!`
-                                                                : `${accessory.trait_type} : ${accessory.trait_name}`
+                                                                : `${accessory.trait_name}`
                                                             }
-                                                        </span>
-                                                    </span>
+                                                        </div>
+                                                    </div>
                                                 </button>
                                             ))
                                         }

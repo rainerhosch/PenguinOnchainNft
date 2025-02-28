@@ -58,6 +58,11 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [rects, setRects] = useState<{ x: number; y: number; color: string }[]>([]);
     const [history, setHistory] = useState<{ x: number; y: number; color: string }[][]>([]);
+
+    // Stack untuk menyimpan perubahan warna (undo/redo)
+    const [colorHistory, setColorHistory] = useState<{ x: number; y: number; prevColor: string; newColor: string }[]>([]);
+    const [colorRedoStack, setColorRedoStack] = useState<{ x: number; y: number; prevColor: string; newColor: string }[]>([]);
+
     const [svgCode, setSvgCode] = useState<string>("");
     const [accessoryCode, setAccessoryCode] = useState<string>("");
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -89,13 +94,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     });
     const allowedAccesories: string[] = (allowedPart as string[]) || [];
 
-    // const { data: tokenURI } = useReadContract({
-    //     address: contractAddress,
-    //     abi,
-    //     functionName: "tokenURI",
-    //     args: [1],
-    // }) || "";
-    // console.log(tokenURI)
 
     useEffect(() => {
         if (listOfAddress !== undefined) {
@@ -150,6 +148,56 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         };
     }, [history]);
 
+    useEffect(() => {
+        const handleUndoColor = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z") {
+                e.preventDefault();
+                if (colorHistory.length === 0) return;
+
+                const lastChange = colorHistory[colorHistory.length - 1];
+                setColorHistory(colorHistory.slice(0, -1));
+                setColorRedoStack([...colorRedoStack, lastChange]);
+
+                setRects((prevRects) =>
+                    prevRects.map((r) =>
+                        r.x === lastChange.x && r.y === lastChange.y
+                            ? { ...r, color: lastChange.prevColor }
+                            : r
+                    )
+                );
+            }
+        };
+
+        const handleRedoColor = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "y") {
+                e.preventDefault();
+                if (colorRedoStack.length === 0) return;
+
+                const lastRedo = colorRedoStack[colorRedoStack.length - 1];
+                setColorRedoStack(colorRedoStack.slice(0, -1));
+                setColorHistory([...colorHistory, lastRedo]);
+
+                setRects((prevRects) =>
+                    prevRects.map((r) =>
+                        r.x === lastRedo.x && r.y === lastRedo.y
+                            ? { ...r, color: lastRedo.newColor }
+                            : r
+                    )
+                );
+            }
+        };
+
+        document.addEventListener("keydown", handleUndoColor as unknown as EventListener);
+        document.addEventListener("keydown", handleRedoColor as unknown as EventListener);
+        return () => {
+            document.removeEventListener("keydown", handleUndoColor as unknown as EventListener);
+            document.removeEventListener("keydown", handleRedoColor as unknown as EventListener);
+        };
+    }, [colorHistory, colorRedoStack]);
+    console.log(colorHistory)
+    console.log(colorRedoStack)
+
+
     const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
         setIsDrawing(true);
         handleCanvasClick(e);
@@ -173,15 +221,22 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         const x = Math.floor((e.clientX - rect.left) * scaleX / PIXEL_SIZE);
         const y = Math.floor((e.clientY - rect.top) * scaleY / PIXEL_SIZE);
 
-        // Check if the pixel already exists and update its color
+        // Cari apakah pixel sudah ada
         const existingRectIndex = rects.findIndex((r) => r.x === x && r.y === y);
         if (existingRectIndex !== -1) {
-            // Update the color of the existing rectangle
+            // Simpan perubahan warna ke dalam history
+            const prevColor = rects[existingRectIndex].color;
+            if (prevColor !== selectedColor) {
+                setColorHistory([...colorHistory, { x, y, prevColor, newColor: selectedColor }]);
+                setColorRedoStack([]); // Reset redo stack karena ada perubahan baru
+            }
+
+            // Update warna pixel
             const updatedRects = [...rects];
             updatedRects[existingRectIndex].color = selectedColor;
             setRects(updatedRects);
         } else {
-            // Add a new rectangle
+            // Tambahkan pixel baru
             setRects([...rects, { x, y, color: selectedColor }]);
         }
     };
@@ -426,6 +481,13 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                     <div dangerouslySetInnerHTML={{ __html: svgCode }} />
                     <form onSubmit={handleMintAcc} className="flex flex-col gap-2 justify-center">
                         <div className="flex flex-col gap-2 items-center my-4">
+                            <input
+                                type="text"
+                                placeholder="Enter accessory name"
+                                className="text-xs border font-mono bg-black/60 text-white border-purple-500 p-1 rounded w-40"
+                                required
+                                onChange={(e) => setAccName(e.target.value)}
+                            />
                             <select
                                 className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
                                 onChange={(e) => setSelectedPengo(e.target.value)} // Store selected Pengo
@@ -447,22 +509,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                             </select>
                         </div>
                         <div className="flex flex-col gap-2 items-center">
-                            <input
-                                type="text"
-                                placeholder="Enter accessory name"
-                                className="text-xs border font-mono bg-black/60 text-white border-purple-500 p-1 rounded w-40"
-                                required
-                                onChange={(e) => setAccName(e.target.value)}
-                            />
-                            {/* <textarea
-                                className="w-full h-40 border p-2 mt-2 text-black text-xs font-mono"
-                                readOnly
-                                onChange={(e) => setAccByte(svgToBytecode(accessoryCode))}
-                                hidden
-                                value={svgToBytecode(accessoryCode)}
-                                required
-                            /> */}
-                            <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button>
+                            {/* <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button> */}
                             <button
                                 type="submit"
                                 className='text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40'

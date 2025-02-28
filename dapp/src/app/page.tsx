@@ -23,10 +23,8 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="pt-24 pb-24 sm:pb-8 px-4 sm:px-8">
-        {/* Hero Section with Stacked Image Slideshow */}
         <div className="relative h-[70vh] mb-16">
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* Stacked Images with Animation */}
             <div className="relative w-full max-w-4xl h-full">
               <div className="absolute inset-0 animate-slide-up-fade animation-delay-200">
                 <Image
@@ -65,28 +63,27 @@ export default function Home() {
           </div>
 
           {/* Hero Text Overlay */}
-          {/* Hero Text Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-white/20 sm:bg-white/50 backdrop-blur-sm rounded-3xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50 sm:bg-white/50 backdrop-blur-sm rounded-3xl">
             <div className="text-center">
-              <h3 className="text-2xl sm:text-6xl font-bold text-black px-12">
+              <h3 className="text-2xl sm:text-6xl font-bold sm:font-mono text-black/60 px-12">
                 The First
               </h3>
-              <h1 className="text-md sm:text-5xl font-bold text-black px-12 sm:py-3">
+              <h1 className="text-md sm:text-5xl font-bold sm:font-mono text-black/60 px-12 sm:py-3">
                 Fully Customizable On-Chain NFT
               </h1>
-              <h4 className="text-md sm:text-5xl font-bold text-black mb-12 px-12">
+              <h4 className="text-md sm:text-5xl font-bold sm:font-mono text-black/60 mb-12 px-12">
                 For Unique Digital Creations
               </h4>
-              <p className="text-sm sm:font-normal font-light sm:text-xl text-black/80 mb-8 max-w-2xl sm:mx-auto mx-2">
+              <p className="text-sm sm:font-normal font-normal sm:font-mono sm:text-xl text-black/80 mb-8 max-w-2xl sm:mx-auto mx-2">
                 Introducing Pengo, the first on-chain customizable NFT that allows users to create and modify their digital Penguin avatars. Draw, customize, and trade unique assets directly on the blockchain for a truly personalized NFT experience.
               </p>
               <div className="flex gap-4 justify-center">
-                <a href="/studio" target="_blank" className="text-sm sm:text-md px-8 py-3 bg-[#c9ff33] text-black font-bold rounded-full hover:bg-[#b3e52d] transition-all button-press-3d inline-block">
+                <a href="/studio" target="_blank" className="text-sm sm:text-md px-8 py-3 sm:font-mono text-white bg-[#8234ff] font-bold rounded-full hover:bg-[#5a30a1] transition-all button-press-3d inline-block">
                   {/* Explore */}
                   Studio
                 </a>
-                <button className="text-sm sm:text-md px-8 py-3 bg-black/70 text-white font-bold rounded-full hover:bg-black/50 transition-colors backdrop-blur-sm">
-                  Accessory Market
+                <button className="text-sm sm:text-md px-8 py-3 bg-black/70 text-white sm:font-mono font-bold rounded-full hover:bg-black/50 transition-colors backdrop-blur-sm">
+                  Accessory Marketplace
                 </button>
               </div>
             </div>
@@ -97,17 +94,17 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl text-white hover:transform hover:scale-105 transition-all">
             <h3 className="text-2xl font-bold mb-4">On-Chain Customization</h3>
-            <p className="text-white/80">Draw and add accessories to your Pengo NFT directly through our blockchain-integrated canvas.</p>
+            <p className="text-white/80 font-normal sm:font-light">Draw and add accessories to your Pengo NFT directly through our blockchain-integrated canvas.</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl text-white hover:transform hover:scale-105 transition-all">
             <h3 className="text-2xl font-bold mb-4">Dynamic NFT Assets</h3>
-            <p className="text-white/80">Modify and upgrade your NFT over time with new traits, making each Pengo uniquely yours.</p>
+            <p className="text-white/80 font-normal sm:font-light">Modify and upgrade your NFT over time with new traits, making each Pengo uniquely yours.</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl text-white hover:transform hover:scale-105 transition-all">
             <h3 className="text-2xl font-bold mb-4">Asset Marketplace</h3>
-            <p className="text-white/80">Buy, sell, and trade custom assets with other users, all securely recorded on-chain.</p>
+            <p className="text-white/80 font-normal sm:font-light">Buy, sell, and trade custom assets with other users, all securely recorded on-chain.</p>
           </div>
         </div>
       </main>

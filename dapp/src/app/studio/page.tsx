@@ -97,17 +97,17 @@ function StudioPage(): JSX.Element {
                                             </>}
                                     </div>
                                 </div>
+                                {hideOptions &&
+                                    <div className="flex justify-center md:mx-auto">
+                                        <Editor />
+                                    </div>
+                                }
 
                                 {/* List Ntfs */}
                                 {showNftList &&
                                     <NftList />
                                 }
 
-                                {hideOptions &&
-                                    <div className="flex justify-center md:mx-auto">
-                                        <Editor />
-                                    </div>
-                                }
                             </div>
 
                         )}
