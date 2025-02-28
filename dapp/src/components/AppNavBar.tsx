@@ -1,15 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect  } from "react";
 import BrushOutlinedIcon from '@mui/icons-material/BrushOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 export default function AppNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { address, status } = useAccount();
+    const [account, setAccount] = useState<{ address: string | undefined; status: string }>({ address: undefined, status: "disconnected" });
+    useEffect(() => {
+        setAccount({ address, status });
+    }, [address, status]); 
     return (
         <>
-            {/* Overlay when mobile menu is open */}
             {mobileMenuOpen && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setMobileMenuOpen(false)} />
             )}
@@ -90,7 +95,7 @@ export default function AppNavbar() {
                                                         <div className="mx-2 py-4">
                                                             <div className="pl-4 space-y-1 mt-2 border-l-2 border-[#c9ff33]/20">
                                                                 <a className="text-white/70 transition-colors w-full font-mono text-left flex items-center justify-between cursor-default">Connected Wallet</a>
-                                                                <a className="text-white/70 text-xs font-light font-mono transition-colors w-full text-left flex items-center justify-between cursor-default">{`${address?.slice(0, 4)}...${address?.slice(-10)}`}</a>
+                                                                <a className="text-white/70 text-xs font-light font-mono transition-colors w-full text-left flex items-center justify-between cursor-default">{`${account.address ? `${account.address.slice(0, 4)}...${account.address.slice(-10)}` : "Not Connected"}`}</a>
                                                             </div>
                                                             {/* <button
                                                                 className="mt-2 font-mono rounded border border-solid border-white/20 transition-colors flex items-center justify-center bg-white/10 text-white gap-1 hover:bg-white/20 text-xs h-8 px-4"
