@@ -6,6 +6,12 @@ import { useState } from "react";
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const toggleMobileMenu = () => {
+        console.log("Before toggle:", mobileMenuOpen);
+        setMobileMenuOpen((prev) => !prev);
+        console.log("After toggle:", !mobileMenuOpen);
+    };
     return (
         <>
             {/* Overlay when mobile menu is open */}
@@ -69,11 +75,11 @@ export default function Navbar() {
                                 </button>
                             </div>
                         </div>
-
+                        
                         {/* Mobile Menu Button Fixed */}
                         <div className="sm:hidden button-press-3d bg-[#9252ff] border-b border-black/10 rounded-full justify-center">
                             <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                onClick={toggleMobileMenu}
                                 role="button"
                                 className="text-black/50 transition-colors px-6 py-1"
                             >
@@ -97,7 +103,6 @@ export default function Navbar() {
                             <div className={`sm:hidden fixed top-20 left-4 right-4 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50 transition-all duration-300 ${
                                 mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
                             }`}>
-                            {/* <div className="sm:hidden absolute mobile-menu-animation top-16 left-2 right-2 bg-[#9252ff] border-b border-white/10 rounded-2xl z-50"> */}
                                 <div className="px-2 pt-2 pb-3 space-y-1">
                                     <div className="block px-3 py-2">
                                         <button className="text-white/80 transition-colors w-full text-left flex items-center justify-between cursor-default">

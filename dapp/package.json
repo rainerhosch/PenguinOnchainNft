@@ -20,6 +20,7 @@
     "encoding": "^0.1.13",
     "ethers": "^6.13.5",
     "fs": "^0.0.1-security",
+    "ios-webkit-debug-proxy": "^0.0.3",
     "next": "^15.2.0-canary.45",
     "pino-pretty": "^11.2.2",
     "react": "^18",
