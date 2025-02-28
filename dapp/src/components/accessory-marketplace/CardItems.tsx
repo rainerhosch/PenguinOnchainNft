@@ -36,9 +36,8 @@ export default function CardItem({ accessoryData }: CardItemProps) {
     return (
         <div className="border p-4 rounded-lg shadow-lg flex flex-col items-center">
             <h2 className="text-lg font-bold">{accessoryData.trait_name}</h2>
-            <p className="text-sm text-gray-600">{accessoryData.trait_type}</p>
+            <p className="text-sm text-white/60">{accessoryData.trait_type}</p>
 
-            {/* SVG untuk menampilkan pixel dalam bentuk rectangle */}
             <svg shapeRendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 {pixels.map((pixel, index) => (
                     <rect
@@ -52,7 +51,7 @@ export default function CardItem({ accessoryData }: CardItemProps) {
                 ))}
             </svg>
 
-            <p className="text-purple-950 font-mono">
+            <p className="text-purple-950 font-mono text-sm">
                 Price: {Number(accessoryData.sellingPrice) / 1e18} ETH
             </p>
             <button className="text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 bg-blue-500 rounded-sm hover:bg-black/30 hover:text-white my-2">
