@@ -105,7 +105,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     useEffect(() => {
         if (listOfAddress.length > 0) {
-            setSelectedPengo(`${listOfAddress[0]}`); 
+            setSelectedPengo(`${listOfAddress[0]}`);
         }
         if (allowedAccesories.length > 0) {
             setSelectedAccessory(allowedAccesories[0]);
@@ -225,175 +225,111 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         const templateSVG = `<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" fill="none"/>
             <!-- Pinguin Pixel Art -->
-                <rect x="14" y="10" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="10" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="10" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="10" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="13" y="11" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="11" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="11" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="11" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="11" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="11" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="13" y="12" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="12" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="12" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="12" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="12" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="12" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="13" y="13" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="13" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="13" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="13" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="13" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="13" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="12" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="14" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="14" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="11" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="12" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="15" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="20" y="15" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="10" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="11" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="12" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="20" y="16" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="21" y="16" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="10" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="11" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="12" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="20" y="17" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="21" y="17" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="11" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="12" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="18" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="20" y="18" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="11" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="12" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="19" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="20" y="19" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="12" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="20" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="20" width="1" height="1" fill="#4b4c4f"/>
-
-                <rect x="12" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="13" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="14" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="15" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="16" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="17" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="18" y="21" width="1" height="1" fill="#4b4c4f"/>
-                <rect x="19" y="21" width="1" height="1" fill="#4b4c4f"/>
-
-                <!-- Front Skin -->
-                <rect x="14" y="15" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="15" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="15" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="15" width="1" height="1" fill="#FFFFFF"/>
-
-                <rect x="13" y="16" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="14" y="16" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="16" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="16" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="16" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="18" y="16" width="1" height="1" fill="#FFFFFF"/>
-
-                <rect x="12" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="13" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="14" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="18" y="17" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="19" y="17" width="1" height="1" fill="#FFFFFF"/>
-
-                <rect x="12" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="13" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="14" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="18" y="18" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="19" y="18" width="1" height="1" fill="#FFFFFF"/>
-
-                <rect x="13" y="19" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="14" y="19" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="19" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="19" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="19" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="18" y="19" width="1" height="1" fill="#FFFFFF"/>
-
-                <rect x="14" y="20" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="15" y="20" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="16" y="20" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="20" width="1" height="1" fill="#FFFFFF"/>
-
-                <!-- Eye -->
-                <rect x="14" y="12" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="14" y="13" width="1" height="1" fill="#000"/>
-                <rect x="17" y="12" width="1" height="1" fill="#FFFFFF"/>
-                <rect x="17" y="13" width="1" height="1" fill="#000"/>
-
-                <!-- peck -->
-                <rect x="15.5" y="13" width="1" height="1" fill="#FFA500"/>
-
-                <!-- Feet -->
-                <rect x="13" y="22" width="1" height="1" fill="#FFA500"/>
-                <rect x="14" y="22" width="1" height="1" fill="#FFA500"/>
-                <rect x="17" y="22" width="1" height="1" fill="#FFA500"/>
-                <rect x="18" y="22" width="1" height="1" fill="#FFA500"/>
+                <rect width="100%" height="100%" fill="#7556a8"/>
+                <rect x='13' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='14' y='10' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='15' y='10' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='16' y='10' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='17' y='10' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='14' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='15' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='16' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='17' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='11' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='12' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='13' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='14' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='15' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='16' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='17' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='13' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='12' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='15' y='12' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='16' y='12' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='11' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='10' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='14' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='20' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='11' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='20' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='10' y='17' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='11' y='17' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='11' y='18' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='11' y='19' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='19' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='20' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='20' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='14' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='15' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='16' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='17' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='21' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='20' y='17' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='20' y='18' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='20' y='19' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='19' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='20' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='21' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='21' y='17' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='20' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='13' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='12' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='18' y='15' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='19' y='16' width='1' height='1' fill='#4B4C4F'/>
+                <rect x='14' y='15' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='15' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='15' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='15' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='13' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='12' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='12' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='13' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='20' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='20' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='20' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='20' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='18' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='19' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='19' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='18' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='16' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='13' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='13' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='18' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='18' y='17' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='16' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='18' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='19' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='15' y='13' width='1' height='1' fill='#F5A623'/>
+                <rect x='16' y='13' width='1' height='1' fill='#F5A623'/>
+                <rect x='14' y='12' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='17' y='12' width='1' height='1' fill='#FFFFFF'/>
+                <rect x='14' y='13' width='1' height='1' fill='#000000'/>
+                <rect x='17' y='13' width='1' height='1' fill='#000000'/>
+                <rect x='13' y='22' width='1' height='1' fill='#F5A623'/>
+                <rect x='14' y='22' width='1' height='1' fill='#F5A623'/>
+                <rect x='17' y='22' width='1' height='1' fill='#F5A623'/>
+                <rect x='18' y='22' width='1' height='1' fill='#F5A623'/>
                 \n${svgRects}\n
             </svg>`;
         setSvgCode(templateSVG);
@@ -401,17 +337,17 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     };
 
     // Hook minting transaction
-    const { data: hash, error,writeContract } = useWriteContract();
+    const { data: hash, error, writeContract } = useWriteContract();
     const { isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
-    
+        useWaitForTransactionReceipt({ hash });
+
     React.useEffect(() => {
         if (error) {
             toast.error(<p className="text-sm font-mono text-red-900">Error: {(error as BaseError).shortMessage || error.message}</p>)
         }
     }, [error]);
 
-    
+
     React.useEffect(() => {
         if (isConfirmed) {
             if (loadingToast) {
@@ -443,10 +379,10 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if(accName == ""){
+        if (accName == "") {
             toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can't be null</p>)
         }
-        if(svgToBytecode(accessoryCode) == ""){
+        if (svgToBytecode(accessoryCode) == "") {
             toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can't be null</p>)
         }
         console.log(selectedPengo)
@@ -470,7 +406,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     return (
         <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
             {/* <h2 className="text-lg font-bold mb-2">SVG Pixel Editor</h2> */}
-            
+
             <Toaster position="bottom-right" reverseOrder={true} />
             <div className="relative w-fit h-fit mx-auto my-4">
                 <canvas
