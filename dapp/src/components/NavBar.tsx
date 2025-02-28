@@ -101,7 +101,7 @@ export default function Navbar() {
                         {/* Mobile Menu */}
                         {mobileMenuOpen && (
                             <div className={`sm:hidden top-20 left-4 right-4 bg-[#9252ff] border-b border-white/10 rounded-2xl transition-all duration-300 ${
-                                mobileMenuOpen ? "mobile-menu-animation z-9999" : "mobile-menu-exit z-0"
+                                mobileMenuOpen ? "mobile-menu-animation" : "mobile-menu-exit"
                             }`}>
                                 <div className="px-2 pt-2 pb-3 space-y-1">
                                     <div className="block px-3 py-2">
