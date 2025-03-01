@@ -43,10 +43,10 @@ const connectors = connectorsForWallets(
 );
 export const config = createConfig({
   connectors,
-  chains: [sepolia, monadTestnet],
+  chains: [monadTestnet, sepolia],
   transports: {
-    [sepolia.id]: http(),
     [monadTestnet.id]: http(),
+    [sepolia.id]: http(),
   },
   ssr: false,
 });
