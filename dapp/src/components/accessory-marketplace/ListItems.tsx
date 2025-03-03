@@ -21,7 +21,6 @@ export default function ListItems() {
     const [loading, setLoading] = useState(true);
     const [accessoryFS, setAccessoryFS] = useState<Accessory[]>([]);
 
-
     const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
