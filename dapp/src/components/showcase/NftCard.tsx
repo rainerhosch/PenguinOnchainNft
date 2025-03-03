@@ -65,7 +65,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
         functionName: "tokenURI",
         args: [nftData],
     }) || "";
-    // console.log(nftData)
     const { data: nftAccData } = useReadContract({
         address: contractAddress,
         abi,
