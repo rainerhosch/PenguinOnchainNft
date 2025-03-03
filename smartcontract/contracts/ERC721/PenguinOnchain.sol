@@ -225,6 +225,7 @@ contract PenguinOnchain is
                 bytePixel: validByte,
                 sellingPrice: 0,
                 lastPrice: 0,
+                tokenId: tokenId,
                 owner: msg.sender,
                 forSale: false
             })
@@ -306,6 +307,7 @@ contract PenguinOnchain is
                 bytePixel: accessory.bytePixel,
                 sellingPrice: 0,
                 lastPrice: price,
+                tokenId: toTokenId,
                 owner: msg.sender,
                 forSale: false
             })
@@ -399,6 +401,7 @@ contract PenguinOnchain is
             bytePixel: accessory.bytePixel,
             sellingPrice: 0,
             lastPrice: amount,
+            tokenId: toTokenId,
             owner: offer.buyer,
             forSale: false
         }));

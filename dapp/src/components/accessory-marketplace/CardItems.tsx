@@ -93,7 +93,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
 
     useEffect(() => {
         
-        console.log(listOfAccOwner)
+        // console.log(listOfAccOwner)
         if (listOfAddress.length > 0) {
             setSelectedPengo(`${listOfAddress[0]}`);
         }

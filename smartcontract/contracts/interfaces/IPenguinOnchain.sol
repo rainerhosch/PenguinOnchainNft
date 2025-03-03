@@ -52,6 +52,7 @@ interface IPenguinOnchain {
         string bytePixel;
         uint256 sellingPrice;
         uint256 lastPrice;
+        uint256 tokenId;
         address owner;
         bool forSale;
     }
