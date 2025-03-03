@@ -104,7 +104,8 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
     const handlePurchase = () => {
 
         if (!fromTokenId || !toTokenId) {
-            alert("Please enter valid NFT Token IDs");
+            alert("Buy not active for now, wait for update!");
+            // alert("Please enter valid NFT Token IDs");
             return;
         }
         onPurchase(accessoryId, Number(fromTokenId), Number(toTokenId));
