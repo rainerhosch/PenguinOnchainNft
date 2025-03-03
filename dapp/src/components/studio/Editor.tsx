@@ -41,7 +41,7 @@ export default function Editor() {
                     <div className="flex flex-col gap-2 md:max-w-[420px]">
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-4 mt-4">
-                                <div className="flex flex-col gap-2 bg-white/40 justify-center rounded-md">
+                                <div className="flex flex-col gap-2 bg-white/40 justify-center rounded-md mx-2">
                                     <p className="my-1 mx-auto text-sm">Used Collor</p>
                                     <div className="grid grid-cols-5 gap-1 mx-auto sm:max-w-[160px] max-w-full justify-center rounded-md">
                                         {usedColors.map((color, index) => (
@@ -54,8 +54,8 @@ export default function Editor() {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start">
-                                    <div className="flex flex-row sm:flex-col gap-4">
+                                <div className="flex flex-row sm:flex-col gap-4 items-center sm:items-start">
+                                    {/* <div className="flex flex-row sm:flex-col gap-4"> */}
                                         <Sketch
                                             style={{backgroundColor:hexBg}}
                                             color={hex}
@@ -69,7 +69,7 @@ export default function Editor() {
                                             onChange={handleColorChange}
                                             className="m-1 sm:max-w-[160px] max-w-[120px] bg-slate-600"
                                         />
-                                    </div>
+                                    {/* </div> */}
                                 </div>
                             </div>
                         </div>
