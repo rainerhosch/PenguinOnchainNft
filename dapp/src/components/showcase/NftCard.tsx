@@ -45,6 +45,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const [showModal, setShowModal] = useState(false);
     const [showSellAccessoryModal, setShowSellAccessoryModal] = useState(false);
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
+    // const [listOfAccesory, setListOfAccessories] = useState<string[]>();
 
     // for selling form
     const [accesoryForSale, setAccesoryForSale] = useState(Number);
@@ -73,10 +74,13 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     });
 
     // const listOfAccesory: string[] = (nftAccData as string[]) || [];
+    // console.log(nftAccData)
     const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
     const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
-    // console.log(nftAccData)
-
+    useEffect(() => {
+        // console.log(nftData)
+    })
+    
     useEffect(() => {
         setLoading(true);
         const fetchNftData = async () => {

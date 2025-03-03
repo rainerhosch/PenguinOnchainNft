@@ -10,31 +10,34 @@ import NftCard from "@/components/showcase/NftCard";
 export default function NftList() {
     const { address, chain } = useAccount();
     const [loading, setLoading] = useState(true);
+    const [nftListOf, setNftList] = useState<string[]>();
 
     const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
 
     // Read list of NFT token IDs owned by the user
-    const { data: listOfAddress } = useReadContract({
+    const { data: listOf } = useReadContract({
         address: contractAddress,
         abi,
         functionName: "tokensOfOwner",
         args: [address],
     });
-
+    
     useEffect(() => {
-        if (listOfAddress !== undefined) {
+        const listOfAddress: string[] = (listOf as string[]) || [];
+        if (listOfAddress !== undefined || listOfAddress > 0) {
             setLoading(false);
+            setNftList(listOfAddress)
         }
-        console.log(listOfAddress)
-    }, [listOfAddress]);
-
+    }, [listOf]);
+    
+    // console.log(nftListOf[2])
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
             {!loading &&
-                (listOfAddress as number[])?.map((index, id) => (
-                    <NftCard key={index} nftData={id} />
+                nftListOf?.map((id, index) => (
+                    <NftCard key={index} nftData={Number(id)} />
                 ))
             }
         </div>
