@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Address } from "viem";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
 import CardItem from "@/components/accessory-marketplace/CardItems";
 
@@ -17,12 +17,12 @@ interface Accessory {
 }
 
 export default function ListItems() {
-    const {chain} = useAccount();
+    const { chain } = useAccount();
     const [loading, setLoading] = useState(true);
     const [accessoryFS, setAccessoryFS] = useState<Accessory[]>([]);
 
     const abi = PengoContract.abi;
-    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
 
     const { data: AccessoriesForSale } = useReadContract({
@@ -31,6 +31,8 @@ export default function ListItems() {
         functionName: "getAllAccessoriesForSale",
     });
 
+    const { writeContract } = useWriteContract();
+
     useEffect(() => {
         if (AccessoriesForSale && Array.isArray(AccessoriesForSale)) {
             setLoading(false);
@@ -38,11 +40,20 @@ export default function ListItems() {
         }
     }, [AccessoriesForSale]);
 
+    const handlePurchase = (accessoryId: number, fromTokenId: number, toTokenId: number) => {
+        writeContract({
+            address: contractAddress,
+            abi,
+            functionName: "purchaseAccessory",
+            args: [accessoryId, fromTokenId, toTokenId],
+        });
+    };
+
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
+        <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 max-w-7xl mx-auto`}>
             {!loading &&
                 accessoryFS.map((item, index) => (
-                    <CardItem key={index} accessoryData={item} />
+                    <CardItem key={index} accessoryData={item} accessoryId={index} onPurchase={handlePurchase} />
                 ))
             }
         </div>
