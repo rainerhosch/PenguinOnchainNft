@@ -38,6 +38,27 @@ const roobert = localFont({
 export const metadata: Metadata = {
   title: "Penguin Onchain",
   description: "Penguin Onchain is more than just an NFT—it's a decentralized, interactive digital identity. Whether you're an artist, collector, or Web3 enthusiast, this project opens new possibilities for self-expression, community-driven rarity, and sustainable blockchain innovation.",
+  openGraph: {
+    title: "Penguin Onchain",
+    description: "Penguin Onchain is a decentralized, interactive NFT identity.",
+    url: "https://penguinonchain.top",
+    type: "website",
+    images: [
+      {
+        url: "/Ytube-Banner-2.png",
+        width: 1200,
+        height: 630,
+        alt: "Penguin Onchain NFT",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@onchainpengo", 
+    title: "Penguin Onchain",
+    description: "A decentralized, interactive NFT identity.",
+    images: ["/Ytube-Banner-2.png"], 
+  },
 };
 
 export default function RootLayout({
