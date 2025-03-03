@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/Ytube-Banner-2.png",
+        url: "/OG-Image1000.png",
         width: 1200,
         height: 630,
         alt: "Penguin Onchain NFT",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     site: "@onchainpengo", 
     title: "Penguin Onchain",
     description: "A decentralized, interactive NFT identity.",
-    images: ["/Ytube-Banner-2.png"], 
+    images: ["/OG-Image1000.png"], 
   },
 };
 

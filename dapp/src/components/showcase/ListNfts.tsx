@@ -32,6 +32,8 @@ export default function NftList() {
             setNftList(listOfAddress)
             if(listOfAddress.length > 6){
                 setNftNumb("6");
+            } if(listOfAddress.length > 2){
+                setNftNumb("4");
             }else{
                 setNftNumb((listOfAddress.length).toString());
             }
