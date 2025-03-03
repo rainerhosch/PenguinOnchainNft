@@ -393,7 +393,6 @@ contract PenguinOnchain is
         uint256 amount = offer.price;
         uint256 toTokenId = offer.toTokenId;
 
-        // Pindahkan aksesori ke token pembeli
         accessories[toTokenId].push(Accessory({
             trait_type: accessory.trait_type,
             trait_name: accessory.trait_name,

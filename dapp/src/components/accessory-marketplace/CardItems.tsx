@@ -90,12 +90,6 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
         functionName: "tokensOfOwner",
         args: [accOwner],
     });
-    const { data: getNFTDetails } = useReadContract({
-        address: contractAddress,
-        abi,
-        functionName: "getNFTDetails",
-        args: [listOfAccOwner],
-    });
 
     useEffect(() => {
         
