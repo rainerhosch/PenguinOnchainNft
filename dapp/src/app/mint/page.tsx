@@ -1,7 +1,33 @@
 'use client'
 import React from "react";
+// import { Metadata } from "next";
 import AppNavbar from "../../components/AppNavBar";
 import PengosMintComponen from "../../components/mint/PengosMintComponeV2"
+
+// export const metadata: Metadata = {
+//     title: "Mint - Penguin Onchain",
+//     description: "Mint your unique Penguin Onchain NFT today!",
+//     openGraph: {
+//         title: "Mint - Penguin Onchain",
+//         description: "Mint your unique Penguin Onchain NFT today!",
+//         url: "https://penguinonchain.top",
+//         type: "website",
+//         images: [
+//             {
+//                 url: "/OG-Mint.png",
+//                 width: 1200,
+//                 height: 630,
+//                 alt: "Mint your Penguin Onchain NFT",
+//             },
+//         ],
+//     },
+//     twitter: {
+//         card: "summary_large_image",
+//         title: "Mint - Penguin Onchain",
+//         description: "Mint your unique Penguin Onchain NFT today!",
+//         images: ["/OG-Mint.png"],
+//     },
+// };
 
 // const traits = [
 //     { category: "Body Color", name: "Zombie", quantity: 300, percentage: "1.5%" },
