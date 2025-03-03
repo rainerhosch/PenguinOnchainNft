@@ -1,11 +1,6 @@
 "use client";
 
 import {
-    // useRef, 
-    useState,
-} from "react";
-import {
-    // Slider, 
     Sketch,
     Github
 } from '@uiw/react-color';
