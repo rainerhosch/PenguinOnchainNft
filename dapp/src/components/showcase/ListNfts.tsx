@@ -11,6 +11,7 @@ export default function NftList() {
     const { address, chain } = useAccount();
     const [loading, setLoading] = useState(true);
     const [nftListOf, setNftList] = useState<string[]>();
+    const [nftNumb, setNftNumb] = useState("");
 
     const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
@@ -29,12 +30,17 @@ export default function NftList() {
         if (listOfAddress !== undefined || listOfAddress > 0) {
             setLoading(false);
             setNftList(listOfAddress)
+            if(listOfAddress.length > 6){
+                setNftNumb("6");
+            }else{
+                setNftNumb((listOfAddress.length).toString());
+            }
         }
     }, [listOf]);
     
-    // console.log(nftListOf[2])
+    // console.log(nftListOf)
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 max-w-7xl mx-auto">
+        <div className={`grid grid-cols-2 md:grid-cols-${nftNumb} lg:grid-cols-${nftNumb} gap-8 max-w-7xl mx-auto justify-items-center`}>
             {!loading &&
                 nftListOf?.map((id, index) => (
                     <NftCard key={index} nftData={Number(id)} />

@@ -45,7 +45,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const [showModal, setShowModal] = useState(false);
     const [showSellAccessoryModal, setShowSellAccessoryModal] = useState(false);
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
-    // const [listOfAccesory, setListOfAccessories] = useState<string[]>();
 
     // for selling form
     const [accesoryForSale, setAccesoryForSale] = useState(Number);
@@ -65,7 +64,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
         abi,
         functionName: "tokenURI",
         args: [nftData],
-    }) || "";
+    });
     const { data: nftAccData } = useReadContract({
         address: contractAddress,
         abi,
@@ -82,7 +81,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             try {
                 await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 5 seconds
 
-                if (tokenURI === 'undefined') {
+                if (tokenURI === undefined) {
                     throw new Error();
                 }
                 const base64Data = (tokenURI as string).split(",")[1];
@@ -101,8 +100,9 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 setLoading(false);
             }
         };
-
-        fetchNftData();
+        if(tokenURI != undefined){
+            fetchNftData();
+        }
     }, [nftData, tokenURI]);
 
     // Hook selling transaction
@@ -169,7 +169,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 nfts.map((nft) => (
                     <div
                         key={nft.id}
-                        className="flex flex-col bg-white/10 p-2  rounded-2xl text-white hover:transform hover:scale-105 transition-all items-center"
+                        className="flex flex-col bg-white/10 p-2  rounded-2xl text-white hover:transform hover:scale-105 transition-all items-center sm:w-48 justify-center"
                     >
                         <Image
                             className="bg-black/20 rounded-md"
