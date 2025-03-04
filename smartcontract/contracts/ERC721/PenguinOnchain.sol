@@ -50,6 +50,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
+import "../libraries/pengoConverter.sol";
 
 contract PenguinOnchain is
     ERC721AQueryable,
@@ -73,10 +74,13 @@ contract PenguinOnchain is
     mapping(address => uint256) public mintedCount;
     mapping(uint256 => Accessory[]) public accessories;
     mapping(uint256 => SpecialTrait) public specialTraits;
-    mapping(string => bool) public allowedParts;
+    mapping(uint256 => uint256) public accessoryToTokenId;
+    mapping(uint256 => uint256) public accessoryToIndex;
+
     mapping(uint256 => mapping(string => bool)) private accessoryOfTokenExists;
     mapping(string => mapping(uint8 => mapping(uint8 => bool)))
         public pixelMapCoordinates;
+    mapping(string => bool) public allowedParts;
     mapping(string => uint8[]) private partPixelsX;
     mapping(string => uint8[]) private partPixelsY;
 
@@ -85,7 +89,8 @@ contract PenguinOnchain is
     mapping(uint256 => mapping(uint256 => Offer)) public offers;
     mapping(address => uint256) public offerBalances; //safety offer fund
 
-    Accessory[] public accessoriesForSale;
+    // Accessory[] public accessoriesForSale;
+    AccessoryForSale[] public accessoriesForSale;
     string[] private partKeys;
 
     event AccessoryAdded(
@@ -165,6 +170,9 @@ contract PenguinOnchain is
             "Accessory slot already filled"
         );
 
+        // new index
+        uint256 accessoryId = accessories[tokenId].length;
+
         uint256 numPixels = data.length / 7;
         uint256 validCount = 0;
 
@@ -231,10 +239,13 @@ contract PenguinOnchain is
         updateTraits(tokenId);
         accessoryOfTokenExists[tokenId][trait_type] = true;
 
+        accessoryToTokenId[accessoryId] = tokenId;
+        accessoryToIndex[accessoryId] = accessoryId; // Save accessory index in the array
+
         emit AccessoryAdded(
             tokenId,
             trait_type,
-            accessories[tokenId].length - 1
+            accessoryId
         );
     }
 
@@ -252,23 +263,45 @@ contract PenguinOnchain is
         accessory.sellingPrice = price;
         accessory.forSale = true;
 
-        accessoriesForSale.push(accessory);
+        accessoriesForSale.push(
+            AccessoryForSale({
+                tokenId: tokenId,
+                accessoryId: accessoryId,
+                accessory: accessory
+            })
+        );
         emit AccessoryListed(accessoryId, price);
     }
 
-    function cancelAccessorySale(uint256 tokenId, uint256 accessoryId) public {
+    function removeAccesory(
+        uint256 tokenId, 
+        uint256 accessoryId
+    ) public {
+        require(accessoryId < accessories[tokenId].length, "Invalid accessoryId");
         Accessory storage accessory = accessories[tokenId][accessoryId];
+        require(accessory.owner == msg.sender, "Not the owner");
+        _saveRemoveAccessory(tokenId, accessoryId);
+    }
 
-        accessory.sellingPrice = 0;
-        accessory.forSale = false;
+    function _saveRemoveAccessory(uint256 tokenId, uint256 accessoryId) private {
+        Accessory storage accessory = accessories[tokenId][accessoryId];
+        if(accessory.forSale){
+            removeAccessoryFromSale(tokenId, accessoryId);
+        }
 
-        emit AccessorySaleCancelled(accessoryId, msg.sender);
+        // If it is not the last element, move the last element to this position
+        uint256 lastIndex = accessories[tokenId].length - 1;
+        if (accessoryId != lastIndex) {
+            accessories[tokenId][accessoryId] = accessories[tokenId][lastIndex];
+        }
+        // remove last element
+        accessories[tokenId].pop();
     }
 
     function getAllAccessoriesForSale()
         public
         view
-        returns (Accessory[] memory)
+        returns (AccessoryForSale[] memory)
     {
         return accessoriesForSale;
     }
@@ -289,6 +322,7 @@ contract PenguinOnchain is
 
         uint256 royalty = (price * ROYALTY_PERCENT) / 100;
         uint256 sellerAmount = price - royalty;
+
         address previousOwner = accessory.owner;
 
         accessories[toTokenId].push(
@@ -302,9 +336,13 @@ contract PenguinOnchain is
                 forSale: false
             })
         );
-        accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
 
-        removeAccessoryFromSale(fromTokenId, accessoryId);
+        _saveRemoveAccessory(fromTokenId, accessoryId);
+        
+        accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
+        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
+
+        updateTraits(toTokenId);
         updateTraits(fromTokenId);
 
         (bool successSeller, ) = payable(previousOwner).call{
@@ -318,6 +356,40 @@ contract PenguinOnchain is
         emit AccessorySold(accessory.trait_type, accessoryId, fromTokenId, toTokenId, previousOwner, msg.sender, price);
         
     }
+
+    function removeAccessoryFromSale(
+        uint256 fromTokenId,
+        uint256 accessoryId
+    ) private {
+        // Ensure the item is truly in the list of accessoriesForSale
+        uint256 index = findAccessoryIndex(fromTokenId, accessoryId);
+        require(index < accessoriesForSale.length, "Accessory not found in sale list");
+        require(accessoriesForSale[index].accessory.owner == msg.sender, "Not the owner");
+
+        // Update accessory status so it is no longer for sale
+        accessories[fromTokenId][accessoryId].forSale = false;
+        accessories[fromTokenId][accessoryId].sellingPrice = 0;
+
+        // Swap and pop technique to remove the item without high gas costs
+        uint256 lastIndex = accessoriesForSale.length - 1;
+        if (index != lastIndex) {
+            accessoriesForSale[index] = accessoriesForSale[lastIndex]; // Replace with the last item
+        }
+        accessoriesForSale.pop(); // Remove the last element to save gas
+    }
+
+    function findAccessoryIndex(uint256 tokenId, uint256 accessoryId) public view returns (uint256) {
+        for (uint256 i = 0; i < accessoriesForSale.length; i++) {
+            if (
+                accessoriesForSale[i].tokenId == tokenId &&
+                accessoriesForSale[i].accessoryId == accessoryId
+            ) {
+                return i;
+            }
+        }
+        return accessoriesForSale.length;
+    }
+
 
     function makeOffer(uint256 accessoryId, uint256 fromTokenId, uint256 toTokenId) public payable nonReentrant {
         require(msg.value > 0, "Offer price must be greater than 0");
@@ -383,6 +455,7 @@ contract PenguinOnchain is
         uint256 amount = offer.price;
         uint256 toTokenId = offer.toTokenId;
 
+        // Pindahkan aksesori ke token pembeli
         accessories[toTokenId].push(Accessory({
             trait_type: accessory.trait_type,
             trait_name: accessory.trait_name,
@@ -393,11 +466,12 @@ contract PenguinOnchain is
             forSale: false
         }));
 
-        updateTraits(toTokenId);
+        _saveRemoveAccessory(fromTokenId, accessoryId);
+
         accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
+        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
 
-
-        removeAccessoryFromSale(fromTokenId, accessoryId);
+        updateTraits(toTokenId);
         updateTraits(fromTokenId);
 
 
@@ -411,7 +485,7 @@ contract PenguinOnchain is
 
         emit AccessorySold(accessory.trait_type, accessoryId, fromTokenId, toTokenId, msg.sender, offer.buyer, amount);
     }
-
+        
 
     function updateTraits(uint256 tokenId) internal {
         uint256 totalValue = 0;

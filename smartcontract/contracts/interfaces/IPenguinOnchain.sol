@@ -60,6 +60,12 @@ interface IPenguinOnchain {
         string category;
         string networth;
     }
+    
+    struct AccessoryForSale {
+        uint256 tokenId;
+        uint256 accessoryId;
+        Accessory accessory;
+    }
 
     struct Offer {
         address buyer;

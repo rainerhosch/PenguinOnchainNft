@@ -76,6 +76,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
     
     useEffect(() => {
+        console.log(listOfAccessories)
         setLoading(true);
         const fetchNftData = async () => {
             try {
