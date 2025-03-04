@@ -50,7 +50,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
-import "../libraries/pengoConverter.sol";
 
 contract PenguinOnchain is
     ERC721AQueryable,
@@ -75,7 +74,6 @@ contract PenguinOnchain is
     mapping(uint256 => Accessory[]) public accessories;
     mapping(uint256 => SpecialTrait) public specialTraits;
     mapping(string => bool) public allowedParts;
-
     mapping(uint256 => mapping(string => bool)) private accessoryOfTokenExists;
     mapping(string => mapping(uint8 => mapping(uint8 => bool)))
         public pixelMapCoordinates;
@@ -225,7 +223,6 @@ contract PenguinOnchain is
                 bytePixel: validByte,
                 sellingPrice: 0,
                 lastPrice: 0,
-                tokenId: tokenId,
                 owner: msg.sender,
                 forSale: false
             })
@@ -261,11 +258,6 @@ contract PenguinOnchain is
 
     function cancelAccessorySale(uint256 tokenId, uint256 accessoryId) public {
         Accessory storage accessory = accessories[tokenId][accessoryId];
-        require(
-            accessory.owner == msg.sender,
-            "Not the owner of this accessory"
-        );
-        require(accessory.forSale, "Accessory is not listed for sale");
 
         accessory.sellingPrice = 0;
         accessory.forSale = false;
@@ -297,7 +289,6 @@ contract PenguinOnchain is
 
         uint256 royalty = (price * ROYALTY_PERCENT) / 100;
         uint256 sellerAmount = price - royalty;
-
         address previousOwner = accessory.owner;
 
         accessories[toTokenId].push(
@@ -307,17 +298,14 @@ contract PenguinOnchain is
                 bytePixel: accessory.bytePixel,
                 sellingPrice: 0,
                 lastPrice: price,
-                tokenId: toTokenId,
                 owner: msg.sender,
                 forSale: false
             })
         );
-        updateTraits(toTokenId);
         accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
 
         removeAccessoryFromSale(fromTokenId, accessoryId);
         updateTraits(fromTokenId);
-        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
 
         (bool successSeller, ) = payable(previousOwner).call{
             value: sellerAmount
@@ -401,7 +389,6 @@ contract PenguinOnchain is
             bytePixel: accessory.bytePixel,
             sellingPrice: 0,
             lastPrice: amount,
-            tokenId: toTokenId,
             owner: offer.buyer,
             forSale: false
         }));
@@ -412,7 +399,6 @@ contract PenguinOnchain is
 
         removeAccessoryFromSale(fromTokenId, accessoryId);
         updateTraits(fromTokenId);
-        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
 
 
         (bool success, ) = payable(msg.sender).call{ value: amount }("");
@@ -426,36 +412,6 @@ contract PenguinOnchain is
         emit AccessorySold(accessory.trait_type, accessoryId, fromTokenId, toTokenId, msg.sender, offer.buyer, amount);
     }
 
-    function removeAccessoryFromSale(
-        uint256 fromTokenId,
-        uint256 accessoryId
-    ) internal {
-        Accessory storage accessory = accessories[fromTokenId][accessoryId];
-
-        // Remove accessory from selling list
-        for (uint256 i = 0; i < accessoriesForSale.length; i++) {
-            if (
-                keccak256(abi.encodePacked(accessoriesForSale[i].trait_name)) ==
-                keccak256(abi.encodePacked(accessory.trait_name))
-            ) {
-                accessoriesForSale[i] = accessoriesForSale[
-                    accessoriesForSale.length - 1
-                ];
-                accessoriesForSale.pop();
-                break;
-            }
-        }
-
-        // Empty accessories from previous owner
-        uint256 length = accessories[fromTokenId].length;
-        if (accessoryId < length - 1) {
-            accessories[fromTokenId][accessoryId] = accessories[fromTokenId][
-                length - 1
-            ];
-        }
-        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
-    }
-    
 
     function updateTraits(uint256 tokenId) internal {
         uint256 totalValue = 0;
