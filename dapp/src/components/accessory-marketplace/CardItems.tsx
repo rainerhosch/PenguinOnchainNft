@@ -1,15 +1,15 @@
 "use client";
 import React, {
-    useRef,
+    // useRef,
     useState,
     useEffect
 } from "react";
 import {
     useAccount,
     useReadContract,
-    useWriteContract,
-    useWaitForTransactionReceipt,
-    type BaseError,
+    // useWriteContract,
+    // useWaitForTransactionReceipt,
+    // type BaseError,
 } from "wagmi";
 import { Address } from "viem";
 import PengoContract from "../../constants/PengoContract.json";
@@ -95,7 +95,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
         
         // console.log(listOfAccOwner)
         if (listOfAddress.length > 0) {
-            setSelectedPengo(`${listOfAddress[0]}`);
+            // setSelectedPengo(`${listOfAddress[0]}`);
         }
     }, [listOfAddress]);
 
