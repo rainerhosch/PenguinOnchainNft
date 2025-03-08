@@ -13,8 +13,6 @@ import {
   // metaMaskWallet
 } from '@rainbow-me/rainbowkit/wallets';
 import { 
-  cookieStorage, 
-  createStorage, 
   http 
 } from '@wagmi/core'
 import { 

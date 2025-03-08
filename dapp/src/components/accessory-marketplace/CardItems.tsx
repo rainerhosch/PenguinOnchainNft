@@ -57,7 +57,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     const { address, chain } = useAccount();
     const pixels = parseBytePixel(accessoryData.bytePixel);
     const [isYour, setIsYour] = useState(false);
-    const [accOwner, setAccOwner] = useState("");
+    // const [accOwner, setAccOwner] = useState("");
     const [selectedPengo, setSelectedPengo] = useState("");
     const [loading, setLoading] = useState(true);
     const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
@@ -80,18 +80,18 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     });
     
     const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
-    const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
+    // const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
 
     useEffect(() => {
         if(accessoryData.owner === address){
             setIsYour(true);
         }
 
-        setAccOwner(accessoryData.owner);
+        // setAccOwner(accessoryData.owner);
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
-    }, [listOfAddress]);
+    }, [accessoryData.owner, address, listOfAddress]);
 
 
 

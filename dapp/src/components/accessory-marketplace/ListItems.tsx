@@ -50,7 +50,10 @@ export default function ListItems() {
 
     // Minting Transaction Hook
     const { data: hash, error, writeContract } = useWriteContract();
-    const { isSuccess: isConfirmed, isLoading, isError, status, failureReason } = useWaitForTransactionReceipt({ hash });
+    const {
+        isSuccess: isConfirmed,
+        isLoading
+    } = useWaitForTransactionReceipt({ hash });
 
     useEffect(() => {
         if (AccessoriesForSale && Array.isArray(AccessoriesForSale)) {
@@ -62,8 +65,8 @@ export default function ListItems() {
 
     useEffect(() => {
         if (isPurchasing && isLoading) {
-            toast.loading("Waiting for confirmation...", { id: "txn-loading", style: { background: 'rgba(140, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' }});
-        }else{
+            toast.loading("Waiting for confirmation...", { id: "txn-loading", style: { background: 'rgba(140, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' } });
+        } else {
             toast.dismiss("txn-loading");
         }
     }, [isLoading, isPurchasing]);
@@ -93,7 +96,7 @@ export default function ListItems() {
             );
             setIsPurchasing(false);
         }
-    }, [isConfirmed]);
+    }, [hash, isConfirmed, networkContract?.explore]);
 
     const handlePurchase = (accessoryId: number, fromTokenId: number, toTokenId: string, price: bigint) => {
         if (!toTokenId || isNaN(Number(toTokenId))) {

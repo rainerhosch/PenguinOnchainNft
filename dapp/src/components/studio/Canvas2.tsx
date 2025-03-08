@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, {
+    useMemo,
     useRef,
     useState,
     useEffect,
@@ -91,14 +93,14 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         functionName: "tokensOfOwner",
         args: [address],
     });
-    const listOfAddress: string[] = (listOf as string[]) || [];
+    const listOfAddress: string[] = useMemo(() => (listOf as string[]) || [], [listOf]);
 
     const { data: allowedPart } = useReadContract({
         address: factoryAddress,
         abi: abiFactory as Abi,
         functionName: "getAllAllowedParts",
     });
-    const allowedAccesories: string[] = (allowedPart as string[]) || [];
+    const allowedAccesories: string[] = useMemo(() => (allowedPart as string[]) || [], [allowedPart]);
 
     const { data: pixelPart } = useReadContract({
         address: factoryAddress,
@@ -513,15 +515,15 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 // window.location.reload(); // Reload the page after showing the toast
             }
         }
-    }, [hash, networkContract?.explore]);
+    }, [hash, loadingToast, networkContract?.explore]);
 
     async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (accName == "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can't be null</p>)
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can&apos;t be null</p>)
         }
         if (svgToBytecode(accessoryCode) == "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can't be null</p>)
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can&apos;t be null</p>)
         }
 
         writeContract({
