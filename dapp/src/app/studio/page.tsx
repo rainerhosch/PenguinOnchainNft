@@ -22,9 +22,11 @@ function StudioPage(): JSX.Element {
     const { address, status, chain } = useAccount(); // Get the connected wallet address
     // console.log(status)
     // console.log(address)
-    const abi = PengoContract.abi;
-    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
-    const contractAddress = networkContract?.PengoAddress;
+    const networkContract = chain?.id !== undefined
+        ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
+        : PengoContract.networkDeployment[1];
+    const abi = networkContract?.abi;
+    const contractAddress = networkContract?.PengoAddress as Address;
 
     const { data: balanceCount } = useReadContract({
         address: contractAddress as Address,
@@ -98,15 +100,15 @@ function StudioPage(): JSX.Element {
                                             </>}
                                     </div>
                                 </div>
-                                {hideOptions &&
-                                    <div className="flex justify-center md:mx-auto">
-                                        <Editor />
-                                    </div>
-                                }
 
                                 {/* List Ntfs */}
                                 {showNftList &&
                                     <NftList />
+                                }
+                                {hideOptions &&
+                                    <div className="flex justify-center md:mx-auto">
+                                        <Editor />
+                                    </div>
                                 }
 
                             </div>

@@ -62,18 +62,19 @@ contract PenguinOnchain is
     IPengoFactory public factory;
 
     uint256 public constant MAX_SUPPLY = 20000;
-    uint256 public constant MINT_PRICE = 0.5 ether;
-    uint256 public constant MAX_MINT_PER_WALLET = 10;
+    uint256 public constant MINT_PRICE = 0.25 ether;
+    uint256 public constant MAX_MINT_PER_WALLET = 100;
     uint256 public constant ROYALTY_PERCENT = 5;
     address public BENEFICARY_ADDRESS;
     address public ROYALTY_ADDRESS;
 
+
+    uint256 public nextAccessoryId = 1;
     mapping(uint256 => uint256) internal seeds;
     mapping(address => uint256) public mintedCount;
     mapping(uint256 => SpecialTrait) public specialTraits;
-    mapping(uint256 => uint256) public accessoryToTokenId;
-    mapping(uint256 => uint256) public accessoryToIndex;
-
+    mapping(uint256 => mapping(uint256 => Accessory)) public accessories;
+    mapping(uint256 => uint256[]) public accessoryIds;
     mapping(uint256 => mapping(string => bool)) private accessoryOfTokenExists;
 
     // offer mapping
@@ -88,6 +89,7 @@ contract PenguinOnchain is
         uint256 accessoryId
     );
     event AccessoryListed(uint256 indexed accessoryId, uint256 price);
+    event AccessoryDeleted(uint256 indexed accessoryId,uint256 indexed fromTokenId);
     event AccessorySold(string accessoryType, uint256 indexed accessoryId, uint256 indexed fromTokenId, uint256 indexed toTokenId, address seller, address buyer, uint256 price);
     event AccessorySaleCancelled(uint256 indexed accessoryId, address accessoryOwner);
     event AccessoryOfferMade(
@@ -138,6 +140,9 @@ contract PenguinOnchain is
         return newTokenIds;
     }
 
+    /*---------------------------------------------------------------------
+    *                     Accessory Function and Logic
+    ---------------------------------------------------------------------*/
     function addAccessory(
         uint256 tokenId,
         string memory trait_type,
@@ -146,15 +151,17 @@ contract PenguinOnchain is
     ) public {
         bytes memory data = PengoConverter.hexStringToBytes(byteCode);
         require(ownerOf(tokenId) == msg.sender, "Not the owner of this NFT");
-        require(allowedParts[trait_type], "Part does not exist");
+        require(factory.isAllowedPart(trait_type), "Part does not exist");
         require(data.length % 7 == 0, "Invalid pixel data length"); // 7 bytes per pixel
         require(
             !accessoryOfTokenExists[tokenId][trait_type],
             "Accessory slot already filled"
         );
 
-        // new index
-        uint256 accessoryId = accessories[tokenId].length;
+        // Generate new accessory ID safely
+        uint256 accessoryId = nextAccessoryId;
+        nextAccessoryId++;
+
 
         uint256 numPixels = data.length / 7;
         uint256 validCount = 0;
@@ -163,7 +170,7 @@ contract PenguinOnchain is
         for (uint256 i = 0; i < numPixels; i++) {
             uint256 offset = i * 7;
             if (
-                isValidCoordinate(
+                factory.isValidCoordinate(
                     trait_type,
                     uint8(data[offset]),
                     uint8(data[offset + 1])
@@ -184,7 +191,7 @@ contract PenguinOnchain is
             uint8 x = uint8(data[offset]);
             uint8 y = uint8(data[offset + 1]);
 
-            if (isValidCoordinate(trait_type, x, y)) {
+            if (factory.isValidCoordinate(trait_type, x, y)) {
                 pixels[counter * 4] = x; // x
                 pixels[counter * 4 + 1] = y; // y
                 pixels[counter * 4 + 2] = uint8(data[offset + 2]); // width
@@ -202,22 +209,25 @@ contract PenguinOnchain is
         }
 
         // Convert back to format hex for saving datas
-        string memory validByte = PengoConverter.reconstructHexString(
+        string memory validByte = factory.reconstructHexString(
             pixels,
             colors
         );
 
-        accessories[tokenId].push(
-            Accessory({
-                trait_type: trait_type,
-                trait_name: trait_name,
-                bytePixel: validByte,
-                sellingPrice: 0,
-                lastPrice: 0,
-                owner: msg.sender,
-                forSale: false
-            })
-        );
+        // Save accessory data to mapping
+        accessories[tokenId][accessoryId] = Accessory({
+            accessoryId: accessoryId,
+            trait_type: trait_type,
+            trait_name: trait_name,
+            bytePixel: validByte,
+            sellingPrice: 0,
+            lastPrice: 0,
+            owner: msg.sender,
+            forSale: false
+        });
+
+        accessoryIds[tokenId].push(accessoryId);
+
 
         updateTraits(tokenId);
         accessoryOfTokenExists[tokenId][trait_type] = true;
@@ -234,22 +244,20 @@ contract PenguinOnchain is
         uint256 accessoryId,
         uint256 price
     ) public {
-        Accessory storage accessory = accessories[tokenId][accessoryId];
-        require(
-            accessory.owner == msg.sender,
-            "Not the owner of this accessory"
-        );
+        require(accessories[tokenId][accessoryId].owner == msg.sender,"Not the owner of this accessory" );
+        require(!accessories[tokenId][accessoryId].forSale, "This accessory is already on sale."); 
 
-        accessory.sellingPrice = price;
-        accessory.forSale = true;
+        accessories[tokenId][accessoryId].sellingPrice = price;
+        accessories[tokenId][accessoryId].forSale = true;
 
         accessoriesForSale.push(
             AccessoryForSale({
                 tokenId: tokenId,
                 accessoryId: accessoryId,
-                accessory: accessory
+                accessory:  accessories[tokenId][accessoryId]
             })
         );
+        
         emit AccessoryListed(accessoryId, price);
     }
 
@@ -257,25 +265,30 @@ contract PenguinOnchain is
         uint256 tokenId, 
         uint256 accessoryId
     ) public {
-        require(accessoryId < accessories[tokenId].length, "Invalid accessoryId");
-        Accessory storage accessory = accessories[tokenId][accessoryId];
-        require(accessory.owner == msg.sender, "Not the owner");
+        require(accessories[tokenId][accessoryId].owner == msg.sender, "Not the owner");
         _saveRemoveAccessory(tokenId, accessoryId);
+
     }
 
-    function _saveRemoveAccessory(uint256 tokenId, uint256 accessoryId) private {
-        Accessory storage accessory = accessories[tokenId][accessoryId];
-        if(accessory.forSale){
-            removeAccessoryFromSale(tokenId, accessoryId);
+    function _saveRemoveAccessory(uint256 fromTokenId, uint256 accessoryId) private {
+        if(accessories[fromTokenId][accessoryId].forSale){
+            removeAccessoryFromSale(fromTokenId, accessoryId);
         }
 
-        // If it is not the last element, move the last element to this position
-        uint256 lastIndex = accessories[tokenId].length - 1;
-        if (accessoryId != lastIndex) {
-            accessories[tokenId][accessoryId] = accessories[tokenId][lastIndex];
+        // Delete from mapping
+        delete accessories[fromTokenId][accessoryId];
+
+        // Delete from list accessoryIds[fromTokenId]
+        uint256 length = accessoryIds[fromTokenId].length;
+        for (uint256 i = 0; i < length; i++) {
+            if (accessoryIds[fromTokenId][i] == accessoryId) {
+                accessoryIds[fromTokenId][i] = accessoryIds[fromTokenId][length - 1];
+                accessoryIds[fromTokenId].pop();
+                break;
+            }
         }
-        // remove last element
-        accessories[tokenId].pop();
+
+        emit AccessoryDeleted(accessoryId, fromTokenId);
     }
 
     function getAllAccessoriesForSale()
@@ -291,33 +304,35 @@ contract PenguinOnchain is
         uint256 fromTokenId,
         uint256 toTokenId
     ) public payable nonReentrant {
-        Accessory storage accessory = accessories[fromTokenId][accessoryId];
-        uint256 price = accessory.sellingPrice;
-        require(accessory.forSale, "Accessory is not for sale");
+        uint256 price = accessories[fromTokenId][accessoryId].sellingPrice;
+        string memory accessoryType = accessories[fromTokenId][accessoryId].trait_type;
+        require(accessories[fromTokenId][accessoryId].forSale != false, "Accessory is not for sale");
         require(msg.value >= price, "Insufficient payment");
-        require(
-            !accessoryOfTokenExists[toTokenId][accessory.trait_type],
-            "Accessory slot already filled"
-        );
+        require(!accessoryOfTokenExists[toTokenId][accessoryType], "Accessory slot already filled");
 
         uint256 royalty = (price * ROYALTY_PERCENT) / 100;
         uint256 sellerAmount = price - royalty;
 
-        address previousOwner = accessory.owner;
+        address previousOwner = accessories[fromTokenId][accessoryId].owner;
 
-        accessories[toTokenId].push(
-            Accessory({
-                trait_type: accessory.trait_type,
-                trait_name: accessory.trait_name,
-                bytePixel: accessory.bytePixel,
+
+        accessories[toTokenId][accessoryId] = Accessory({
+                accessoryId: accessoryId,
+                trait_type: accessoryType,
+                trait_name: accessories[fromTokenId][accessoryId].trait_name,
+                bytePixel: accessories[fromTokenId][accessoryId].bytePixel,
                 sellingPrice: 0,
                 lastPrice: price,
                 owner: msg.sender,
                 forSale: false
-            })
-        );
+        });
+        accessoryIds[toTokenId].push(accessoryId);
 
-        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
+        accessoryOfTokenExists[toTokenId][accessoryType] = true;
+        accessoryOfTokenExists[fromTokenId][accessoryType] = false;
+
+        _saveRemoveAccessory(fromTokenId, accessoryId);
+        updateTraits(toTokenId);
         updateTraits(fromTokenId);
 
         (bool successSeller, ) = payable(previousOwner).call{
@@ -328,7 +343,7 @@ contract PenguinOnchain is
         (bool successRoyalty, ) = payable(owner()).call{value: royalty}("");
         require(successRoyalty, "Transfer to royalty failed");
 
-        emit AccessorySold(accessory.trait_type, accessoryId, fromTokenId, toTokenId, previousOwner, msg.sender, price);
+        emit AccessorySold(accessoryType, accessoryId, fromTokenId, toTokenId, previousOwner, msg.sender, price);
         
     }
 
@@ -367,10 +382,9 @@ contract PenguinOnchain is
 
     function makeOffer(uint256 accessoryId, uint256 fromTokenId, uint256 toTokenId) public payable nonReentrant {
         require(msg.value > 0, "Offer price must be greater than 0");
-
-        Accessory storage accessory = accessories[fromTokenId][accessoryId];
-        require(accessory.owner != msg.sender, "Owner cannot make an offer");
-        require(!accessoryOfTokenExists[toTokenId][accessory.trait_type],"Accessory slot already filled");
+        
+        require(accessories[fromTokenId][accessoryId].owner != msg.sender, "Owner cannot make an offer");
+        require(!accessoryOfTokenExists[toTokenId][accessories[fromTokenId][accessoryId].trait_type],"Accessory slot already filled");
 
         Offer storage currentOffer = offers[fromTokenId][accessoryId];
         require(
@@ -423,27 +437,26 @@ contract PenguinOnchain is
         Offer storage offer = offers[fromTokenId][accessoryId];
         require(offer.active, "No active offer");
         
-        Accessory storage accessory = accessories[fromTokenId][accessoryId];
-        require(accessory.owner == msg.sender, "Not the owner of this accessory");
+        // Accessory storage accessory = accessories[fromTokenId][accessoryId];
+        require(accessories[fromTokenId][accessoryId].owner == msg.sender, "Not the owner of this accessory");
 
         uint256 amount = offer.price;
         uint256 toTokenId = offer.toTokenId;
 
-        // Pindahkan aksesori ke token pembeli
-        accessories[toTokenId].push(Accessory({
-            trait_type: accessory.trait_type,
-            trait_name: accessory.trait_name,
-            bytePixel: accessory.bytePixel,
+        accessories[toTokenId][accessoryId] = Accessory({
+            accessoryId: accessoryId,
+            trait_type: accessories[fromTokenId][accessoryId].trait_type,
+            trait_name: accessories[fromTokenId][accessoryId].trait_name,
+            bytePixel: accessories[fromTokenId][accessoryId].bytePixel,
             sellingPrice: 0,
             lastPrice: amount,
             owner: offer.buyer,
             forSale: false
-        }));
-
+        });
+        accessoryIds[toTokenId].push(accessoryId);
         _saveRemoveAccessory(fromTokenId, accessoryId);
-
-        accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
-        accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
+        accessoryOfTokenExists[toTokenId][accessories[fromTokenId][accessoryId].trait_type] = true;
+        accessoryOfTokenExists[fromTokenId][accessories[fromTokenId][accessoryId].trait_type] = false;
 
         updateTraits(toTokenId);
         updateTraits(fromTokenId);
@@ -457,14 +470,14 @@ contract PenguinOnchain is
         offerBalances[offer.buyer] -= amount;
         totalOfferBalance -= amount;
 
-        emit AccessorySold(accessory.trait_type, accessoryId, fromTokenId, toTokenId, msg.sender, offer.buyer, amount);
+        emit AccessorySold(accessories[fromTokenId][accessoryId].trait_type, accessoryId, fromTokenId, toTokenId, msg.sender, offer.buyer, amount);
     }
         
 
     function updateTraits(uint256 tokenId) internal {
         uint256 totalValue = 0;
-        for (uint256 i = 0; i < accessories[tokenId].length; i++) {
-            totalValue += accessories[tokenId][i].lastPrice;
+        for (uint256 i = 0; i < accessoryIds[tokenId].length; i++) {
+            totalValue += accessories[tokenId][accessoryIds[tokenId][i]].lastPrice;
         }
 
         // Convert totalValue from wei to ether
@@ -534,7 +547,14 @@ contract PenguinOnchain is
     function getNFTDetails(
         uint256 tokenId
     ) public view returns (Accessory[] memory, SpecialTrait memory) {
-        return (accessories[tokenId], specialTraits[tokenId]);
+        uint256 count = accessoryIds[tokenId].length;
+        Accessory[] memory tempAccessories = new Accessory[](count);
+
+        for (uint256 i = 0; i < count; i++) {
+            tempAccessories[i] = accessories[tokenId][accessoryIds[tokenId][i]];
+        }
+
+        return (tempAccessories, specialTraits[tokenId]);
     }
 
     function tokenURI(
@@ -571,5 +591,5 @@ contract PenguinOnchain is
         require(success, "Withdraw failed");
     }
 
-
+    
 }

@@ -5,28 +5,33 @@ import React, {
 } from "react";
 import {
     useAccount,
-    useReadContract,
-    // useWriteContract,
-    // useWaitForTransactionReceipt,
-    // type BaseError,
+    useReadContract
 } from "wagmi";
 import { Address } from "viem";
+import toast from "react-hot-toast";
 import PengoContract from "../../constants/PengoContract.json";
 
 interface Accessory {
     bytePixel: string;
     forSale: boolean;
     lastPrice: bigint;
-    owner: string;
+    owner: Address;
     sellingPrice: bigint;
     trait_name: string;
     trait_type: string;
 }
 
+type SpecialTrait = {
+    category: string;
+    networth: string;
+};
+
+
 interface CardItemProps {
     accessoryData: Accessory;
-    onPurchase: (accessoryId: number, fromTokenId: number, toTokenId: number) => void;
+    onPurchase: (accessoryId: number, fromTokenId: number, toTokenId: string, price: bigint) => void;
     accessoryId: number;
+    tokenId: string;
 }
 
 const parseBytePixel = (bytePixel: string) => {
@@ -48,7 +53,7 @@ const parseBytePixel = (bytePixel: string) => {
 };
 
 
-export default function CardItem({ accessoryData, onPurchase, accessoryId }: CardItemProps) {
+export default function CardItem({ accessoryData, onPurchase, accessoryId, tokenId }: CardItemProps) {
     const { address, chain } = useAccount();
     const pixels = parseBytePixel(accessoryData.bytePixel);
     const [isYour, setIsYour] = useState(false);
@@ -56,6 +61,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
     const [selectedPengo, setSelectedPengo] = useState("");
     const [loading, setLoading] = useState(true);
     const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
+    const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress as Address;
 
     const { data: listOf } = useReadContract({
@@ -66,10 +72,21 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
     });
     const listOfAddress: string[] = (listOf as string[]) || [];
 
+    const { data: nftAccData } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: "getNFTDetails",
+        args: [selectedPengo],
+    });
+    
+    const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
+    const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
+
     useEffect(() => {
         if(accessoryData.owner === address){
             setIsYour(true);
         }
+
         setAccOwner(accessoryData.owner);
         if (listOfAddress !== undefined) {
             setLoading(false);
@@ -79,11 +96,16 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
 
 
 
-    const handlePurchase = () => {
 
+    const handlePurchase = () => {
+        for (let i = 0; i < listOfAccessories.length; i++) {
+            if (listOfAccessories[i].trait_type === accessoryData.trait_type) {
+                toast.error(`The ${accessoryData.trait_type}, already on pengo #${selectedPengo}`, { id: `invalid-token`, style: { background: 'rgba(255, 0, 191, 0.452)', color: '#fff', fontFamily: 'monospace' } });
+                return; // Stop execution if error
+            }
         }
-        onPurchase(accessoryId, Number(fromTokenId), Number(toTokenId));
-    };
+        onPurchase(accessoryId, Number(tokenId), selectedPengo, accessoryData.sellingPrice);
+    }
 
     return (
         <div className="border p-4 rounded-lg shadow-lg flex flex-col items-center">
@@ -111,7 +133,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
                 className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
                 onChange={(e) => setSelectedPengo(e.target.value)}
             >
-                <option value="" disabled>- Select Target -</option>
+                <option value="" className="text-xs">- Select Target -</option>
                 {!loading && listOfAddress.map((tokenId, index) => (
                     <option key={index} value={`${tokenId}`}>Pengo #{tokenId}</option>
                 ))}

@@ -12,14 +12,26 @@ import {
   // bitgetWallet, 
   // metaMaskWallet
 } from '@rainbow-me/rainbowkit/wallets';
-// import { abstractWallet } from "@abstract-foundation/agw-react/connectors";
-import { monadTestnet, sepolia } from "wagmi/chains";
-import { createConfig, WagmiProvider } from "wagmi";
-import { http } from "viem";
+import { 
+  cookieStorage, 
+  createStorage, 
+  http 
+} from '@wagmi/core'
+import { 
+  monadTestnet, 
+  sepolia 
+} from "wagmi/chains";
+import { 
+  createConfig, 
+  WagmiProvider 
+} from "wagmi";
 
 if (typeof window !== "undefined") {
   indexedDB.deleteDatabase("walletconnect");
 }
+
+// Get projectId from https://cloud.reown.com
+export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 const connectors = connectorsForWallets(
   [
     {
@@ -35,7 +47,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: "Rainbowkit Test",
-    projectId: "d841c21dbf51af2d65b5c2cfc5232ee6",
+    projectId: projectId || "", // Ensure projectId is a string
     appDescription: "",
     appIcon: "",
     appUrl: "",
@@ -46,7 +58,8 @@ export const config = createConfig({
   chains: [monadTestnet, sepolia],
   transports: {
     [monadTestnet.id]: http(),
-    [sepolia.id]: http(),
+    // [sepolia.id]: http(),
+    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
   },
   ssr: false,
 });

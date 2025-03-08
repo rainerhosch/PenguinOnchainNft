@@ -1,0 +1,461 @@
+{
+    "code": 0,
+    "reason": "",
+    "message": "OK",
+    "result": {
+        "data": [
+            {
+                "ownerAddress": "0x820a62AdAC7c62a8292107E553514860C9163b24",
+                "amount": "11",
+                "uniqueTokens": 11,
+                "lastTransaction": "",
+                "percentage": "9.243697",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x96c9a7c05712241174D683473D0636efEBE01098",
+                "amount": "10",
+                "uniqueTokens": 10,
+                "lastTransaction": "",
+                "percentage": "8.403361",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x2272d165FF959498375C54dCEb1bc61821208C2c",
+                "amount": "10",
+                "uniqueTokens": 10,
+                "lastTransaction": "",
+                "percentage": "8.403361",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x1d8ebcD7136Ed09570570655880A5ad11c3665a7",
+                "amount": "10",
+                "uniqueTokens": 10,
+                "lastTransaction": "",
+                "percentage": "8.403361",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x8314f880aD99c2A49C7f3229b01Ad233a8D9Fbca",
+                "amount": "8",
+                "uniqueTokens": 8,
+                "lastTransaction": "",
+                "percentage": "6.722689",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x8F78c5Ac83234ff690e88bFcED7E5bF114B5B74B",
+                "amount": "4",
+                "uniqueTokens": 4,
+                "lastTransaction": "",
+                "percentage": "3.361345",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x58C637Db2017b616e9e3d92A8FF99aAAeecf003C",
+                "amount": "4",
+                "uniqueTokens": 4,
+                "lastTransaction": "",
+                "percentage": "3.361345",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xF4eAb2C06a8947EE9ed62Abae45A8E9f0aa4104a",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xDF9E9205988D5cc7E5948D2F82e0e1245C0bA270",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xD4B14E0642908Ca8628B151bB7faA27B1E8B83A6",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xAb343bc261cBC4cBB2e12a2988B747236AFe5E77",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x19A3231B3B37a71bE87f4C3810a48E3706367185",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x0BF93bC2097C47bFB1F17065D8c89967D644a921",
+                "amount": "2",
+                "uniqueTokens": 2,
+                "lastTransaction": "",
+                "percentage": "1.680672",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xF9EE653118482e67518aaD1ad9E7Aaf409d11aE4",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xF62e4989de605FD62Daf45EaBB27863887924bA6",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xF427F8424e707F03E9DD02ba93c3845c18F91DA8",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xf1B6Bad39CF5f4a494F4d708C61Cc6EC194F5814",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xeE66d80FeCddbf65848F1d7FceD4E2c1B49a2e4b",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xeAD9FCe56567C843E2C6D65BC99C7020d918e525",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xE86851f5dd2507430761B6Ce70BD5617dBf66cdc",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xe627552C6338855983a147fa5235E5D92a3C2891",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xe2c0877309466BC11dB2BD4aB9d3cE4C92D6f584",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xDe7d8Da0B6376719Bb48eac57FE8213d691921e1",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xdCc3954f928bAeB58c31785c11FE8FC503700503",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xD669c3B2fB1e5a64b5041EC800EE475DE2C3BAe6",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xd627E14a832da05355aCCC70CB66c1c0383F7073",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xD42fdE074bBb8Ed3f4D60a734F0ab9C9cA467AD4",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xCEE31FDC36251DEA395EC68c21f47B6977B0Eb23",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xCb81a9db04b6854C7D0Dea2ccA8F6F487607031F",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xBfcd1E452E965C6300305EA40b8346E33C578e22",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xBE8C66bA2FE0efFD60cA601b13f0481dAEF888a6",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xB94529690597783a39554cCA834Db8219Cf646Ef",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xb8eA844e7E03344372076C5A00Ef3eF1d0De9EC3",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xb4bB5be1E5b1126A17437e6a5FC3B9Bb2D6b0340",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xb29eeaE5b3F24Dc62A1f10fa3816B7E96f9Fd807",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xAe8949e354D90119daC4d659751fc7F5E2c43be5",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0xA81120C3c881579E5c1BfE0dF10A4036D930d666",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x96FDBe99f6F8BD9d6A33Dfcdf404969aA4Ff3e22",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x92317A960B48A29Bc124abD4cFa8a054b9BF6766",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x818782A1243888Ad1C28e0b6A0660DFB2CBC79b7",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x75573132C9f1A320183d20b3Ec9bC2f0a38546e9",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x66E3f52c05f6f26E6C0e9668BDa620e33A93E784",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x60B5A4257c60f3bfD13Ee4AD89f08D5A5cEB389A",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x5Ec90585046457b94acE97596389E144f79da209",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x5B76Dd6d1506658eB25652a61854dEd918463C28",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x50d0dD8EEb0EC44bc4bAb51d74476fE93F41Eeb9",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x4f8b113243F05501c1A839bD9eb40F90d469Bd7D",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x45aAf1cE409172D4257C2f425910F516CEd975dD",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x43Dc4ceB61F658E66f5d828E0a69d643c9544C81",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            },
+            {
+                "ownerAddress": "0x432AdfbAB4F73Df53522A3907b961531D279dc43",
+                "amount": "1",
+                "uniqueTokens": 1,
+                "lastTransaction": "",
+                "percentage": "0.840336",
+                "value": "",
+                "isContract": false
+            }
+        ],
+        "nextPageIndex": 2,
+        "total": 63
+    }
+}

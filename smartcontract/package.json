@@ -5,16 +5,18 @@
   "author": "pengo foundation",
   "license": "MIT",
   "scripts": {
-    "config": "npx hardhat vars set DEPLOYER_PRIVATE_KEY",
+    "config-var": "npx hardhat vars set",
+    "config-priv": "npx hardhat vars set DEPLOYER_PRIVATE_KEY",
     "compile": "npx hardhat compile",
     "deploy": "npx hardhat deploy",
+    "deploy-ign-testnet": "npx hardhat ignition deploy ignition/modules/PenguinOnchainTestnet.ts",
     "deploy-ign": "npx hardhat ignition deploy ignition/modules/PenguinOnchain.ts",
     "compile-abs": "npx hardhat compile --network",
     "deploy-abs": "npx hardhat deploy-zksync --script deploy.ts --network ",
     "verify": "npx hardhat verify",
     "verify-abs": "npx hardhat verify --network abstractMainnet YOUR_CONTRACT_ADDRESS",
     "clean": "npx hardhat clean",
-    "local-node" : "npx hardhat node",
+    "local-node": "npx hardhat node",
     "test": "npx hardhat test"
   },
   "devDependencies": {
@@ -23,6 +25,7 @@
     "@openzeppelin/contracts": "^4.7.2",
     "ethers": "^6.13.5",
     "hardhat": "^2.22.18",
+    "hardhat-gas-reporter": "^2.2.2",
     "zksync-ethers": "^6.16.0"
   },
   "dependencies": {

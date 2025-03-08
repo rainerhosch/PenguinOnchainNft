@@ -7,14 +7,20 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 export default function AppNavbar() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { address, status } = useAccount();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [account, setAccount] = useState<{ address: string | undefined; status: string }>({ address: undefined, status: "disconnected" });
     useEffect(() => {
+        if(window.screen.orientation.type === 'portrait-primary'){
+            setIsMobile(true);
+        }
         setAccount({ address, status });
     }, [address, status]);
 
     const toggleMobileMenu = () => {
+        // console.log(window.screen.availHeight)
+        console.log("Is mobile:", isMobile)
         console.log("Before toggle:", mobileMenuOpen);
         setMobileMenuOpen((prev) => !prev);
         console.log("After toggle:", !mobileMenuOpen);
@@ -22,8 +28,8 @@ export default function AppNavbar() {
 
     return (
         <>
-            {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setMobileMenuOpen(false)} />
+            {mobileMenuOpen &&(
+                <div className={`fixed inset-0 bg-black/60 z-50`} onClick={() => setMobileMenuOpen(false)} />
             )}
             <nav className="fixed left-2 right-2 z-50 sm:bg-[#563988] bg-[#563988] border-b border-white/10 rounded-b-2xl sm:top-2 sm:rounded-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -7,7 +7,7 @@ import React, {
     MouseEvent,
     KeyboardEvent
 } from "react";
-import { Address } from "viem";
+import { Abi, Address } from "viem";
 import toast, { Toaster } from 'react-hot-toast';
 import {
     useAccount,
@@ -73,8 +73,13 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [showOverlay, setShowOverlay] = useState(false);
 
 
-    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const networkContract = chain?.id !== undefined
+    ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
+    : PengoContract.networkDeployment[1];
+    const abi = networkContract?.abi;
+    const abiFactory = networkContract?.abiFactory;
     const contractAddress = networkContract?.PengoAddress as Address;
+    const factoryAddress = networkContract?.factoryAddress as Address;
 
 
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
@@ -89,15 +94,15 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const listOfAddress: string[] = (listOf as string[]) || [];
 
     const { data: allowedPart } = useReadContract({
-        address: contractAddress,
-        abi,
+        address: factoryAddress,
+        abi: abiFactory as Abi,
         functionName: "getAllAllowedParts",
     });
     const allowedAccesories: string[] = (allowedPart as string[]) || [];
 
     const { data: pixelPart } = useReadContract({
-        address: contractAddress,
-        abi,
+        address: factoryAddress,
+        abi: abiFactory as Abi,
         functionName: "getPixelPart",
         args: [selectedAcc],
     });
@@ -105,8 +110,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     
     
     useEffect(() => {
-        console.log(listOfAddress)
-        // console.log(allowedPixelPart)
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
@@ -492,21 +495,23 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
 
     React.useEffect(() => {
-        if (isConfirmed && hash && networkContract?.explore) {
-            toast.success(
-                <p className="text-sm font-mono text-black/30">
-                    Transaction Hash:<br />
-                    <a
-                        href={`${networkContract.explore}/tx/${hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#60ff00] underline"
-                    >
-                        {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
-                    </a>
-                </p>
-            );
-            window.location.reload(); // Reload the page after showing the toast
+        if(!loadingToast){
+            if (hash && networkContract?.explore) {
+                toast.success(
+                    <p className="text-sm font-mono text-black/30">
+                        Transaction Hash:<br />
+                        <a
+                            href={`${networkContract.explore}/tx/${hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#60ff00] underline"
+                        >
+                            {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
+                        </a>
+                    </p>
+                );
+                // window.location.reload(); // Reload the page after showing the toast
+            }
         }
     }, [hash, networkContract?.explore]);
 
@@ -521,11 +526,11 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
         writeContract({
             address: contractAddress as Address,
-            abi,
+            abi: abi as Abi, // Ensure abi is correctly typed
             functionName: "addAccessory",
             args: [
                 selectedPengo,
-                selectedAcc,
+                selectedAcc || "", // Provide a default value if selectedAcc is undefined
                 accName,
                 svgToBytecode(accessoryCode)
             ]
@@ -534,7 +539,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     return (
         <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
-            <Toaster position="top-right" reverseOrder={true} />
+            <Toaster position="bottom-right" reverseOrder={true} />
             <div className="relative w-fit h-fit mx-auto my-4">
                 <canvas
                     ref={canvasRef}

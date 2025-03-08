@@ -6,7 +6,7 @@ pragma solidity >=0.6.0;
 /// @author Penguin Onchain Lab
 /// @notice Provides functions for encoding/decoding unit like byte, string, hex
 library PengoConverter {
-
+    
     // this function is for convert bytes into hex string it's seem at toHexString but i need to test the speed
     function toHexChar(bytes1 b) internal pure returns (string memory) {
         bytes memory alphabet = "0123456789ABCDEF";

@@ -16,6 +16,18 @@ import PengosMintComponen from "../../components/mint/PengosMintComponeV2"
 //     { category: "Top Eye Color", name: "Purple Shade", quantity: 5910, percentage: "30%" },
 //     { category: "Top Eye Color", name: "Standard", quantity: 10835, percentage: "55%" },
 // ];
+const traits = [
+    { category: "Body Color", name: "Zombie", percentage: "1.5%" },
+    { category: "Body Color", name: "Arctic", percentage: "3.5%" },
+    { category: "Body Color", name: "Fire", percentage: "7.5%" },
+    { category: "Body Color", name: "Female", percentage: "43.75%" },
+    { category: "Body Color", name: "Male", percentage: "43.75%" },
+    { category: "Top Eye Color", name: "Zombie Eye", percentage: "1.5%" },
+    { category: "Top Eye Color", name: "Ancestors", percentage: "5%" },
+    { category: "Top Eye Color", name: "Sleepy", percentage: "10%" },
+    { category: "Top Eye Color", name: "Purple Shade", percentage: "30%" },
+    { category: "Top Eye Color", name: "Standard", percentage: "55%" },
+];
 
 export default function MintPage() {
 
@@ -29,15 +41,14 @@ export default function MintPage() {
                         <h1 className="text-2xl font-bold text-center mb-4 text-black">Mint Your Pengos</h1>
                         <PengosMintComponen />
                     </div>
-                    {/* <div className="flex flex-col px-5">
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">Trait Distribution</h2>
+                    <div className="flex flex-col px-5">
+                        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-center">DNA Traits Distribution</h2>
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-gray shadow-md rounded-lg">
                                 <thead>
                                     <tr className="bg-[#301361]">
                                         <th className="py-2 px-4 text-left text-xs font-mono sm:text-base">Category</th>
                                         <th className="py-2 px-4 text-left text-xs font-mono sm:text-base">Trait</th>
-                                        <th className="py-2 px-4 text-right text-xs font-mono sm:text-base">Quantity</th>
                                         <th className="py-2 px-4 text-right text-xs font-mono sm:text-base">Percentage</th>
                                     </tr>
                                 </thead>
@@ -46,19 +57,18 @@ export default function MintPage() {
                                         <tr
                                             key={index}
                                             className={
-                                                index % 2 === 0 ? "bg-purple-800" : "bg-purple-400"
+                                                index % 2 === 0 ? "bg-purple-500" : "bg-purple-400"
                                             }
                                         >
-                                            <td className="py-2 px-4 text-xs font-mono sm:text-base">{trait.category}</td>
-                                            <td className="py-2 px-4 text-xs font-mono sm:text-base">{trait.name}</td>
-                                            <td className="py-2 px-4 text-xs font-mono sm:text-base text-right">{trait.quantity}</td>
-                                            <td className="py-2 px-4 text-xs font-mono sm:text-base text-right">{trait.percentage}</td>
+                                            <td className=" px-4 text-xs font-mono sm:text-base text-sky-800">{trait.category}</td>
+                                            <td className=" px-4 text-xs font-mono sm:text-base text-indigo-700">{trait.name}</td>
+                                            <td className=" px-4 text-xs font-mono sm:text-base text-right text-yellow-900">{trait.percentage}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </main>
         </div>

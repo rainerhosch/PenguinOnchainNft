@@ -53,6 +53,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract PengoFactory is IPengoFactory, Ownable {
     using Strings for uint256;
+    mapping(string => mapping(uint8 => mapping(uint8 => bool))) public pixelMapCoordinates;
+    mapping(string => bool) public allowedParts;
+    mapping(string => uint8[]) private partPixelsX;
+    mapping(string => uint8[]) private partPixelsY;
+    string[] private partKeys;
     
     struct Color {
         string name;
@@ -70,6 +75,9 @@ contract PengoFactory is IPengoFactory, Ownable {
     string internal constant BYTE_FEET      = "0d160101F5A6230e160101F5A62311160101F5A62312160101F5A623";
 
     IPenguinOnchain public pengoContract;
+
+    event CoordinatesInitialized(string part, string byteData);
+    event RemovedPart(string part);
 
     constructor() {}
 
@@ -96,7 +104,7 @@ contract PengoFactory is IPengoFactory, Ownable {
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_TOP_EYE, topEyeColor.value)));
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BOT_EYE, "")));
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_FEET, "")));
-        
+
         string memory accessoriesCollected = "";
         // Looping for accessories
         for (uint256 i = 0; i < accessories.length; i++) {
@@ -106,7 +114,7 @@ contract PengoFactory is IPengoFactory, Ownable {
             accessoriesCollected = string(
                 abi.encodePacked(
                     accessoriesCollected,
-                    bytes(accessoriesCollected).length > 0 ? "," : "", // Tambahkan koma jika bukan data pertama
+                    bytes(accessoriesCollected).length > 0 ? "," : "",
                     '{"trait_type": "', accessories[i].trait_type, '", "value": "', accessories[i].trait_name, '"}'
                 )
             );
@@ -125,6 +133,7 @@ contract PengoFactory is IPengoFactory, Ownable {
                         '"image": "data:image/svg+xml;base64,', Base64.encode(bytes(rawPengo)), '",',
                         '"attributes": [',
                         '{"trait_type": "Pengo Type", "value": "', baseColor.name, '"},',
+                        '{"trait_type": "Eye Type", "value": "', topEyeColor.name, '"},',
                         '{"trait_type": "Life Goal", "value": "', specialTraits.category, '"},',
                         '{"trait_type": "Net Worth", "value": "', specialTraits.networth, '"}',
                         bytes(accessoriesCollected).length > 0 ? "," : "",
@@ -195,7 +204,7 @@ contract PengoFactory is IPengoFactory, Ownable {
         string memory part,
         uint256 _seed
     ) private pure returns (Color memory) {
-        uint256 maxSupply = 20000;
+        uint256 maxSupply = 50000; // change to 50K from 20K
         uint256 seed = _seed % maxSupply;
 
         if (keccak256(abi.encodePacked(part)) == keccak256(abi.encodePacked("Body"))) {
@@ -254,5 +263,133 @@ contract PengoFactory is IPengoFactory, Ownable {
 
     function setPengoContract(address _pengoContract) external {
         pengoContract = IPenguinOnchain(_pengoContract);
+    }
+
+    /*---------------------------------------------------------------------
+    *                        Coordinate Setup
+    ---------------------------------------------------------------------*/
+
+    function removeAllowedPart(string memory part) public onlyOwner {
+        require(allowedParts[part], "Part not found");
+        delete allowedParts[part];
+        // delete pixelMapCoordinates[part];
+        for (uint8 x = 0; x < 255; x++) {
+            for (uint8 y = 0; y < 255; y++) {
+                if (pixelMapCoordinates[part][x][y]) {
+                    delete pixelMapCoordinates[part][x][y];
+                }
+            }
+        }
+        delete partPixelsX[part];
+        delete partPixelsY[part];
+        for (uint256 i = 0; i < partKeys.length; i++) {
+            if (
+                keccak256(abi.encodePacked(partKeys[i])) ==
+                keccak256(abi.encodePacked(part))
+            ) {
+                partKeys[i] = partKeys[partKeys.length - 1];
+                partKeys.pop();
+                break;
+            }
+        }
+        emit RemovedPart(part);
+    }
+
+    function initializeCoordinates(
+        string memory part,
+        string memory byteData
+    ) public onlyOwner {
+        require(!allowedParts[part], "Part already initialized");
+        bytes memory data = PengoConverter.hexStringToBytes(byteData);
+
+        uint256 numPixels = data.length / 7;
+        for (uint256 i = 0; i < numPixels; i++) {
+            uint256 offset = i * 7;
+            uint8 x = uint8(data[offset]); // x
+            uint8 y = uint8(data[offset + 1]); // y
+            pixelMapCoordinates[part][x][y] = true;
+            partPixelsX[part].push(x);
+            partPixelsY[part].push(y);
+        }
+        allowedParts[part] = true;
+        partKeys.push(part); // Store the key for retrieval
+        emit CoordinatesInitialized(part, byteData);
+    }
+    // Function to retrieve all allowed parts
+    function getAllAllowedParts() public view returns (string[] memory) {
+        string[] memory parts = new string[](partKeys.length);
+
+        for (uint256 i = 0; i < partKeys.length; i++) {
+            parts[i] = partKeys[i];
+        }
+        return parts;
+    }
+
+    function isAllowedPart(
+        string calldata part
+    ) public view returns (bool) {
+        return allowedParts[part];
+    }
+
+    function isValidCoordinate(
+        string memory part,
+        uint8 x,
+        uint8 y
+    ) public view returns (bool) {
+        require(allowedParts[part], "Part not allowed!");
+        return pixelMapCoordinates[part][x][y];
+    }
+    
+    function reconstructHexString(uint256[] memory pixels, string[] memory colors) public pure returns (string memory) {
+        require(pixels.length % 4 == 0, "Invalid pixel data");
+        require(colors.length == pixels.length / 4, "Pixel and color mismatch");
+
+        bytes memory result;
+
+        for (uint256 i = 0; i < colors.length; i++) {
+            bytes memory pixelData = abi.encodePacked(
+                bytes1(uint8(pixels[i * 4])),       // x
+                bytes1(uint8(pixels[i * 4 + 1])),   // y
+                bytes1(uint8(pixels[i * 4 + 2])),   // w
+                bytes1(uint8(pixels[i * 4 + 3]))    // h
+            );
+
+            // Get color string and then conver into bytes
+            bytes memory colorBytes = bytes(colors[i]);
+
+            // Combine pixelDatas and colorBytes
+            result = abi.encodePacked(result, pixelData, colorBytes);
+        }
+
+        return toHexString(result);
+    }
+
+    
+    // this function is for convert bytes into hex string
+    function toHexString(bytes memory data) internal pure returns (string memory) {
+        bytes memory HEX = "0123456789ABCDEF";
+        bytes memory str = new bytes(2 * data.length);
+
+        for (uint256 i = 0; i < data.length; i++) {
+            str[2 * i] = HEX[uint8(data[i]) >> 4];  // Get 4 bit at the top
+            str[2 * i + 1] = HEX[uint8(data[i]) & 0x0f];  // Get 4 bit at the bottom
+        }
+        
+        return string(str);
+    }
+
+    function getPixelPart(
+        string memory part
+    ) public view returns (uint256[] memory xCoords, uint256[] memory yCoords) {
+        require(allowedParts[part], "Part not allowed!");
+
+        uint256 length = partPixelsX[part].length;
+        xCoords = new uint256[](length);
+        yCoords = new uint256[](length);
+
+        for (uint256 i = 0; i < length; i++) {
+            xCoords[i] = partPixelsX[part][i];
+            yCoords[i] = partPixelsY[part][i];
+        }
     }
 }

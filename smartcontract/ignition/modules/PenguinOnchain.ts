@@ -2,14 +2,9 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 export default buildModule("PenguinOnchainModule", (m) => {
-    const pengoConverter = m.contract("PengoConverter");
+    // const pengoConverter = m.contract("PengoConverter");
     const pengoFactory = m.contract("PengoFactory");
-    const penguinOnchain = m.contract("PenguinOnchain", [], {
-        after: [pengoConverter],
-        libraries: {
-            "contracts/libraries/pengoConverter.sol:PengoConverter": pengoConverter,
-        },
-    });
+    const penguinOnchain = m.contract("PenguinOnchain");
     // const pengoDao = m.contract("PengoDao", [penguinOnchain]);
     const part_name1 = "Top Wear";
     const part_data1 = "0d0b01010000000e0b01010000000f0b0101000000100b0101000000110b0101000000120b01010000000d0a01010000000e0901010000000f0901010000001009010100000011090101000000120a01010000000d0d01010000000d0c01010000000d09010100000012090101000000100a01010000000f0a01010000000e0801010000000e0701010000000f070101000000100701010000001107010100000011080101000000120c0101000000120d01010000000e0a0101000000110a01010000000f080101000000100801010000000c0d0101000000130d01010000000c0c01010000000c0b01010000000c0a01010000000c0901010000000d0801010000000c0801010000000c0701010000000d07010100000012070101000000130701010000001308010100000013090101000000130a0101000000130b0101000000130c01010000000e0c01010000000f0c0101000000100c0101000000110c010100000012080101000000";
@@ -22,10 +17,10 @@ export default buildModule("PenguinOnchainModule", (m) => {
 
     m.call(penguinOnchain, "setFactory", [pengoFactory]);
     m.call(pengoFactory, "setPengoContract", [penguinOnchain])
-    m.call(penguinOnchain, "initializeCoordinates", [part_name1, part_data1], { id: "initializeCoordinatesTopWear" });
-    m.call(penguinOnchain, "initializeCoordinates", [part_name2, part_data2], { id: "initializeCoordinatesBodyWear" });
-    m.call(penguinOnchain, "initializeCoordinates", [part_name3, part_data3], { id: "initializeCoordinatesFootWear" });
-    m.call(penguinOnchain, "initializeCoordinates", [part_name4, part_data4], { id: "initializeCoordinatesEyeWear" });
+    m.call(pengoFactory, "initializeCoordinates", [part_name1, part_data1], { id: "initializeCoordinatesTopWear" });
+    m.call(pengoFactory, "initializeCoordinates", [part_name2, part_data2], { id: "initializeCoordinatesBodyWear" });
+    m.call(pengoFactory, "initializeCoordinates", [part_name3, part_data3], { id: "initializeCoordinatesFootWear" });
+    m.call(pengoFactory, "initializeCoordinates", [part_name4, part_data4], { id: "initializeCoordinatesEyeWear" });
 
     return { 
         pengoFactory,

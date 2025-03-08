@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Address } from 'viem';
+import { Abi, Address } from 'viem';
 import Image from "next/image";
 import image1 from "@/app/images/pengo-template.svg";
 import {
@@ -19,8 +19,10 @@ export default function PengosMintComponent() {
     const { address, status, chain } = useAccount();
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
     
-    const abi = PengoContract.abi;
-    const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
+    const networkContract = chain?.id !== undefined
+    ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
+    : PengoContract.networkDeployment[1];
+    const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress;
     
 
@@ -72,7 +74,7 @@ export default function PengosMintComponent() {
 
         writeContract({
             address: contractAddress as Address,
-            abi,
+            abi: abi as Abi, // Ensure abi is correctly typed,
             functionName: "mintPengo",
             args: [BigInt(totalMint)],
             value: BigInt(Number(price) * totalMint),

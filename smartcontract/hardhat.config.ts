@@ -2,6 +2,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 import { vars } from "hardhat/config";
 import "@matterlabs/hardhat-zksync";
+require("hardhat-gas-reporter");
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -17,6 +18,14 @@ const config: HardhatUserConfig = {
         },
       }
     }
+  },
+  gasReporter: {
+    enabled: true,       // Aktifkan gas reporter
+    currency: "USD",     // Pilihan: USD, EUR, dll.
+    gasPrice: 52,        // Harga gas (Gwei) untuk estimasi biaya
+    coinmarketcap: vars.get("CMC_API_KEY"),   // API Key (opsional) untuk menampilkan harga gas secara real-time
+    outputFile: "gas-report.txt", // Simpan hasil ke file (opsional)
+    noColors: false,     // Hapus warna terminal jika ingin output bersih
   },
   defaultNetwork: "sepolia",
   networks: {

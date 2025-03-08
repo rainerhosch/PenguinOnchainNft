@@ -47,6 +47,7 @@ pragma solidity ^0.8.17;
 
 interface IPenguinOnchain {
     struct Accessory {
+        uint256 accessoryId;
         string trait_type;
         string trait_name;
         string bytePixel;
