@@ -40,6 +40,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
 
     const abi = networkContract?.abi as Abi;
     const contractAddress = networkContract?.PengoAddress as Address;
+    const currencySymbols = networkContract?.currency;
 
     const { data: hash, error, isPending, writeContract} = useWriteContract();
     const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
@@ -101,7 +102,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
                     </p>
                     {sellPrice != 0 &&
                         <p className="text-sm font-mono">
-                            for  {sellPrice} ETH
+                            for  {sellPrice} {currencySymbols}
                         </p>
                     }
                 </div>
@@ -114,7 +115,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
                     // onChange={(e) => setSellPrice(parseFloat(e.target.value) || 0)}
                     onChange={(e) => setSellPrice(Math.max(0, Number(e.target.value)))}
                     className="w-full text-sm p-2 border border-white bg-transparent text-white rounded"
-                    placeholder="Enter price in ETH"
+                    placeholder={`Enter price in ${currencySymbols}`}
                 />
 
                 <div className="flex gap-2 mt-4">

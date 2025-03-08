@@ -24,6 +24,7 @@ export default function PengosMintComponent() {
     : PengoContract.networkDeployment[1];
     const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress;
+    const currencySymbols = networkContract?.currency;
     
 
     // Check if the connected user's chain matches the expected chain
@@ -127,7 +128,7 @@ export default function PengosMintComponent() {
                             <p className="text-sm font-mono text-white/30">Your Balance</p>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-mono text-white/30"> {price ? ethers.formatEther(BigInt(Number(price))) : '0'} ETH</p>
+                            <p className="text-sm font-mono text-white/30"> {price ? ethers.formatEther(BigInt(Number(price))) : '0'} {currencySymbols}</p>
                             <p className="text-sm font-mono text-white/30"> {balanceCount?.toString()} PENGO</p>
                         </div>
                     </div>
@@ -161,7 +162,7 @@ export default function PengosMintComponent() {
                         </button>
                     )}
                     <p className="mx-auto text-sm font-mono text-white/50">
-                        Price amount {ethers.formatEther(BigInt(Number(price) || 0) * BigInt(totalMint))} ETH
+                        Price amount {ethers.formatEther(BigInt(Number(price) || 0) * BigInt(totalMint))} {currencySymbols}
                     </p>
                 </form>
             </div>

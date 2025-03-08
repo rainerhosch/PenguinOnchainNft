@@ -64,6 +64,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
     const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress as Address;
+    const currencySymbols = networkContract?.currency;
 
     const { data: listOf } = useReadContract({
         address: contractAddress,
@@ -127,7 +128,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
             </svg>
 
             <p className="text-purple-950 font-mono text-sm">
-                Price: {Number(accessoryData.sellingPrice) / 1e18} ETH
+                Price: {Number(accessoryData.sellingPrice) / 1e18} {currencySymbols}
             </p>
             <select
                 hidden={isYour}
