@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { 
-    Abi, 
+import {
+    Abi,
     Address
 } from "viem";
 import {
@@ -110,6 +110,10 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                             height={200}
                         />
                         <h3 className="text-purple-950 text-sm font-mono my-1">{nft.name}</h3>
+                        <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center py-2">
+                            <span className="text-xs font-mono text-white/50">Special trait: {specialTrait.category}</span>
+                            <span className="text-xs font-mono text-white/50">Networth : {specialTrait.networth}</span>
+                        </div>
                         {listOfAccessories.length > 0 ? (
                             <button onClick={() => setShowModal(true)} className="text-xs font-mono border border-white py-1 px-2 bg-purple-900 rounded-sm hover:bg-black/30 my-2">
                                 View Trait
@@ -122,9 +126,9 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             )}
 
             {showModal && (
-                <AccessoryModal 
-                    accessories={listOfAccessories} 
-                    specialTrait={specialTrait} 
+                <AccessoryModal
+                    accessories={listOfAccessories}
+                    specialTrait={specialTrait}
                     setSelectedAccessory={setSelectedAccessory}
                     setShowModal={setShowModal}
                     setShowSellAccessoryModal={setShowSellAccessoryModal}
@@ -132,10 +136,10 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             )}
 
             {showSellAccessoryModal && selectedAccessory && (
-                <SellAccessoryModal 
-                    accessory={selectedAccessory} 
+                <SellAccessoryModal
+                    accessory={selectedAccessory}
                     nftId={nftData}
-                    setShowSellAccessoryModal={setShowSellAccessoryModal} 
+                    setShowSellAccessoryModal={setShowSellAccessoryModal}
                 />
             )}
         </>
