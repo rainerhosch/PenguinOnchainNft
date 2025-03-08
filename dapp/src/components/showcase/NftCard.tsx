@@ -128,7 +128,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             {showModal && (
                 <AccessoryModal
                     accessories={listOfAccessories}
-                    specialTrait={specialTrait}
+                    // specialTrait={specialTrait}
                     setSelectedAccessory={setSelectedAccessory}
                     setShowModal={setShowModal}
                     setShowSellAccessoryModal={setShowSellAccessoryModal}

@@ -18,13 +18,19 @@ interface SpecialTrait {
 
 interface AccessoryModalProps {
     accessories: Accessory[];
-    specialTrait: SpecialTrait;
+    // specialTrait: SpecialTrait;
     setSelectedAccessory: (accessory: Accessory) => void;
     setShowModal: (show: boolean) => void;
     setShowSellAccessoryModal: (show: boolean) => void;
 }
 
-const AccessoryModal: React.FC<AccessoryModalProps> = ({ accessories, specialTrait, setSelectedAccessory, setShowModal, setShowSellAccessoryModal }) => {
+const AccessoryModal: React.FC<AccessoryModalProps> = ({ 
+    accessories, 
+    // specialTrait, 
+    setSelectedAccessory, 
+    setShowModal, 
+    setShowSellAccessoryModal 
+}) => {
     return (
         <div className="fixed z-50 flex items-center justify-center bg-black/50 backdrop-blur-xl inset-0">
             <div className="flex flex-col gap-2 bg-purple-950 rounded-lg p-4 justify-center pointer-events-auto w-3/4 sm:w-1/4">
