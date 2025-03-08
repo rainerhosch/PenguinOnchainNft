@@ -11,10 +11,10 @@ type Accessory = {
     owner: string;
     sellingPrice: bigint;
 };
-interface SpecialTrait {
-    category: string;
-    networth: string;
-}
+// interface SpecialTrait {
+//     category: string;
+//     networth: string;
+// }
 
 interface AccessoryModalProps {
     accessories: Accessory[];
