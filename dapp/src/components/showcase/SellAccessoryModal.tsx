@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { parseEther } from "ethers";
 import { Address, Abi } from "viem";
@@ -85,7 +86,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
                 window.location.reload();
             }, 5000);
         }
-    }, [isSuccess, hash]);
+    }, [isSuccess, hash, error, networkContract?.explore, setShowSellAccessoryModal]);
 
 
     return (
