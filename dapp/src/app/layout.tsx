@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import NextWalletProvider from "../components/NextWalletProvider"
+import { Analytics } from "@vercel/analytics/next"
 
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -75,6 +76,7 @@ export default function RootLayout({
       >
         <NextWalletProvider>
           {children}
+          <Analytics/>
         </NextWalletProvider>
       </body>
     </html>
