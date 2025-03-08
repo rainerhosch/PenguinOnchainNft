@@ -59,39 +59,28 @@ contract PenguinOnchain is
     IPenguinOnchain
 {
     using Strings for uint256;
-
     IPengoFactory public factory;
 
     uint256 public constant MAX_SUPPLY = 20000;
     uint256 public constant MINT_PRICE = 0.5 ether;
     uint256 public constant MAX_MINT_PER_WALLET = 10;
     uint256 public constant ROYALTY_PERCENT = 5;
-
     address public BENEFICARY_ADDRESS;
     address public ROYALTY_ADDRESS;
 
     mapping(uint256 => uint256) internal seeds;
     mapping(address => uint256) public mintedCount;
-    mapping(uint256 => Accessory[]) public accessories;
     mapping(uint256 => SpecialTrait) public specialTraits;
     mapping(uint256 => uint256) public accessoryToTokenId;
     mapping(uint256 => uint256) public accessoryToIndex;
 
     mapping(uint256 => mapping(string => bool)) private accessoryOfTokenExists;
-    mapping(string => mapping(uint8 => mapping(uint8 => bool)))
-        public pixelMapCoordinates;
-    mapping(string => bool) public allowedParts;
-    mapping(string => uint8[]) private partPixelsX;
-    mapping(string => uint8[]) private partPixelsY;
 
     // offer mapping
     uint256 public totalOfferBalance;
     mapping(uint256 => mapping(uint256 => Offer)) public offers;
     mapping(address => uint256) public offerBalances; //safety offer fund
-
-    // Accessory[] public accessoriesForSale;
     AccessoryForSale[] public accessoriesForSale;
-    string[] private partKeys;
 
     event AccessoryAdded(
         uint256 indexed tokenId,
@@ -115,9 +104,6 @@ contract PenguinOnchain is
         address buyer,
         uint256 price
     );
-
-    event CoordinatesInitialized(string part, string byteData);
-    event RemovedPart(string part);
 
     constructor() ERC721A("Penguin Onchain", "Pengo") {
         BENEFICARY_ADDRESS = owner();
@@ -152,9 +138,6 @@ contract PenguinOnchain is
         return newTokenIds;
     }
 
-    /*
-     *
-     */
     function addAccessory(
         uint256 tokenId,
         string memory trait_type,
@@ -238,9 +221,6 @@ contract PenguinOnchain is
 
         updateTraits(tokenId);
         accessoryOfTokenExists[tokenId][trait_type] = true;
-
-        accessoryToTokenId[accessoryId] = tokenId;
-        accessoryToIndex[accessoryId] = accessoryId; // Save accessory index in the array
 
         emit AccessoryAdded(
             tokenId,
@@ -337,12 +317,7 @@ contract PenguinOnchain is
             })
         );
 
-        _saveRemoveAccessory(fromTokenId, accessoryId);
-        
-        accessoryOfTokenExists[toTokenId][accessory.trait_type] = true;
         accessoryOfTokenExists[fromTokenId][accessory.trait_type] = false;
-
-        updateTraits(toTokenId);
         updateTraits(fromTokenId);
 
         (bool successSeller, ) = payable(previousOwner).call{
@@ -364,7 +339,6 @@ contract PenguinOnchain is
         // Ensure the item is truly in the list of accessoriesForSale
         uint256 index = findAccessoryIndex(fromTokenId, accessoryId);
         require(index < accessoriesForSale.length, "Accessory not found in sale list");
-        require(accessoriesForSale[index].accessory.owner == msg.sender, "Not the owner");
 
         // Update accessory status so it is no longer for sale
         accessories[fromTokenId][accessoryId].forSale = false;
@@ -544,7 +518,6 @@ contract PenguinOnchain is
         uint256 tokenId
     ) private view returns (uint256 pseudoRandomness) {
         pseudoRandomness = uint256(
-            // keccak256(abi.encodePacked(block.timestamp, msg.sender, tokenId))
             keccak256(
                 abi.encodePacked(
                     block.timestamp,
@@ -586,8 +559,6 @@ contract PenguinOnchain is
         factory = _factoryAddress;
     }
 
-
-
     function withdraw() public onlyOwner {
         uint256 totalOfferFunds = totalOfferBalance; 
         uint256 withdrawableAmount = address(this).balance - totalOfferFunds;
@@ -600,89 +571,5 @@ contract PenguinOnchain is
         require(success, "Withdraw failed");
     }
 
-    /*---------------------------------------------------------------------
-    *                        Coordinate Setup
-    ---------------------------------------------------------------------*/
 
-    function removeAllowedPart(string memory part) public onlyOwner {
-        require(allowedParts[part], "Part not found");
-        delete allowedParts[part];
-        // delete pixelMapCoordinates[part];
-        for (uint8 x = 0; x < 255; x++) {
-            for (uint8 y = 0; y < 255; y++) {
-                if (pixelMapCoordinates[part][x][y]) {
-                    delete pixelMapCoordinates[part][x][y];
-                }
-            }
-        }
-        delete partPixelsX[part];
-        delete partPixelsY[part];
-        for (uint256 i = 0; i < partKeys.length; i++) {
-            if (
-                keccak256(abi.encodePacked(partKeys[i])) ==
-                keccak256(abi.encodePacked(part))
-            ) {
-                partKeys[i] = partKeys[partKeys.length - 1];
-                partKeys.pop();
-                break;
-            }
-        }
-        emit RemovedPart(part);
-    }
-
-    function initializeCoordinates(
-        string memory part,
-        string memory byteData
-    ) public onlyOwner {
-        require(!allowedParts[part], "Part already initialized");
-        bytes memory data = PengoConverter.hexStringToBytes(byteData);
-
-        uint256 numPixels = data.length / 7;
-        for (uint256 i = 0; i < numPixels; i++) {
-            uint256 offset = i * 7;
-            uint8 x = uint8(data[offset]); // x
-            uint8 y = uint8(data[offset + 1]); // y
-            // uint8 w = uint8(data[offset + 2]);   // width
-            // uint8 h = uint8(data[offset + 3]);   // height
-            pixelMapCoordinates[part][x][y] = true;
-            partPixelsX[part].push(x);
-            partPixelsY[part].push(y);
-        }
-        allowedParts[part] = true;
-        partKeys.push(part); // Store the key for retrieval
-        emit CoordinatesInitialized(part, byteData);
-    }
-    // Function to retrieve all allowed parts
-    function getAllAllowedParts() public view returns (string[] memory) {
-        string[] memory parts = new string[](partKeys.length);
-
-        for (uint256 i = 0; i < partKeys.length; i++) {
-            parts[i] = partKeys[i];
-        }
-        return parts;
-    }
-
-    function isValidCoordinate(
-        string memory part,
-        uint8 x,
-        uint8 y
-    ) public view returns (bool) {
-        require(allowedParts[part], "Part not allowed!");
-        return pixelMapCoordinates[part][x][y];
-    }
-
-    function getPixelPart(
-        string memory part
-    ) public view returns (uint256[] memory xCoords, uint256[] memory yCoords) {
-        require(allowedParts[part], "Part not allowed!");
-
-        uint256 length = partPixelsX[part].length;
-        xCoords = new uint256[](length);
-        yCoords = new uint256[](length);
-
-        for (uint256 i = 0; i < length; i++) {
-            xCoords[i] = partPixelsX[part][i];
-            yCoords[i] = partPixelsY[part][i];
-        }
-    }
 }

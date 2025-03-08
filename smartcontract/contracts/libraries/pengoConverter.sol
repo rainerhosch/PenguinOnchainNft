@@ -7,20 +7,6 @@ pragma solidity >=0.6.0;
 /// @notice Provides functions for encoding/decoding unit like byte, string, hex
 library PengoConverter {
 
-    // this function is for convert bytes into hex string
-    function toHexString(bytes memory data) internal pure returns (string memory) {
-        bytes memory HEX = "0123456789ABCDEF";
-        bytes memory str = new bytes(2 * data.length);
-
-        for (uint256 i = 0; i < data.length; i++) {
-            str[2 * i] = HEX[uint8(data[i]) >> 4];  // Get 4 bit at the top
-            str[2 * i + 1] = HEX[uint8(data[i]) & 0x0f];  // Get 4 bit at the bottom
-        }
-        
-        return string(str);
-    }
-
-    
     // this function is for convert bytes into hex string it's seem at toHexString but i need to test the speed
     function toHexChar(bytes1 b) internal pure returns (string memory) {
         bytes memory alphabet = "0123456789ABCDEF";
@@ -74,29 +60,4 @@ library PengoConverter {
         }
         return string(bstr);
     }
-
-    function reconstructHexString(uint256[] memory pixels, string[] memory colors) public pure returns (string memory) {
-        require(pixels.length % 4 == 0, "Invalid pixel data");
-        require(colors.length == pixels.length / 4, "Pixel and color mismatch");
-
-        bytes memory result;
-
-        for (uint256 i = 0; i < colors.length; i++) {
-            bytes memory pixelData = abi.encodePacked(
-                bytes1(uint8(pixels[i * 4])),       // x
-                bytes1(uint8(pixels[i * 4 + 1])),   // y
-                bytes1(uint8(pixels[i * 4 + 2])),   // w
-                bytes1(uint8(pixels[i * 4 + 3]))    // h
-            );
-
-            // Get color string and then conver into bytes
-            bytes memory colorBytes = bytes(colors[i]);
-
-            // Combine pixelDatas and colorBytes
-            result = abi.encodePacked(result, pixelData, colorBytes);
-        }
-
-        return toHexString(result);
-    }
-
 }

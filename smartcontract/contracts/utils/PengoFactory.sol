@@ -90,7 +90,6 @@ contract PengoFactory is IPengoFactory, Ownable {
         );
 
         // Get all pixel data on array uint256[]
-        
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BODY, baseColor.value)));
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BELLY, "")));
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BILL, "")));
@@ -98,8 +97,6 @@ contract PengoFactory is IPengoFactory, Ownable {
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BOT_EYE, "")));
         rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_FEET, "")));
         
-
-
         string memory accessoriesCollected = "";
         // Looping for accessories
         for (uint256 i = 0; i < accessories.length; i++) {

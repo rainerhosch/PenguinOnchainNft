@@ -1,6 +1,5 @@
 "use client";
 import React, {
-    // useRef,
     useState,
     useEffect
 } from "react";
@@ -52,15 +51,10 @@ const parseBytePixel = (bytePixel: string) => {
 export default function CardItem({ accessoryData, onPurchase, accessoryId }: CardItemProps) {
     const { address, chain } = useAccount();
     const pixels = parseBytePixel(accessoryData.bytePixel);
-
-    const [fromTokenId, setFromTokenId] = useState("");
     const [isYour, setIsYour] = useState(false);
-    const [toTokenId, setToTokenId] = useState("");
     const [accOwner, setAccOwner] = useState("");
     const [selectedPengo, setSelectedPengo] = useState("");
     const [loading, setLoading] = useState(true);
-    // console.log(accessoryId)
-    const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
 
@@ -77,36 +71,16 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
             setIsYour(true);
         }
         setAccOwner(accessoryData.owner);
-        // console.log(accessoryData)
-        // console.log(allowedPixelPart)
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
     }, [listOfAddress]);
 
-    const { data: listOfAccOwner } = useReadContract({
-        address: contractAddress,
-        abi,
-        functionName: "tokensOfOwner",
-        args: [accOwner],
-    });
-
-    useEffect(() => {
-        
-        // console.log(listOfAccOwner)
-        if (listOfAddress.length > 0) {
-            // setSelectedPengo(`${listOfAddress[0]}`);
-        }
-    }, [listOfAddress]);
 
 
 
     const handlePurchase = () => {
 
-        if (!fromTokenId || !toTokenId) {
-            alert("Buy not active for now, wait for update!");
-            // alert("Please enter valid NFT Token IDs");
-            return;
         }
         onPurchase(accessoryId, Number(fromTokenId), Number(toTokenId));
     };
@@ -132,15 +106,6 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId }: Car
             <p className="text-purple-950 font-mono text-sm">
                 Price: {Number(accessoryData.sellingPrice) / 1e18} ETH
             </p>
-
-            {/* <input
-                type="number"
-                disabled={isYour}
-                placeholder="From NFT Token ID"
-                value={fromTokenId}
-                onChange={(e) => setFromTokenId(e.target.value)}
-                className="text-xs border font-mono bg-black/60 text-white border-purple-500 p-1 rounded w-40"
-            /> */}
             <select
                 hidden={isYour}
                 className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'

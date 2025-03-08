@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/jsx-key */
 "use client";
 
 import React, {
@@ -76,7 +73,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [showOverlay, setShowOverlay] = useState(false);
 
 
-    const abi = PengoContract.abi;
     const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
 

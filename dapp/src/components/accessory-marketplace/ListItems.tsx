@@ -20,7 +20,6 @@ export default function ListItems() {
     const [loading, setLoading] = useState(true);
     const [accessoryFS, setAccessoryFS] = useState<Accessory[]>([]);
 
-    const abi = PengoContract.abi;
     const networkContract = chain?.id !== undefined
     ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
     : PengoContract.networkDeployment[0];
@@ -41,7 +40,6 @@ export default function ListItems() {
             setAccessoryFS(AccessoriesForSale);
         }
     }, [AccessoriesForSale]);
-    console.log(AccessoriesForSale);
 
     const handlePurchase = (accessoryId: number, fromTokenId: number, toTokenId: number) => {
         writeContract({

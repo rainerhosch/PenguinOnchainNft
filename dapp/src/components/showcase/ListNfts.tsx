@@ -17,7 +17,6 @@ export default function NftList() {
     const networkContract = PengoContract.networkDeployment.find(network =>  Number(network.chainId) === chain?.id);
     const contractAddress = networkContract?.PengoAddress as Address;
 
-    // Read list of NFT token IDs owned by the user
     const { data: listOf } = useReadContract({
         address: contractAddress,
         abi,
@@ -29,14 +28,6 @@ export default function NftList() {
         const listOfAddress: string[] = (listOf as string[]) || [];
         if (listOfAddress !== undefined || listOfAddress > 0) {
             setLoading(false);
-            setNftList(listOfAddress)
-            if(listOfAddress.length > 6){
-                setNftNumb("6");
-            } if(listOfAddress.length > 2){
-                setNftNumb("4");
-            }else{
-                setNftNumb((listOfAddress.length).toString());
-            }
         }
     }, [listOf]);
     
