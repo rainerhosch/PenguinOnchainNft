@@ -486,27 +486,27 @@ contract PenguinOnchain is
         if (totalValueInEther < 1) {
             specialTraits[tokenId] = SpecialTrait({
                 category: "lil pengo",
-                networth: string.concat(totalValueInEther.toString(), " Eth")
+                networth: string.concat(totalValueInEther.toString(), " MON")
             });
         } else if (totalValueInEther < 2) {
             specialTraits[tokenId] = SpecialTrait({
                 category: "pengo army",
-                networth: string.concat(totalValueInEther.toString(), " Eth")
+                networth: string.concat(totalValueInEther.toString(), " MON")
             });
         } else if (totalValueInEther < 5) {
             specialTraits[tokenId] = SpecialTrait({
                 category: "pengo millionaire",
-                networth: string.concat(totalValueInEther.toString(), " Eth")
+                networth: string.concat(totalValueInEther.toString(), " MON")
             });
         } else if (totalValueInEther < 10) {
             specialTraits[tokenId] = SpecialTrait({
                 category: "pengo billionaire",
-                networth: string.concat(totalValueInEther.toString(), " Eth")
+                networth: string.concat(totalValueInEther.toString(), " MON")
             });
         } else {
             specialTraits[tokenId] = SpecialTrait({
                 category: "fucking rich pengo",
-                networth: string.concat(totalValueInEther.toString(), " Eth")
+                networth: string.concat(totalValueInEther.toString(), " MON")
             });
         }
     }
