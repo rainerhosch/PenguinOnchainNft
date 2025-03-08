@@ -17,7 +17,7 @@ import {
 } from '@wagmi/core'
 import { 
   monadTestnet, 
-  sepolia 
+  // sepolia 
 } from "wagmi/chains";
 import { 
   createConfig, 
@@ -53,11 +53,14 @@ const connectors = connectorsForWallets(
 );
 export const config = createConfig({
   connectors,
-  chains: [monadTestnet, sepolia],
+  chains: [
+    monadTestnet, 
+    // sepolia
+  ],
   transports: {
     [monadTestnet.id]: http(),
     // [sepolia.id]: http(),
-    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
+    // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
   },
   ssr: false,
 });
