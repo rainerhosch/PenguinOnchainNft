@@ -45,7 +45,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: "Rainbowkit Test",
-    projectId: projectId || "", // Ensure projectId is a string
+    projectId: projectId || "ec1ad1e46b783592191fca2eb897e27d", // Ensure projectId is a string
     appDescription: "",
     appIcon: "",
     appUrl: "",
