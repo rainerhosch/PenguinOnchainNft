@@ -52,10 +52,10 @@ const AccessoryModal: React.FC<AccessoryModalProps> = ({ accessories, specialTra
                         </div>
                     </button>
                 ))}
-                <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center">
+                {/* <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center">
                     <span className="text-xs font-mono text-white/50">Special trait: {specialTrait.category}</span>
                     <span className="text-xs font-mono text-white/50">Networth : {specialTrait.networth}</span>
-                </div>
+                </div> */}
                 <button onClick={() => setShowModal(false)} className="mt-4 border border-white hover:bg-red-500/50 text-white py-1 px-2 rounded text-xs font-mono">
                     Close
                 </button>
