@@ -22,7 +22,7 @@ export default function Navbar() {
                 <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setMobileMenuOpen(false)} />
             )}
 
-            <nav className="fixed top-2 left-2 right-2 z-50 sm:bg-black/70 bg-black/80 border-b border-white/10 rounded-full">
+            <nav className="fixed top-2 left-2 right-2 z-50 bg-purple-900 border-b border-white/10 rounded-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-14">
                         <div className="flex items-center gap-4">
@@ -42,39 +42,39 @@ export default function Navbar() {
                         {/* Desktop Menu */}
                         <div className="hidden sm:flex items-center space-x-8">
                             <div className="relative group ml-6">
-                                <button className="text-white/80 hover:text-purple-500/80 transition-colors">
+                                <button className="text-white/80 hover:text-white/30 transition-colors">
                                     Docs
                                     <svg className="w-4 h-4 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
-                                <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-white/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-[#9252ff] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                     <div className="py-1">
-                                        <a href="/getting-started" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Getting Started</a>
-                                        {/* <a href="/tutorials" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Tutorials</a> */}
-                                        {/* <a href="#api-reference" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">API Reference</a> */}
+                                        <a href="/getting-started" className="block px-4 py-2 text-sm text-white hover:text-black/60">Getting Started</a>
+                                        {/* <a href="/tutorials" className="block px-4 py-2 text-sm text-white hover:text-black/60">Tutorials</a> */}
+                                        {/* <a href="#api-reference" className="block px-4 py-2 text-sm text-white hover:text-black/60">API Reference</a> */}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="relative group">
-                                <button className="text-white/80 hover:text-purple-500/80 transition-colors">
+                                <button className="text-white/80 hover:text-white/30 transition-colors">
                                     Resources
                                     <svg className="w-4 h-4 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
-                                <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-white/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                                <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-[#9252ff] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                     <div className="py-1">
-                                        <a href={`${deployment.me}/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Collections</a>
-                                        <a href={`${deployment.explore}/token/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Explore</a>
-                                        {/* <a href="#creator" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Creator</a> */}
+                                        <a href={`${deployment.me}/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-white hover:text-black/60">Collections</a>
+                                        <a href={`${deployment.explore}/token/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-white hover:text-black/60">Explore</a>
+                                        {/* <a href="#creator" className="block px-4 py-2 text-sm text-white hover:text-black/60">Creator</a> */}
                                     </div>
                                 </div>
                             </div>
                             <div className="relative group">
-                                <button className="text-white/80 hover:text-purple-500/80 transition-colors">
-                                    <a href="our-programs" className="block px-4 py-2 text-white/80 hover:text-purple-500/80">Programs</a>
+                                <button className="text-white/80 hover:text-white/30 transition-colors">
+                                    <a href="our-programs" className="block px-4 py-2 text-white/80 hover:text-white/30">Programs</a>
                                 </button>
                             </div>
                         </div>
