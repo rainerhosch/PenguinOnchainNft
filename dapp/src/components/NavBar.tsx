@@ -3,9 +3,12 @@
 import Image from "next/image";
 import { useState } from "react";
 // import { ConnectButton } from "@rainbow-me/rainbowkit";
+import PengoContract from "../constants/PengoContract.json";
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const deployment = PengoContract.networkDeployment[0];
 
     const toggleMobileMenu = () => {
         console.log("Before toggle:", mobileMenuOpen);
@@ -47,9 +50,9 @@ export default function Navbar() {
                                 </button>
                                 <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-white/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                     <div className="py-1">
-                                        <a href="#getting-started" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Getting Started</a>
-                                        <a href="#tutorials" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Tutorials</a>
-                                        <a href="#api-reference" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">API Reference</a>
+                                        <a href="/getting-started" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Getting Started</a>
+                                        {/* <a href="/tutorials" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Tutorials</a> */}
+                                        {/* <a href="#api-reference" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">API Reference</a> */}
                                     </div>
                                 </div>
                             </div>
@@ -63,15 +66,15 @@ export default function Navbar() {
                                 </button>
                                 <div className="absolute left-0 mt-6 w-48 rounded-md shadow-lg bg-white/70 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                                     <div className="py-1">
-                                        <a href="#github" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">GitHub</a>
-                                        <a href="#explore" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Explore</a>
-                                        <a href="#creator" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Creator</a>
+                                        <a href={`${deployment.me}/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Collections</a>
+                                        <a href={`${deployment.explore}/token/${deployment.PengoAddress}`} target="_blank" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Explore</a>
+                                        {/* <a href="#creator" className="block px-4 py-2 text-sm text-black/40 hover:text-purple-500/80">Creator</a> */}
                                     </div>
                                 </div>
                             </div>
                             <div className="relative group">
                                 <button className="text-white/80 hover:text-purple-500/80 transition-colors">
-                                    <a href="#programs" className="block px-4 py-2 text-white/80 hover:text-purple-500/80">Programs</a>
+                                    <a href="our-programs" className="block px-4 py-2 text-white/80 hover:text-purple-500/80">Programs</a>
                                 </button>
                             </div>
                         </div>
@@ -109,9 +112,9 @@ export default function Navbar() {
                                             Docs
                                         </button>
                                         <div className="pl-4 space-y-2 mt-2 border-l-2 border-black/20">
-                                            <a href="#getting-started" className="block text-sm text-white/80 hover:text-black">└─ Getting Started</a>
-                                            <a href="#tutorials" className="block text-sm text-white/80 hover:text-black">└─ Tutorials</a>
-                                            <a href="#api-reference" className="block text-sm text-white/80 hover:text-black">└─ API Reference</a>
+                                            <a href="/getting-started" className="block text-sm text-white/80 hover:text-black">└─ Getting Started</a>
+                                            {/* <a href="/tutorials" className="block text-sm text-white/80 hover:text-black">└─ Tutorials</a> */}
+                                            {/* <a href="#api-reference" className="block text-sm text-white/80 hover:text-black">└─ API Reference</a> */}
                                         </div>
                                     </div>
                                     <div className="block px-3 py-2">
@@ -119,12 +122,12 @@ export default function Navbar() {
                                             Resources
                                         </button>
                                         <div className="pl-4 space-y-2 mt-2 border-l-2 border-black/20">
-                                            <a href="#github" className="block text-sm text-white/80 hover:text-black">└─ GitHub</a>
-                                            <a href="#explore" className="block text-sm text-white/80 hover:text-black">└─ Explore</a>
-                                            <a href="#creator" className="block text-sm text-white/80 hover:text-black">└─ Creator</a>
+                                            <a href={`${deployment.me}/${deployment.PengoAddress}`} target="_blank" className="block text-sm text-white/80 hover:text-black">└─ Collections</a>
+                                            <a href={`${deployment.explore}/token/${deployment.PengoAddress}`} target="_blank" className="block text-sm text-white/80 hover:text-black">└─ Explore</a>
+                                            {/* <a href="#creator" className="block text-sm text-white/80 hover:text-black">└─ Creator</a> */}
                                         </div>
                                     </div>
-                                    <a href="#programs" className="block px-3 py-2 text-white/80 hover:text-black">Programs</a>
+                                    <a href="our-programs" className="block px-3 py-2 text-white/80 hover:text-black">Programs</a>
                                 </div>
                             </div>
                         )}
