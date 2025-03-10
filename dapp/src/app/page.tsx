@@ -78,11 +78,11 @@ export default function Home() {
                 Introducing Pengo, the first on-chain customizable NFT that allows users to create and modify their digital Penguin avatars. Draw, customize, and trade unique assets directly on the blockchain for a truly personalized NFT experience.
               </p>
               <div className="flex gap-4 justify-center">
-                <a href="/studio" target="_blank" className="text-xs sm:text-md px-4 py-2 sm:px-8 sm:py-3 sm:font-mono text-white bg-[#8234ff] font-bold rounded-full hover:bg-[#5a30a1] transition-all button-press-3d inline-block">
+                <a href="/studio" target="_blank" className="text-xs sm:text-md px-4 py-2 sm:px-8 sm:py-3 text-white bg-[#8234ff] font-bold rounded-full hover:bg-[#5a30a1] transition-all button-press-3d inline-block">
                   {/* Explore */}
                   Studio
                 </a>
-                <a href="/accessory-marketplace" target="_blank" className="text-xs sm:text-md px-4 py-2 sm:px-8 sm:py-3 bg-black/70 text-white sm:font-mono font-bold rounded-full hover:bg-black/50 transition-colors backdrop-blur-sm">
+                <a href="/accessory-marketplace" target="_blank" className="text-xs sm:text-md px-4 py-2 sm:px-8 sm:py-3 bg-black/70 text-white font-bold rounded-full hover:bg-black/50 transition-colors backdrop-blur-sm">
                   Accessory Marketplace
                 </a>
               </div>
