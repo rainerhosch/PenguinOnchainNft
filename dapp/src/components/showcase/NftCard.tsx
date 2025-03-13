@@ -85,8 +85,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 }]);
             } catch (error) {
                 console.error("Error fetching NFTs:", (error as BaseError).shortMessage);
-            } finally {
-                setLoading(false);
             }
         };
         fetchNftData();
@@ -128,7 +126,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             {showModal && (
                 <AccessoryModal
                     accessories={listOfAccessories}
-                    // specialTrait={specialTrait}
                     setSelectedAccessory={setSelectedAccessory}
                     setShowModal={setShowModal}
                     setShowSellAccessoryModal={setShowSellAccessoryModal}
