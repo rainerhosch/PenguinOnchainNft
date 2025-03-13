@@ -41,7 +41,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showSellAccessoryModal, setShowSellAccessoryModal] = useState(false);
-
     const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
 
     const networkContract = chain?.id !== undefined
@@ -51,14 +50,14 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const abi = networkContract?.abi as Abi;
     const contractAddress = networkContract?.PengoAddress as Address;
 
-    const { data: tokenURI } = useReadContract({
+    const { data: tokenURI, isLoading: isLoadingTokenURI } = useReadContract({
         address: contractAddress,
         abi,
         functionName: "tokenURI",
         args: [nftData],
     });
 
-    const { data: nftAccData } = useReadContract({
+    const { data: nftAccData, isLoading: isLoadingNftAcc } = useReadContract({
         address: contractAddress,
         abi,
         functionName: "getNFTDetails",
@@ -69,7 +68,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
 
     useEffect(() => {
-        setLoading(true);
+        setLoading(true); // Set loading ke true sebelum mulai fetch data
         const fetchNftData = async () => {
             try {
                 if (!tokenURI) return;
@@ -87,15 +86,27 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 console.error("Error fetching NFTs:", (error as BaseError).shortMessage);
             }
         };
+
         fetchNftData();
+        // console.log(tokenURI)
+        // console.log(nftData)
     }, [nftData, tokenURI]);
+
+    // Gunakan useEffect untuk menangani perubahan loading berdasarkan isLoading dari wagmi hooks
+    useEffect(() => {
+        if (!isLoadingTokenURI && !isLoadingNftAcc) {
+            setLoading(false);
+        }
+    }, [isLoadingTokenURI, isLoadingNftAcc]);
 
     return (
         <>
             <Toaster position="bottom-right" reverseOrder={true} />
             {loading ? (
-                <div className="flex flex-col bg-white/10 p-8 rounded-2xl text-white items-center">
-                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-900"></div>
+                <div className="flex flex-col bg-white/10 p-2 rounded-2xl text-white items-center">
+                    <div className="h-36 w-36 bg-gray-500 rounded-2xl animate-pulse"></div>
+                    <div className="mt-4 h-4 w-3/4 bg-gray-600 rounded animate-pulse"></div>
+                    <div className="mt-2 h-4 w-3/4 bg-gray-600 rounded animate-pulse"></div>
                 </div>
             ) : (
                 nfts.map((nft) => (

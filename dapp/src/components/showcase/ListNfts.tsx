@@ -8,7 +8,7 @@ import NftCard from "@/components/showcase/NftCard";
 
 export default function NftList() {
     const { address, chain } = useAccount();
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
     const [nftListOf, setNftList] = useState<string[]>([]);
     const [visibleCount, setVisibleCount] = useState(10); // Start with 10 NFT
 
@@ -30,7 +30,7 @@ export default function NftList() {
         if (listOf) {
             const listOfAddress: string[] = (listOf as string[]) || [];
             setNftList(listOfAddress);
-            setLoading(false);
+            // setLoading(false);
         }
     }, [listOf]);
 
@@ -40,7 +40,7 @@ export default function NftList() {
     return (
         <div className="max-w-7xl mx-auto">
             <div className={`grid grid-cols-2 md:grid-cols-${nftNumb} lg:grid-cols-${nftNumb} gap-4 justify-items-center`}>
-                {!loading &&
+                {
                     nftListOf.slice(0, visibleCount).map((id, index) => (
                         <NftCard key={index} nftData={Number(id)} />
                     ))

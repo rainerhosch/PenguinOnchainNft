@@ -59,7 +59,7 @@ export default function ListItems() {
         if (AccessoriesForSale && Array.isArray(AccessoriesForSale)) {
             setLoading(false);
             setAccessoryFS(AccessoriesForSale);
-            console.log(AccessoriesForSale)
+            // console.log(AccessoriesForSale)
         }
     }, [AccessoriesForSale]);
 
@@ -138,7 +138,7 @@ export default function ListItems() {
             {visibleCount < accessoryFS.length && (
                 <div className="text-center mt-6">
                     <button
-                        className="text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 bg-transparent rounded-sm hover:bg-black/30 hover:text-white my-2"
+                        className="text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 bg-transparent rounded-sm hover:bg-black/30 hover:text-white my-2 animate-pulse"
                         onClick={() => setVisibleCount((prev) => prev + 5)}
                     >
                         Load More
