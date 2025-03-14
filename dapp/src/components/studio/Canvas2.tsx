@@ -546,7 +546,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     return (
         <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
-            <Toaster position="bottom-right" reverseOrder={true} />
             <div className="relative w-fit h-fit mx-auto my-4">
                 <canvas
                     ref={canvasRef}

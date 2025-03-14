@@ -117,7 +117,6 @@ export default function PengosMintComponent() {
 
     return (
         <div className="bg-black/40 rounded-lg shadow-lg p-6 text-center mx-auto max-w-fit">
-            <Toaster position="bottom-right" reverseOrder={true} />
             <div className="flex flex-col gap-2">
                 <h2 className="text-xl font-bold mb-4">Penguin Onchain NFT</h2>
                 <Image src={image1} alt="Penguin Template" width={200} height={200} priority={true} />

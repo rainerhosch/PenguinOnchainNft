@@ -12,7 +12,6 @@ import {
     type BaseError
 } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
-import { Toaster } from 'react-hot-toast';
 import AccessoryModal from "./AccessoryModal";
 import SellAccessoryModal from "./SellAccessoryModal";
 
@@ -101,7 +100,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
 
     return (
         <>
-            <Toaster position="bottom-right" reverseOrder={true} />
             {loading ? (
                 <div className="flex flex-col bg-white/10 p-2 rounded-2xl text-white items-center">
                     <div className="h-36 w-36 bg-gray-500 rounded-2xl animate-pulse"></div>

@@ -1,15 +1,11 @@
 "use client";
-
 import Image from "next/image";
 import { useState } from "react";
-// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../constants/PengoContract.json";
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     const deployment = PengoContract.networkDeployment[0];
-
     const toggleMobileMenu = () => {
         console.log("Before toggle:", mobileMenuOpen);
         setMobileMenuOpen((prev) => !prev);
