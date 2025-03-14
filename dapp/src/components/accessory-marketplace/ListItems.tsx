@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { Abi, Address } from "viem";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import {
     useAccount,
     useReadContract,
@@ -119,7 +119,6 @@ export default function ListItems() {
 
     return (
         <div className="max-w-7xl mx-auto">
-            <Toaster position="bottom-right" reverseOrder={true} />
 
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
                 {!loading &&

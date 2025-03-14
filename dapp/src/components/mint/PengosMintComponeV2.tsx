@@ -11,7 +11,7 @@ import {
     type BaseError,
 } from "wagmi";
 import { ethers } from "ethers";
-import toast, { Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
 

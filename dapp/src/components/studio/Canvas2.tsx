@@ -10,7 +10,7 @@ import React, {
     KeyboardEvent
 } from "react";
 import { Abi, Address } from "viem";
-import toast, { Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import {
     useAccount,
     useReadContract,
@@ -65,7 +65,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const [svgCode, setSvgCode] = useState<string>("");
     const [accessoryCode, setAccessoryCode] = useState<string>("");
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
-    const { address , chain } = useAccount();
+    const { address, chain } = useAccount();
     const [loading, setLoading] = useState(true);
 
     const [selectedPengo, setSelectedPengo] = useState("");
@@ -76,8 +76,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
 
     const networkContract = chain?.id !== undefined
-    ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
-    : PengoContract.networkDeployment[1];
+        ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
+        : PengoContract.networkDeployment[1];
     const abi = networkContract?.abi;
     const abiFactory = networkContract?.abiFactory;
     const contractAddress = networkContract?.PengoAddress as Address;
@@ -109,8 +109,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         args: [selectedAcc],
     });
     const allowedPixelPart: string[] = (pixelPart as string[]) || [];
-    
-    
+
+
     useEffect(() => {
         if (listOfAddress !== undefined) {
             setLoading(false);
@@ -233,7 +233,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 setShowOverlay((prev) => !prev); // Toggle overlay
             }
         };
-    
+
         window.addEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
         return () => window.removeEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
     }, []);
@@ -244,48 +244,48 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
-    
+
         // Clear the canvas before drawing the overlay
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawCanvas()
-    
+
         if (showOverlay && Array.isArray(allowedPixelPart) &&
             allowedPixelPart.length === 2 &&
             Array.isArray(allowedPixelPart[0]) &&
             Array.isArray(allowedPixelPart[1])
         ) {
-            const xCoords = allowedPixelPart[0].map((val) => Number(val)); 
+            const xCoords = allowedPixelPart[0].map((val) => Number(val));
             const yCoords = allowedPixelPart[1].map((val) => Number(val));
-    
+
             ctx.fillStyle = "rgba(0, 255, 0, 0.3)"; // transnparent color
-    
+
             for (let i = 0; i < xCoords.length; i++) {
                 const x = xCoords[i] * PIXEL_SIZE;
                 const y = yCoords[i] * PIXEL_SIZE;
-    
+
                 // Draw shadow area only if the overlay is activated
                 ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
             }
         }
     }, [showOverlay, allowedPixelPart]);
-    
+
 
     const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current) return;
-        
+
 
         const rect = canvasRef.current.getBoundingClientRect();
         const scaleX = canvasRef.current.width / rect.width;
         const scaleY = canvasRef.current.height / rect.height;
         const x = Math.floor((e.clientX - rect.left) * scaleX / PIXEL_SIZE);
         const y = Math.floor((e.clientY - rect.top) * scaleY / PIXEL_SIZE);
-    
-    
+
+
         // **Ensure that allowedPixelPart has the correct data structure**
         const allowedCoords = new Set<string>();
 
         if (
-            Array.isArray(allowedPixelPart) && 
+            Array.isArray(allowedPixelPart) &&
             allowedPixelPart.length === 2 &&
             Array.isArray(allowedPixelPart[0]) &&
             Array.isArray(allowedPixelPart[1])
@@ -300,7 +300,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
         // Check if the coordinates are allowed
         if (!allowedCoords.has(`${x},${y}`)) {
-            toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 0, 0.5)', color: '#fff', fontFamily: 'monospace' } });
+            toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
             return;
         }
 
@@ -475,16 +475,16 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     };
 
     // Hook minting transaction
-    const { data: hash, 
-        error, 
-        writeContract 
+    const { data: hash,
+        error,
+        writeContract
     } = useWriteContract();
     const { isSuccess: isConfirmed } =
         useWaitForTransactionReceipt({ hash });
 
     React.useEffect(() => {
         if (error) {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: {(error as BaseError).shortMessage || error.message}</p>)
+            toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `error-name-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
         }
     }, [error]);
 
@@ -494,13 +494,13 @@ export default function Canvas({ selectedColor }: CanvasProps) {
             if (loadingToast) {
                 setLoadingToast(false);
             }
-            toast.success(<p className="text-sm font-mono text-black/50 text-[#60ff00">Transaction confirmed!</p>)
+            toast.success(`Transaction confirmed!`, { id: `toast-success`, style: { background: 'rgba(72, 255, 0, 0.603)', color: '#fff', fontFamily: 'monospace' } });
         }
     }, [isConfirmed, loadingToast]);
 
 
     React.useEffect(() => {
-        if(!loadingToast){
+        if (!loadingToast) {
             if (hash && networkContract?.explore) {
                 toast.success(
                     <p className="text-sm font-mono text-black/30">
@@ -523,11 +523,11 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (accName === "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can&apos;t be null</p>);
+            toast.error(`Error: Name accessory can't be null`, { id: `error-name-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
             return; // Exit if accName is empty
         }
         if (svgToBytecode(accessoryCode) === "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can&apos;t be null</p>);
+            toast.error(`Error: Pixel accessory can't be null`, { id: `error-pixel-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace', position: 'relative'} });
             return; // Exit if accessoryCode is empty
         }
 

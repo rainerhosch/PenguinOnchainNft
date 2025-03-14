@@ -1,6 +1,7 @@
 'use client'
 import React from "react";
 // import { Metadata } from "next";
+import { Toaster } from 'react-hot-toast';
 import AppNavbar from "../../components/AppNavBar";
 import PengosMintComponen from "../../components/mint/PengosMintComponeV2"
 
@@ -35,6 +36,14 @@ export default function MintPage() {
     return (
         <div className="relative min-h-screen bg-[#9252ff] overflow-hidden">
             <AppNavbar />
+            <Toaster
+                position="bottom-right"
+                reverseOrder={true}
+                toastOptions={{
+                    duration: 1000, // Set duration for the toast
+                    // Add any other options to prevent multiple toasts
+                }}
+            />
             <main className="relative pt-24 pb-24 px-4 sm:px-4 sm:max-w-7.5xl mx-auto flex justify-center">
                 <div className="flex flex-col content-center">
                     <div className="bg-transfarent rounded-lg shadow-lg p-6 mb-10">

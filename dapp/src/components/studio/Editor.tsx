@@ -56,19 +56,19 @@ export default function Editor() {
                                 </div>
                                 <div className="flex flex-row sm:flex-col gap-4 items-center sm:items-start">
                                     {/* <div className="flex flex-row sm:flex-col gap-4"> */}
-                                        <Sketch
-                                            style={{backgroundColor:hexBg}}
-                                            color={hex}
-                                            onChange={handleColorChange}
-                                            className="m-1 sm:max-w-[160px] max-w-[120px]"
-                                        />
+                                    <Sketch
+                                        style={{ backgroundColor: hexBg }}
+                                        color={hex}
+                                        onChange={handleColorChange}
+                                        className="m-1 sm:max-w-[160px] max-w-[120px]"
+                                    />
 
-                                        <Chrome
-                                            style={{backgroundColor:hexBg}}
-                                            color={hex}
-                                            onChange={handleColorChange}
-                                            className="m-1 sm:max-w-[160px] max-w-[120px] bg-slate-600"
-                                        />
+                                    <Chrome
+                                        style={{ backgroundColor: hexBg }}
+                                        color={hex}
+                                        onChange={handleColorChange}
+                                        className="m-1 sm:max-w-[160px] max-w-[120px] bg-slate-600"
+                                    />
                                     {/* </div> */}
                                 </div>
                             </div>

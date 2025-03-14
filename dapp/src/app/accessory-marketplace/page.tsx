@@ -1,4 +1,5 @@
 import React from "react";
+import { Toaster } from 'react-hot-toast';
 import AppNavbar from "../../components/AppNavBar";
 import ListItems from "../../components/accessory-marketplace/ListItems";
 
@@ -10,6 +11,14 @@ export default function AccessoryMarketplace() {
                 <div className="flex flex-col content-center">
                     <h1 className="text-2xl font-bold text-center mb-4 text-black">Accessory Marketplace</h1>
                     <ListItems />
+                    <Toaster
+                    position="bottom-right"
+                    reverseOrder={true}
+                    toastOptions={{
+                        duration: 1000, // Set duration for the toast
+                        // Add any other options to prevent multiple toasts
+                    }}
+                />
                 </div>
             </main>
         </div>

@@ -9,7 +9,7 @@ import {
     useReadContract
 } from "wagmi";
 import { Address } from "viem";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import PengoContract from "../../constants/PengoContract.json";
 
 interface Accessory {
