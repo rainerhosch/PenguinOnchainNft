@@ -118,7 +118,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                         />
                         <h3 className="text-purple-950 text-sm font-mono my-1">{nft.name}</h3>
                         {specialTrait.category != "" && <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center py-2 px-2">
-                            <span className="text-xs font-mono text-purple-950/70">Special trait: {specialTrait.category}</span>
+                            <span className="text-xs font-mono text-purple-950/70">{specialTrait.category}</span>
                             <span className="text-xs font-mono text-purple-950/70">Networth : {specialTrait.networth}</span>
                         </div>}
                         {listOfAccessories.length > 0 ? (

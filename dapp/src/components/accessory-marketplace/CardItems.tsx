@@ -111,10 +111,10 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
 
     return (
         <div className="border p-4 rounded-lg shadow-lg flex flex-col items-center">
-            <h2 className="text-lg font-bold">{accessoryData.trait_name}</h2>
+            <h2 className="text-sm font-bold text-purple-950">{accessoryData.trait_name}</h2>
             <p className="text-sm text-white/60">{accessoryData.trait_type}</p>
 
-            <svg shapeRendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+            <svg  height={150} width={150} shapeRendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 {pixels.map((pixel, index) => (
                     <rect
                         key={index}
@@ -132,7 +132,7 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
             </p>
             <select
                 hidden={isYour}
-                className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
+                className='text-xs sm:text-sm bg-purple-600 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
                 onChange={(e) => setSelectedPengo(e.target.value)}
             >
                 <option value="" className="text-xs">- Select Target -</option>
