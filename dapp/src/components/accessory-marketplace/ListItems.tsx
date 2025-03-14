@@ -80,7 +80,7 @@ export default function ListItems() {
 
     useEffect(() => {
         if (isConfirmed) {
-            toast.success("Transaction confirmed!");
+            toast.success(`Transaction confirmed!`, { id: `invalid-token`, style: { background: 'rgba(94, 255, 0, 0.541)', color: '#fff', fontFamily: 'monospace' } });
             toast.success(
                 <p className="text-sm font-mono text-black/30">
                     Transaction Hash:<br />
