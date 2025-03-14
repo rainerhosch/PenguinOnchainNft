@@ -475,7 +475,10 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     };
 
     // Hook minting transaction
-    const { data: hash, error, writeContract } = useWriteContract();
+    const { data: hash, 
+        error, 
+        writeContract 
+    } = useWriteContract();
     const { isSuccess: isConfirmed } =
         useWaitForTransactionReceipt({ hash });
 
@@ -519,11 +522,13 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (accName == "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can&apos;t be null</p>)
+        if (accName === "") {
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Name accessory can&apos;t be null</p>);
+            return; // Exit if accName is empty
         }
-        if (svgToBytecode(accessoryCode) == "") {
-            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can&apos;t be null</p>)
+        if (svgToBytecode(accessoryCode) === "") {
+            toast.error(<p className="text-sm font-mono text-red-900">Error: Pixel accessory can&apos;t be null</p>);
+            return; // Exit if accessoryCode is empty
         }
 
         writeContract({
