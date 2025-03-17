@@ -267,7 +267,6 @@ contract PenguinOnchain is
     ) public {
         require(accessories[tokenId][accessoryId].owner == msg.sender, "Not the owner");
         _saveRemoveAccessory(tokenId, accessoryId);
-
     }
 
     function _saveRemoveAccessory(uint256 fromTokenId, uint256 accessoryId) private {
