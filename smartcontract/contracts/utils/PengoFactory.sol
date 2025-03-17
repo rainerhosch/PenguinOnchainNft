@@ -149,6 +149,29 @@ contract PengoFactory is IPengoFactory, Ownable {
             string(abi.encodePacked("data:application/json;base64,", metadata));
     }
 
+    function _createContractURI() external view virtual returns (string memory) {
+                // create metadata
+        string memory metadata = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        "{",
+                        '"name": "Penguin Onchain",',
+                        '"description": "Penguin Onchain is an innovative on-chain NFT project that pushes the boundaries of generative art and blockchain customization. Unlike traditional NFT collections that are pre-generated and stored off-chain, every Penguin NFT is generated using an algorithm directly on the blockchain, ensuring true decentralization and immutability.",',
+                        '"image": "https://penguinonchain.top/pengo-icon.png",',
+                        '"external_url": "https://penguinonchain.top",',
+                        '"seller_fee_basis_points": "500",',
+                        '"fee_recipient": "', owner(), '",',
+                        "}"
+                    )
+                )
+            )
+        );
+
+        return
+            string(abi.encodePacked("data:application/json;base64,", metadata));
+    }
+
 
     function parsePixelData(string memory _datapixel, string memory customColor) internal pure returns (string memory) {
         bytes memory data = PengoConverter.hexStringToBytes(_datapixel);

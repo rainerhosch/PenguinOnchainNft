@@ -48,15 +48,18 @@ import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/interfaces/IERC165.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
 import "../libraries/pengoConverter.sol";
+
 
 contract PenguinOnchain is
     ERC721AQueryable,
     Ownable,
     ReentrancyGuard,
-    IPenguinOnchain
+    IPenguinOnchain,
+    IERC165
 {
     using Strings for uint256;
     IPengoFactory public factory;
@@ -106,6 +109,7 @@ contract PenguinOnchain is
         address buyer,
         uint256 price
     );
+    event MetadataUpdate(uint256 _tokenId);
 
     constructor() ERC721A("Penguin Onchain", "Pengo") {
         BENEFICARY_ADDRESS = owner();
@@ -267,6 +271,10 @@ contract PenguinOnchain is
     ) public {
         require(accessories[tokenId][accessoryId].owner == msg.sender, "Not the owner");
         _saveRemoveAccessory(tokenId, accessoryId);
+        
+        updateTraits(tokenId);
+        accessoryOfTokenExists[tokenId][accessories[tokenId][accessoryId].trait_type] = false;
+        
     }
 
     function _saveRemoveAccessory(uint256 fromTokenId, uint256 accessoryId) private {
@@ -508,6 +516,8 @@ contract PenguinOnchain is
                 networth: string.concat(totalValueInEther.toString(), " MON")
             });
         }
+        
+        emit MetadataUpdate(tokenId);
     }
 
     /*---------------------------------------------------------------------
@@ -564,6 +574,11 @@ contract PenguinOnchain is
         return factory.tokenURI(tokenId, seed);
     }
 
+    function contractURI() public view virtual returns (string memory) { 
+        return factory._createContractURI();
+    }
+
+
     function setRoyaltyAddress(address _royaltyAddress) public onlyOwner {
         ROYALTY_ADDRESS = _royaltyAddress;
     }
@@ -588,6 +603,11 @@ contract PenguinOnchain is
             value: withdrawableAmount
         }("");
         require(success, "Withdraw failed");
+    }
+
+    /// @dev See {IERC165-supportsInterface}.
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721A, IERC721A) returns (bool) {
+        return interfaceId == bytes4(0x49064906) || super.supportsInterface(interfaceId);
     }
 
     
