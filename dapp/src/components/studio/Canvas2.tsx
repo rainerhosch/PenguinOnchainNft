@@ -18,7 +18,7 @@ import {
     useWaitForTransactionReceipt,
     type BaseError,
 } from "wagmi";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+// import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PengoContract from "../../constants/PengoContract.json";
 
 const CANVAS_SIZE = 300 * 2;
@@ -300,10 +300,10 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         }
 
         // Check if the coordinates are allowed
-        // if (!allowedCoords.has(`${x},${y}`)) {
-        //     toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
-        //     return;
-        // }
+        if (!allowedCoords.has(`${x},${y}`)) {
+            toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
+            return;
+        }
 
         // Check if the pixel already exists
         const existingRectIndex = rects.findIndex((r) => r.x === x && r.y === y);
@@ -597,7 +597,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                                 ))}
                             </select>
                         </div>
-                        <div className="flex flex-col gap-2 items-center">
+                        {/* <div className="flex flex-col gap-2 items-center">
                             <button
                                 type="button"
                                 onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))}
@@ -608,7 +608,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                                 className="text-white/40"
                                 fontSize="small"/>
                             </button>
-                        </div>
+                        </div> */}
                         <div className="flex flex-col gap-2 items-center">
                             {/* <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button> */}
                             <button
