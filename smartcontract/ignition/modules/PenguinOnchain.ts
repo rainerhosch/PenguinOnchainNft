@@ -2,7 +2,6 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 export default buildModule("PenguinOnchainModule", (m) => {
-    // const pengoConverter = m.contract("PengoConverter");
     const pengoFactory = m.contract("PengoFactory");
     const penguinOnchain = m.contract("PenguinOnchain");
     // const pengoDao = m.contract("PengoDao", [penguinOnchain]);
