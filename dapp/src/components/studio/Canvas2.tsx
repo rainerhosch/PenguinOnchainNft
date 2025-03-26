@@ -300,10 +300,10 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         }
 
         // Check if the coordinates are allowed
-        if (!allowedCoords.has(`${x},${y}`)) {
-            toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
-            return;
-        }
+        // if (!allowedCoords.has(`${x},${y}`)) {
+        //     toast.error(`Coordinate (${x},${y}) out of range!`, { id: `coordinate-error`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
+        //     return;
+        // }
 
         // Check if the pixel already exists
         const existingRectIndex = rects.findIndex((r) => r.x === x && r.y === y);
@@ -360,9 +360,11 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 (r) => `<rect x='${r.x}' y='${r.y}' width='1' height='1' fill='${r.color}'/>` // Updated width and height to 1
             )
             .join("\n");
+        const svgTemplateOpen = `<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="none"/>`;
+        const svgCloseTag = `</svg>`;
 
-        const templateSVG = `<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100%" height="100%" fill="none"/>
+        const templateSVG = `${svgTemplateOpen}
             <!-- Pinguin Pixel Art -->
                 <rect width="100%" height="100%" fill="#7556a8"/>
                 <rect x='13' y='11' width='1' height='1' fill='#4B4C4F'/>
@@ -470,7 +472,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 <rect x='17' y='22' width='1' height='1' fill='#F5A623'/>
                 <rect x='18' y='22' width='1' height='1' fill='#F5A623'/>
                 \n${svgRects}\n
-            </svg>`;
+            ${svgCloseTag}`;
         setSvgCode(templateSVG);
         setAccessoryCode(svgRects);
     };
@@ -597,18 +599,18 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                                 ))}
                             </select>
                         </div>
-                        {/* <div className="flex flex-col gap-2 items-center">
+                        <div className="flex flex-col gap-2 items-center">
                             <button
                                 type="button"
-                                onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))}
+                                onClick={() => navigator.clipboard.writeText(accessoryCode)}
                                 className="text-end text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent hover:bg-black/30 border w-40"
                             >
                                 <span className="text-xs font-mono mx-4">Copy bytecode</span>
-                                <ContentCopyIcon
+                                {/* <ContentCopyIcon
                                 className="text-white/40"
-                                fontSize="small"/>
+                                fontSize="small"/> */}
                             </button>
-                        </div> */}
+                        </div>
                         <div className="flex flex-col gap-2 items-center">
                             {/* <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button> */}
                             <button
