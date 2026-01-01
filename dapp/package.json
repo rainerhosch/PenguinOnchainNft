@@ -22,7 +22,7 @@
     "ethers": "^6.13.5",
     "fs": "^0.0.1-security",
     "ios-webkit-debug-proxy": "^0.0.3",
-    "next": "^15.2.0-canary.45",
+    "next": "15.6.0-canary.60",
     "pino-pretty": "^11.2.2",
     "react": "^18",
     "react-component-export-image": "^1.0.5",
