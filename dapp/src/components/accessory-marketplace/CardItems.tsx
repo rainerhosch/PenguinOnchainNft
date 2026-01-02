@@ -58,7 +58,6 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     const { address, chain } = useAccount();
     const pixels = parseBytePixel(accessoryData.bytePixel);
     const [isYour, setIsYour] = useState(false);
-    // const [accOwner, setAccOwner] = useState("");
     const [selectedPengo, setSelectedPengo] = useState("");
     const [loading, setLoading] = useState(true);
     const networkContract = PengoContract.networkDeployment.find(network => Number(network.chainId) === chain?.id);
@@ -80,73 +79,122 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
         functionName: "getNFTDetails",
         args: [selectedPengo],
     });
-    
+
     const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
-    // const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
 
     useEffect(() => {
-        if(accessoryData.owner === address){
+        if (accessoryData.owner === address) {
             setIsYour(true);
         }
 
-        // setAccOwner(accessoryData.owner);
         if (listOfAddress !== undefined) {
             setLoading(false);
         }
     }, [accessoryData.owner, address, listOfAddress]);
 
-
-
-
-
     const handlePurchase = () => {
         for (let i = 0; i < listOfAccessories.length; i++) {
             if (listOfAccessories[i].trait_type === accessoryData.trait_type) {
-                toast.error(`The ${accessoryData.trait_type}, already on pengo #${selectedPengo}`, { id: `invalid-token`, style: { background: 'rgba(255, 0, 191, 0.452)', color: '#fff', fontFamily: 'monospace' } });
-                return; // Stop execution if error
+                toast.error(`The ${accessoryData.trait_type} already exists on Pengo #${selectedPengo}`, { id: `duplicate-trait` });
+                return;
             }
         }
         onPurchase(accessoryId, Number(tokenId), selectedPengo, accessoryData.sellingPrice);
     }
 
+    const formatPrice = (price: bigint) => {
+        const eth = Number(price) / 1e18;
+        if (eth < 0.001) return '<0.001';
+        return eth.toFixed(3);
+    };
+
     return (
-        <div className="border p-4 rounded-lg shadow-lg flex flex-col items-center">
-            <h2 className="text-sm font-bold text-purple-950">{accessoryData.trait_name}</h2>
-            <p className="text-sm text-white/60">{accessoryData.trait_type}</p>
+        <div className="glass rounded-xl overflow-hidden group hover:bg-white/10 transition-all duration-300">
+            {/* SVG Preview */}
+            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <svg
+                    height={120}
+                    width={120}
+                    shapeRendering="crispEdges"
+                    viewBox="0 0 30 30"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="drop-shadow-lg"
+                >
+                    {pixels.map((pixel, index) => (
+                        <rect
+                            key={index}
+                            x={pixel.x}
+                            y={pixel.y}
+                            width={pixel.w}
+                            height={pixel.h}
+                            fill={pixel.color}
+                        />
+                    ))}
+                </svg>
 
-            <svg  height={150} width={150} shapeRendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                {pixels.map((pixel, index) => (
-                    <rect
-                        key={index}
-                        x={pixel.x}
-                        y={pixel.y}
-                        width={pixel.w}
-                        height={pixel.h}
-                        fill={pixel.color}
-                    />
-                ))}
-            </svg>
+                {/* Trait Type Badge */}
+                <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-medium bg-primary-500/80 text-white rounded-md">
+                    {accessoryData.trait_type}
+                </span>
 
-            <p className="text-purple-950 font-mono text-sm">
-                Price: {Number(accessoryData.sellingPrice) / 1e18} {currencySymbols}
-            </p>
-            <select
-                hidden={isYour}
-                className='text-xs sm:text-sm bg-purple-600 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
-                onChange={(e) => setSelectedPengo(e.target.value)}
-            >
-                <option value="" className="text-xs">- Select Target -</option>
-                {!loading && listOfAddress.map((tokenId, index) => (
-                    <option key={index} value={`${tokenId}`}>Pengo #{tokenId}</option>
-                ))}
-            </select>
+                {/* Owner Badge */}
+                {isYour && (
+                    <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-medium bg-green-500/80 text-white rounded-md">
+                        Yours
+                    </span>
+                )}
+            </div>
 
-            <button
-                onClick={handlePurchase}
-                disabled={isYour} // Disable button if isYoure is true
-                className={`text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 ${isYour ? 'bg-red' : 'bg-blue-500'} rounded-sm hover:bg-black/30 hover:text-white my-2`}>
-                {isYour ? 'This Youre' : 'Buy Now'}
-            </button>
+            {/* Content */}
+            <div className="p-3">
+                {/* Name */}
+                <h3 className="text-sm font-semibold text-white truncate mb-1">
+                    {accessoryData.trait_name}
+                </h3>
+
+                {/* Price */}
+                <div className="flex items-center gap-1 mb-3">
+                    <svg className="w-3 h-3 text-primary-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L4.5 12l7.5 4.5L19.5 12 12 0zM4.5 13.5L12 24l7.5-10.5L12 18l-7.5-4.5z" />
+                    </svg>
+                    <span className="text-sm font-bold text-white">{formatPrice(accessoryData.sellingPrice)}</span>
+                    <span className="text-xs text-neutral-400">{currencySymbols}</span>
+                </div>
+
+                {/* Actions */}
+                {!isYour ? (
+                    <div className="space-y-2">
+                        <select
+                            className="w-full text-xs bg-white/5 border border-white/10 text-neutral-300 py-2 px-2 rounded-lg transition focus:border-primary-500 focus:outline-none hover:bg-white/10"
+                            onChange={(e) => setSelectedPengo(e.target.value)}
+                            value={selectedPengo}
+                        >
+                            <option value="" className="bg-neutral-900">Select Target Pengo</option>
+                            {!loading && listOfAddress.map((id, index) => (
+                                <option key={index} value={`${id}`} className="bg-neutral-900">
+                                    Pengo #{id}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button
+                            onClick={handlePurchase}
+                            disabled={!selectedPengo}
+                            className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${selectedPengo
+                                    ? 'btn-primary'
+                                    : 'bg-white/5 text-neutral-500 cursor-not-allowed'
+                                }`}
+                        >
+                            Buy Now
+                        </button>
+                    </div>
+                ) : (
+                    <div className="text-center py-2">
+                        <span className="text-xs text-neutral-500">You own this</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

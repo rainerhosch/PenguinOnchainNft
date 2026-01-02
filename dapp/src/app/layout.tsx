@@ -57,10 +57,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@onchainpengo", 
+    site: "@onchainpengo",
     title: "Penguin Onchain",
     description: "A decentralized, interactive NFT identity.",
-    images: ["/OG-Studio.png"], 
+    images: ["/OG-Studio.png"],
   },
 };
 
@@ -70,14 +70,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning={true}>
       <body
-        suppressHydrationWarning={true}
         className={`${geistSans.variable} ${geistMono.variable} ${avenueMono.variable} ${roobert.variable} antialiased`}
       >
         <NextWalletProvider>
           {children}
-          <Analytics/>
+          <Analytics />
         </NextWalletProvider>
       </body>
     </html>

@@ -12,6 +12,7 @@ import {
 } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
 import CardItem from "@/components/accessory-marketplace/CardItems";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface Accessory {
     bytePixel: string;
@@ -30,10 +31,10 @@ interface AccessoryForSale {
 }
 
 export default function ListItems() {
-    const { chain } = useAccount();
+    const { chain, address, status } = useAccount();
     const [loading, setLoading] = useState(true);
     const [isPurchasing, setIsPurchasing] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(5); // Tampilkan 12 item pertama
+    const [visibleCount, setVisibleCount] = useState(12);
     const [accessoryFS, setAccessoryFS] = useState<AccessoryForSale[]>([]);
 
     const networkContract = chain?.id !== undefined
@@ -48,7 +49,6 @@ export default function ListItems() {
         functionName: "getAllAccessoriesForSale",
     });
 
-    // Minting Transaction Hook
     const { data: hash, error, writeContract } = useWriteContract();
     const {
         isSuccess: isConfirmed,
@@ -59,13 +59,12 @@ export default function ListItems() {
         if (AccessoriesForSale && Array.isArray(AccessoriesForSale)) {
             setLoading(false);
             setAccessoryFS(AccessoriesForSale);
-            // console.log(AccessoriesForSale)
         }
     }, [AccessoriesForSale]);
 
     useEffect(() => {
         if (isPurchasing && isLoading) {
-            toast.loading("Waiting for confirmation...", { id: "txn-loading", style: { background: 'rgba(140, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' } });
+            toast.loading("Processing transaction...", { id: "txn-loading" });
         } else {
             toast.dismiss("txn-loading");
         }
@@ -73,24 +72,24 @@ export default function ListItems() {
 
     useEffect(() => {
         if (error) {
-            toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `invalid-token`, style: { background: 'rgba(255, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' } });
+            toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `purchase-error` });
             setIsPurchasing(false);
         }
     }, [error]);
 
     useEffect(() => {
         if (isConfirmed) {
-            toast.success(`Transaction confirmed!`, { id: `invalid-token`, style: { background: 'rgba(94, 255, 0, 0.541)', color: '#fff', fontFamily: 'monospace' } });
+            toast.success(`Transaction confirmed!`, { id: `purchase-success` });
             toast.success(
-                <p className="text-sm font-mono text-black/30">
+                <p className="text-sm">
                     Transaction Hash:<br />
                     <a
                         href={`${networkContract?.explore}/tx/${hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#60ff00] underline"
+                        className="text-cyan-400 underline hover:text-cyan-300"
                     >
-                        {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
+                        {`${hash?.slice(0, 6)}...${hash?.slice(-4)}`}
                     </a>
                 </p>
             );
@@ -100,7 +99,7 @@ export default function ListItems() {
 
     const handlePurchase = (accessoryId: number, fromTokenId: number, toTokenId: string, price: bigint) => {
         if (!toTokenId || isNaN(Number(toTokenId))) {
-            toast.error(`Please enter a valid Target Token ID!`, { id: `invalid-token`, style: { background: 'rgba(140, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' } });
+            toast.error(`Please select a target Pengo!`, { id: `invalid-token` });
             return;
         }
 
@@ -114,33 +113,99 @@ export default function ListItems() {
         });
     };
 
-    // Memoize sliced data to optimize performance
     const visibleAccessories = useMemo(() => accessoryFS.slice(0, visibleCount), [accessoryFS, visibleCount]);
 
-    return (
-        <div className="max-w-7xl mx-auto">
+    // Not connected state
+    if (status === 'disconnected' || status === 'connecting' || !address) {
+        return (
+            <div className="text-center py-16">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">Connect Your Wallet</h3>
+                <p className="text-neutral-400 mb-6 max-w-md mx-auto">
+                    Connect your wallet to browse and purchase accessories for your Pengo NFTs.
+                </p>
+                <div className="flex justify-center">
+                    <ConnectButton />
+                </div>
+            </div>
+        );
+    }
 
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
-                {!loading &&
-                    visibleAccessories.map((accessory, index) => (
-                        <CardItem
-                            key={`${index}`} // Ensuring unique keys by combining accessoryId with index
-                            accessoryData={accessory.accessory}
-                            accessoryId={Number(accessory.accessoryId)}
-                            tokenId={accessory.tokenId.toString()}
-                            onPurchase={handlePurchase}
-                        />
-                    ))}
+    // Loading state
+    if (loading) {
+        return (
+            <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                    <svg className="w-8 h-8 text-primary-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <p className="text-neutral-400">Loading accessories...</p>
+            </div>
+        );
+    }
+
+    // Empty state
+    if (accessoryFS.length === 0) {
+        return (
+            <div className="text-center py-16">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-500/20 to-secondary-500/20 flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-10 h-10 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">No Accessories Listed</h3>
+                <p className="text-neutral-400 mb-6 max-w-md mx-auto">
+                    Be the first to list your custom accessory on the marketplace!
+                </p>
+                <a href="/studio" className="btn-primary py-2.5 px-6 inline-flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Create Accessory
+                </a>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            {/* Results count */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <p className="text-sm text-neutral-400">
+                    Showing <span className="text-white font-medium">{visibleAccessories.length}</span> of <span className="text-white font-medium">{accessoryFS.length}</span> items
+                </p>
             </div>
 
-            {/* Tombol Load More */}
+            {/* Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {visibleAccessories.map((accessory, index) => (
+                    <CardItem
+                        key={`${index}`}
+                        accessoryData={accessory.accessory}
+                        accessoryId={Number(accessory.accessoryId)}
+                        tokenId={accessory.tokenId.toString()}
+                        onPurchase={handlePurchase}
+                    />
+                ))}
+            </div>
+
+            {/* Load More */}
             {visibleCount < accessoryFS.length && (
-                <div className="text-center mt-6">
+                <div className="text-center mt-8">
                     <button
-                        className="text-[8px] sm:text-xs font-mono sm:font-light border border-white py-1 px-2 bg-transparent rounded-sm hover:bg-black/30 hover:text-white my-2 animate-pulse"
-                        onClick={() => setVisibleCount((prev) => prev + 5)}
+                        onClick={() => setVisibleCount((prev) => prev + 12)}
+                        className="btn-secondary py-3 px-8 inline-flex items-center gap-2"
                     >
-                        Load More
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                        Load More ({accessoryFS.length - visibleCount} remaining)
                     </button>
                 </div>
             )}
