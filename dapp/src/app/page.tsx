@@ -117,7 +117,7 @@ export default function Home() {
                 { value: "100%", label: "On-Chain Art, Your Assets is Yours." },
                 { value: "20K", label: "Only 20,000 NFTs will be minted" },
                 { value: "0", label: "No Trading Fees, On Accessory Marketplace" },
-                { value: "24/7", label: "Available 24/7" },
+                { value: "30x30", label: "Pixel Art" },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
                   <div className="text-3xl sm:text-4xl font-bold gradient-text mb-2">
@@ -142,7 +142,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {/* Feature 1 */}
               <div className="feature-card group">
                 <div className="feature-icon">
@@ -152,7 +152,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">On-Chain Customization</h3>
                 <p className="text-neutral-400">
-                  Draw and add accessories to your Pengo NFT directly through our blockchain-integrated canvas. Every modification is permanently stored.
+                  Draw and add accessories to your Pengo NFT directly through our blockchain-integrated canvas.
                 </p>
               </div>
 
@@ -165,7 +165,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">Dynamic NFT Assets</h3>
                 <p className="text-neutral-400">
-                  Modify and upgrade your NFT over time with new traits, making each Pengo uniquely yours. Your NFT evolves with you.
+                  Modify and upgrade your NFT over time with new traits, making each Pengo uniquely yours.
                 </p>
               </div>
 
@@ -178,8 +178,27 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">Asset Marketplace</h3>
                 <p className="text-neutral-400">
-                  Buy, sell, and trade custom assets with other users. All transactions are securely recorded on-chain.
+                  Buy, sell, and trade custom accessories with other users. All transactions on-chain.
                 </p>
+              </div>
+
+              {/* Feature 4 - Staking Rewards */}
+              <div className="feature-card group">
+                <div className="feature-icon" style={{ background: 'linear-gradient(135deg, #10b981, #06b6d4)' }}>
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Passive Income</h3>
+                <p className="text-neutral-400">
+                  Pengo is more than art—it's like holding shares. Earn staking rewards directly to your wallet.
+                </p>
+                <a href="/our-programs" className="btn-secondary inline-flex items-center gap-1 text-sm text-green-400 hover:text-green-300 mt-3 transition-colors">
+                  Learn more
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
               </div>
             </div>
           </div>

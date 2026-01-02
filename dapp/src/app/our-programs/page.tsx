@@ -46,6 +46,123 @@ const OurProgramsPage = () => {
                 </div>
             </section>
 
+            {/* Staking Rewards Highlight Section */}
+            <section className="px-4 sm:px-6 pb-16">
+                <div className="max-w-6xl mx-auto">
+                    <div className="glass-card p-8 sm:p-12 relative overflow-hidden">
+                        {/* Background decorations */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-cyan-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+                        <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                            {/* Content */}
+                            <div>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium mb-4">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                    Value-Backed NFT
+                                </div>
+
+                                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                                    Pengo = <span className="text-green-400">Digital Shares</span>
+                                </h2>
+
+                                <p className="text-lg text-neutral-300 mb-6">
+                                    Pengo isn't just digital art, it's like holding shares in a growing ecosystem. When you mint a Pengo, your funds go directly into our <strong className="text-white">Staking Pool</strong>, generating passive income for all holders.
+                                </p>
+
+                                <div className="space-y-4 mb-8">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl semibold text-green-400">40%</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-white mb-1">Distributed to Holders</h4>
+                                            <p className="text-sm text-neutral-400">40% of staking yields are distributed to NFT holders, claimable directly from the dApp.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl semibold text-cyan-400">40%</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-white mb-1">Reinvested in Pool</h4>
+                                            <p className="text-sm text-neutral-400">40% is compounded back into the staking pool, continuously increasing its size and future rewards.</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl semibold text-cyan-400">20%</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-white mb-1">Foundation Growth</h4>
+                                            <p className="text-sm text-neutral-400">20% of staking yields are distributed to the foundation, supporting the ecosystem's growth and development.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                        <span className="font-medium text-white">Floor Price Growth</span>
+                                    </div>
+                                    <p className="text-sm text-neutral-400">
+                                        As the staking pool grows, Pengo's intrinsic value increases proportionally, creating natural floor price appreciation tied to real yield, not speculation.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Visual Stats */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="glass p-6 rounded-2xl text-center">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/20 flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-2xl font-bold text-white mb-1">Passive</div>
+                                    <div className="text-sm text-neutral-400">Income Stream</div>
+                                </div>
+
+                                <div className="glass p-6 rounded-2xl text-center">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-2xl font-bold text-white mb-1">Growing</div>
+                                    <div className="text-sm text-neutral-400">Pool Size</div>
+                                </div>
+
+                                <div className="glass p-6 rounded-2xl text-center">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-2xl font-bold text-white mb-1">On-Chain</div>
+                                    <div className="text-sm text-neutral-400">Transparent</div>
+                                </div>
+
+                                <div className="glass p-6 rounded-2xl text-center">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-secondary-500/20 to-secondary-600/20 flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-2xl font-bold text-white mb-1">Community</div>
+                                    <div className="text-sm text-neutral-400">Owned</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Programs Grid */}
             <section className="px-4 sm:px-6 pb-16">
                 <div className="max-w-6xl mx-auto">
