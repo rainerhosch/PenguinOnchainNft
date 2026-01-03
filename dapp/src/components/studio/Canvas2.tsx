@@ -335,7 +335,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         if (!ctx) return;
 
         ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        ctx.strokeStyle = "#ddd";
+        ctx.strokeStyle = "rgba(200, 200, 200, 0.3)";
         for (let i = 0; i < CANVAS_SIZE; i += PIXEL_SIZE) {
             ctx.beginPath();
             ctx.moveTo(i, 0);
