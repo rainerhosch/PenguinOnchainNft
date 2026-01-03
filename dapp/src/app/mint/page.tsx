@@ -1,9 +1,9 @@
 'use client'
-import React from "react";
+import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { Toaster } from 'react-hot-toast';
 import AppNavbar from "../../components/AppNavBar";
-import PengosMintComponent from "../../components/mint/PengosMintComponeV2"
+import PengosMintComponent, { MintData } from "../../components/mint/PengosMintComponeV2"
 
 const traits = [
     { category: "Body Color", name: "Zombie", percentage: "1.5%", rarity: "legendary" },
@@ -34,7 +34,20 @@ const rarityBadgeColors: { [key: string]: string } = {
     common: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30"
 };
 
+// Format large numbers with commas
+function formatNumber(num: string): string {
+    const n = parseInt(num, 10);
+    if (isNaN(n)) return '...';
+    return n.toLocaleString();
+}
+
 export default function MintPage() {
+    const [mintData, setMintData] = useState<MintData | null>(null);
+
+    const handleDataLoad = useCallback((data: MintData) => {
+        setMintData(data);
+    }, []);
+
     return (
         <div className="min-h-screen bg-gradient-mesh">
             {/* Grid Pattern */}
@@ -83,7 +96,7 @@ export default function MintPage() {
                     <div className="grid lg:grid-cols-2 gap-8 items-start">
                         {/* Mint Card */}
                         <div className="lg:sticky lg:top-24">
-                            <PengosMintComponent />
+                            <PengosMintComponent onDataLoad={handleDataLoad} />
                         </div>
 
                         {/* Traits Section */}
@@ -91,11 +104,15 @@ export default function MintPage() {
                             {/* Info Cards */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="glass-card p-4 text-center">
-                                    <div className="text-2xl font-bold gradient-text">20,000</div>
+                                    <div className="text-2xl font-bold gradient-text">
+                                        {mintData ? formatNumber(mintData.totalMinted) + '/' + formatNumber(mintData.maxSupply) : '...'}
+                                    </div>
                                     <div className="text-sm text-neutral-400">Total Supply</div>
                                 </div>
                                 <div className="glass-card p-4 text-center">
-                                    <div className="text-2xl font-bold gradient-text">10</div>
+                                    <div className="text-2xl font-bold gradient-text">
+                                        {mintData ? mintData.maxMintPerWallet : '...'}
+                                    </div>
                                     <div className="text-sm text-neutral-400">Max per Wallet</div>
                                 </div>
                             </div>

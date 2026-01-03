@@ -5,7 +5,6 @@ import Image from "next/image";
 import image1 from "@/app/images/pengo-template.svg";
 import {
     useAccount,
-    useReadContract,
     useWriteContract,
     useWaitForTransactionReceipt,
     type BaseError,
@@ -14,18 +13,49 @@ import { ethers } from "ethers";
 import { toast } from 'react-hot-toast';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
+import { usePengoContract } from "../../hooks/usePengoContract";
 
-export default function PengosMintComponent() {
+export interface MintData {
+    maxSupply: string;
+    maxMintPerWallet: string;
+    totalMinted: string;
+}
+
+interface PengosMintComponentProps {
+    onDataLoad?: (data: MintData) => void;
+}
+
+export default function PengosMintComponent({ onDataLoad }: PengosMintComponentProps) {
     const { address, status, chain } = useAccount();
     const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
 
     const networkContract = chain?.id !== undefined
         ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
-        : PengoContract.networkDeployment[1];
+        : PengoContract.networkDeployment[0];
     const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress;
     const currencySymbols = networkContract?.currency;
 
+    // Use the shared hook for on-chain data
+    const {
+        maxSupply,
+        maxMintPerWallet: mintLimit,
+        mintPrice: price,
+        totalSupply: totalMinted,
+        userBalance: balanceCount,
+        isLoading
+    } = usePengoContract();
+
+    // Notify parent when data is loaded
+    React.useEffect(() => {
+        if (!isLoading && onDataLoad) {
+            onDataLoad({
+                maxSupply: maxSupply?.toString() || '0',
+                maxMintPerWallet: mintLimit?.toString() || '0',
+                totalMinted: totalMinted?.toString() || '0',
+            });
+        }
+    }, [isLoading, maxSupply, mintLimit, totalMinted, onDataLoad]);
 
     // Check if the connected user's chain matches the expected chain
     if (!networkContract) {
@@ -34,26 +64,6 @@ export default function PengosMintComponent() {
 
     // State for contract data
     const [totalMint, setTotalMint] = React.useState(1);
-
-    // Hooks for read price
-    const { data: price } = useReadContract({
-        address: contractAddress as Address,
-        abi,
-        functionName: "MINT_PRICE",
-    });
-
-    const { data: balanceCount } = useReadContract({
-        address: contractAddress as Address,
-        abi,
-        functionName: "balanceOf",
-        args: [address],
-    });
-
-    const { data: mintLimit } = useReadContract({
-        address: contractAddress as Address,
-        abi,
-        functionName: "MAX_MINT_PER_WALLET",
-    });
 
     // Hook minting transaction
     const { data: hash, error, isPending, writeContract } = useWriteContract();

@@ -69,7 +69,7 @@ const OurProgramsPage = () => {
                                 </h2>
 
                                 <p className="text-lg text-neutral-300 mb-6">
-                                    Pengo isn't just digital art, it's like holding shares in a growing ecosystem. When you mint a Pengo, your funds go directly into our <strong className="text-white">Staking Pool</strong>, generating passive income for all holders.
+                                    Pengo isn't just digital art, it's like holding shares in a growing ecosystem. 70% of Funds from minting phase will be stored in to <strong className="text-white">Staking Pool</strong>, generating passive income for all holders. The team only takes 30% for art works and operational costs.
                                 </p>
 
                                 <div className="space-y-4 mb-8">
