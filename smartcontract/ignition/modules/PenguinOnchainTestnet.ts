@@ -20,7 +20,7 @@ export default buildModule("PenguinOnchainModule", (m) => {
     m.call(pengoFactory, "initializeCoordinates", [part_name3, part_data3], { id: "initializeCoordinatesFootWear" });
     m.call(pengoFactory, "initializeCoordinates", [part_name4, part_data4], { id: "initializeCoordinatesEyeWear" });
 
-    return { 
+    return {
         pengoFactory,
         penguinOnchain,
         // pengoDao

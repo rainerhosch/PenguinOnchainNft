@@ -24,17 +24,16 @@ export default function Navbar() {
         <>
             {/* Overlay when mobile menu is open */}
             {mobileMenuOpen && (
-                <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" 
-                    onClick={() => setMobileMenuOpen(false)} 
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                    onClick={() => setMobileMenuOpen(false)}
                 />
             )}
 
-            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                scrolled 
-                    ? 'bg-neutral-900/95 backdrop-blur-xl border-b border-white/5 shadow-lg' 
-                    : 'bg-transparent'
-            }`}>
+            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+                ? 'bg-neutral-900/95 backdrop-blur-xl border-b border-white/5 shadow-lg'
+                : 'bg-transparent'
+                }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16 sm:h-20">
                         {/* Logo */}
@@ -121,7 +120,7 @@ export default function Navbar() {
                                 </a>
                             </div>
                         </div>
-                        
+
                         {/* Mobile Menu Button */}
                         <div className="md:hidden">
                             <button

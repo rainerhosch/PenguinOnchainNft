@@ -22,7 +22,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,       // Aktifkan gas reporter
     currency: "USD",     // Pilihan: USD, EUR, dll.
-    gasPrice: 52,        // Harga gas (Gwei) untuk estimasi biaya
+    gasPrice: 10,        // Harga gas (Gwei) untuk estimasi biaya
     coinmarketcap: vars.get("CMC_API_KEY"),   // API Key (opsional) untuk menampilkan harga gas secara real-time
     outputFile: "gas-report.txt", // Simpan hasil ke file (opsional)
     noColors: false,     // Hapus warna terminal jika ingin output bersih
@@ -31,7 +31,7 @@ const config: HardhatUserConfig = {
   networks: {
     monadTestnet: {
       url: vars.get("MONAD_RPC_URL"),
-      accounts: [vars.get("PRIVATE_KEY")],
+      accounts: [vars.get("PRIVATE_KEY_MONAD")],
       chainId: Number(vars.get("MONAD_CHAIN_ID")),
     },
     sepolia: {

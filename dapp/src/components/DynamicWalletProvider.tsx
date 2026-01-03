@@ -12,16 +12,16 @@ import {
   // bitgetWallet, 
   // metaMaskWallet
 } from '@rainbow-me/rainbowkit/wallets';
-import { 
-  http 
+import {
+  http
 } from '@wagmi/core'
-import { 
-  monadTestnet, 
-  // sepolia 
+import {
+  // monadTestnet, 
+  sepolia
 } from "wagmi/chains";
-import { 
-  createConfig, 
-  WagmiProvider 
+import {
+  createConfig,
+  WagmiProvider
 } from "wagmi";
 
 if (typeof window !== "undefined") {
@@ -54,13 +54,13 @@ const connectors = connectorsForWallets(
 export const config = createConfig({
   connectors,
   chains: [
-    monadTestnet, 
-    // sepolia
+    // monadTestnet, 
+    sepolia
   ],
   transports: {
-    [monadTestnet.id]: http(),
+    // [monadTestnet.id]: http(),
     // [sepolia.id]: http(),
-    // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
+    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
   },
   ssr: false,
 });

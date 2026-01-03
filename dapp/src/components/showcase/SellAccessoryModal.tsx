@@ -42,7 +42,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
     const contractAddress = networkContract?.PengoAddress as Address;
     const currencySymbols = networkContract?.currency;
 
-    const { data: hash, error, isPending, writeContract} = useWriteContract();
+    const { data: hash, error, isPending, writeContract } = useWriteContract();
     const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
 
 
@@ -65,7 +65,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
             toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `invalid-price`, style: { background: 'rgba(255, 0, 119, 0.37)', color: '#fff', fontFamily: 'monospace' } })
         }
 
-        if(isSuccess){
+        if (isSuccess) {
             toast.success(`Accessory listed successfully!`, { id: `invalid-price`, style: { background: 'rgba(140, 0, 255, 0.582)', color: '#fff', fontFamily: 'monospace' } });
             if (hash && networkContract?.explore) {
                 toast.success(
@@ -111,7 +111,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
                     type="number"
                     step="0.001"
                     min="0"
-                    value={sellPrice || 0 || Number(accessory.lastPrice)/1e18}
+                    value={sellPrice || 0 || Number(accessory.lastPrice) / 1e18}
                     // onChange={(e) => setSellPrice(parseFloat(e.target.value) || 0)}
                     onChange={(e) => setSellPrice(Math.max(0, Number(e.target.value)))}
                     className="w-full text-sm p-2 border border-white bg-transparent text-white rounded"

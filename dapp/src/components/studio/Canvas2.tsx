@@ -527,7 +527,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
             return; // Exit if accName is empty
         }
         if (svgToBytecode(accessoryCode) === "") {
-            toast.error(`Error: Pixel accessory can't be null`, { id: `error-pixel-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace', position: 'relative'} });
+            toast.error(`Error: Pixel accessory can't be null`, { id: `error-pixel-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace', position: 'relative' } });
             return; // Exit if accessoryCode is empty
         }
 
