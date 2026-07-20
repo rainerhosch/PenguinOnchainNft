@@ -17,11 +17,6 @@
         },
         {
             "inputs": [],
-            "name": "ApproveToCaller",
-            "type": "error"
-        },
-        {
-            "inputs": [],
             "name": "BalanceQueryForZeroAddress",
             "type": "error"
         },
@@ -47,12 +42,37 @@
         },
         {
             "inputs": [],
+            "name": "NotCompatibleWithSpotMints",
+            "type": "error"
+        },
+        {
+            "inputs": [],
             "name": "OwnerQueryForNonexistentToken",
             "type": "error"
         },
         {
             "inputs": [],
             "name": "OwnershipNotInitializedForExtraData",
+            "type": "error"
+        },
+        {
+            "inputs": [],
+            "name": "SequentialMintExceedsLimit",
+            "type": "error"
+        },
+        {
+            "inputs": [],
+            "name": "SequentialUpToTooSmall",
+            "type": "error"
+        },
+        {
+            "inputs": [],
+            "name": "SpotMintTokenIdTooSmall",
+            "type": "error"
+        },
+        {
+            "inputs": [],
+            "name": "TokenAlreadyExists",
             "type": "error"
         },
         {
@@ -115,6 +135,25 @@
                     "type": "uint256"
                 },
                 {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "AccessoryDeleted",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
                     "indexed": false,
                     "internalType": "uint256",
                     "name": "price",
@@ -134,13 +173,136 @@
                     "type": "uint256"
                 },
                 {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
                     "indexed": false,
                     "internalType": "address",
                     "name": "buyer",
                     "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
                 }
             ],
-            "name": "AccessoryPurchased",
+            "name": "AccessoryOfferCancelled",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "name": "AccessoryOfferMade",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "accessoryOwner",
+                    "type": "address"
+                }
+            ],
+            "name": "AccessorySaleCancelled",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "string",
+                    "name": "accessoryType",
+                    "type": "string"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "seller",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "name": "AccessorySold",
             "type": "event"
         },
         {
@@ -228,25 +390,6 @@
             "anonymous": false,
             "inputs": [
                 {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "byteData",
-                    "type": "string"
-                }
-            ],
-            "name": "CoordinatesInitialized",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
                     "indexed": true,
                     "internalType": "address",
                     "name": "previousOwner",
@@ -260,19 +403,6 @@
                 }
             ],
             "name": "OwnershipTransferred",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": false,
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
-                }
-            ],
-            "name": "RemovedPart",
             "type": "event"
         },
         {
@@ -394,6 +524,11 @@
             "name": "accessories",
             "outputs": [
                 {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
                     "internalType": "string",
                     "name": "trait_type",
                     "type": "string"
@@ -436,6 +571,101 @@
             "inputs": [
                 {
                     "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "accessoriesForSale",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "tokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_type",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "bytePixel",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "sellingPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "lastPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "forSale",
+                            "type": "bool"
+                        }
+                    ],
+                    "internalType": "struct IPenguinOnchain.Accessory",
+                    "name": "accessory",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "accessoryIds",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
                     "name": "tokenId",
                     "type": "uint256"
                 },
@@ -463,25 +693,6 @@
         {
             "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
-                }
-            ],
-            "name": "allowedParts",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
                     "internalType": "address",
                     "name": "to",
                     "type": "address"
@@ -493,6 +704,24 @@
                 }
             ],
             "name": "approve",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "approveOffer",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -514,6 +743,24 @@
                 }
             ],
             "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "cancelOffer",
+            "outputs": [],
+            "stateMutability": "nonpayable",
             "type": "function"
         },
         {
@@ -550,7 +797,7 @@
                         }
                     ],
                     "internalType": "struct IERC721A.TokenOwnership",
-                    "name": "",
+                    "name": "ownership",
                     "type": "tuple"
                 }
             ],
@@ -612,13 +859,96 @@
             "type": "function"
         },
         {
-            "inputs": [],
-            "name": "getAllAllowedParts",
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "tokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "findAccessoryIndex",
             "outputs": [
                 {
-                    "internalType": "string[]",
+                    "internalType": "uint256",
                     "name": "",
-                    "type": "string[]"
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getAllAccessoriesForSale",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "accessoryId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_type",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "bytePixel",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "sellingPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "lastPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "owner",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "forSale",
+                                    "type": "bool"
+                                }
+                            ],
+                            "internalType": "struct IPenguinOnchain.Accessory",
+                            "name": "accessory",
+                            "type": "tuple"
+                        }
+                    ],
+                    "internalType": "struct IPenguinOnchain.AccessoryForSale[]",
+                    "name": "",
+                    "type": "tuple[]"
                 }
             ],
             "stateMutability": "view",
@@ -655,6 +985,11 @@
             "outputs": [
                 {
                     "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
                         {
                             "internalType": "string",
                             "name": "trait_type",
@@ -719,30 +1054,6 @@
         {
             "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
-                }
-            ],
-            "name": "getPixelPart",
-            "outputs": [
-                {
-                    "internalType": "uint256[]",
-                    "name": "xCoords",
-                    "type": "uint256[]"
-                },
-                {
-                    "internalType": "uint256[]",
-                    "name": "yCoords",
-                    "type": "uint256[]"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
                     "internalType": "uint256",
                     "name": "tokenId",
                     "type": "uint256"
@@ -762,24 +1073,6 @@
         {
             "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
-                },
-                {
-                    "internalType": "string",
-                    "name": "byteData",
-                    "type": "string"
-                }
-            ],
-            "name": "initializeCoordinates",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
                     "internalType": "address",
                     "name": "owner",
                     "type": "address"
@@ -791,35 +1084,6 @@
                 }
             ],
             "name": "isApprovedForAll",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
-                },
-                {
-                    "internalType": "uint8",
-                    "name": "x",
-                    "type": "uint8"
-                },
-                {
-                    "internalType": "uint8",
-                    "name": "y",
-                    "type": "uint8"
-                }
-            ],
-            "name": "isValidCoordinate",
             "outputs": [
                 {
                     "internalType": "bool",
@@ -851,6 +1115,29 @@
             "name": "listAccessoryForSale",
             "outputs": [],
             "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "fromTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "makeOffer",
+            "outputs": [],
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -906,6 +1193,77 @@
         },
         {
             "inputs": [],
+            "name": "nextAccessoryId",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "offerBalances",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "offers",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "toTokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "price",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bool",
+                    "name": "active",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
             "name": "owner",
             "outputs": [
                 {
@@ -939,34 +1297,10 @@
         {
             "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
                 },
-                {
-                    "internalType": "uint8",
-                    "name": "",
-                    "type": "uint8"
-                },
-                {
-                    "internalType": "uint8",
-                    "name": "",
-                    "type": "uint8"
-                }
-            ],
-            "name": "pixelMapCoordinates",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
                 {
                     "internalType": "uint256",
                     "name": "fromTokenId",
@@ -975,11 +1309,6 @@
                 {
                     "internalType": "uint256",
                     "name": "toTokenId",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "accessoryId",
                     "type": "uint256"
                 }
             ],
@@ -991,12 +1320,17 @@
         {
             "inputs": [
                 {
-                    "internalType": "string",
-                    "name": "part",
-                    "type": "string"
+                    "internalType": "uint256",
+                    "name": "tokenId",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "accessoryId",
+                    "type": "uint256"
                 }
             ],
-            "name": "removeAllowedPart",
+            "name": "removeAccesory",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -1028,7 +1362,7 @@
             ],
             "name": "safeTransferFrom",
             "outputs": [],
-            "stateMutability": "nonpayable",
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -1056,7 +1390,7 @@
             ],
             "name": "safeTransferFrom",
             "outputs": [],
-            "stateMutability": "nonpayable",
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -1241,11 +1575,24 @@
         },
         {
             "inputs": [],
-            "name": "totalSupply",
+            "name": "totalOfferBalance",
             "outputs": [
                 {
                     "internalType": "uint256",
                     "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "result",
                     "type": "uint256"
                 }
             ],
@@ -1272,7 +1619,7 @@
             ],
             "name": "transferFrom",
             "outputs": [],
-            "stateMutability": "nonpayable",
+            "stateMutability": "payable",
             "type": "function"
         },
         {
