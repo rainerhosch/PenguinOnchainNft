@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import {
     Abi,
-    Address
+    Address,
 } from "viem";
 import {
     useAccount,
     useReadContract,
-    type BaseError
+    type BaseError,
 } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
 import AccessoryModal from "./AccessoryModal";
@@ -27,6 +26,7 @@ type Accessory = {
     lastPrice: bigint;
     owner: string;
     sellingPrice: bigint;
+    bytePixel?: string;
 };
 
 type SpecialTrait = {
@@ -36,18 +36,26 @@ type SpecialTrait = {
 
 const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const { chain } = useAccount();
-    const [nfts, setNfts] = useState<{ id: number; name: string; image: string; traits: unknown }[]>([]);
+    const [nfts, setNfts] = useState<
+        { id: number; name: string; image: string; traits: unknown }[]
+    >([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showSellAccessoryModal, setShowSellAccessoryModal] = useState(false);
-    const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(null);
+    const [selectedAccessory, setSelectedAccessory] = useState<Accessory | null>(
+        null
+    );
 
-    const networkContract = chain?.id !== undefined
-        ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
-        : PengoContract.networkDeployment[1];
+    const networkContract =
+        chain?.id !== undefined
+            ? PengoContract.networkDeployment.find(
+                (network) => Number(network.chainId) === chain.id
+            )
+            : PengoContract.networkDeployment[1];
 
     const abi = networkContract?.abi as Abi;
     const contractAddress = networkContract?.PengoAddress as Address;
+    const currencySymbol = networkContract?.currency || "ETH";
 
     const { data: tokenURI, isLoading: isLoadingTokenURI } = useReadContract({
         address: contractAddress,
@@ -63,11 +71,15 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
         args: [nftData],
     });
 
-    const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
-    const specialTrait: SpecialTrait = (nftAccData as [Accessory[], SpecialTrait])?.[1] || { category: "", networth: "" };
+    const listOfAccessories: Accessory[] =
+        (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
+    const specialTrait: SpecialTrait = (nftAccData as [
+        Accessory[],
+        SpecialTrait,
+    ])?.[1] || { category: "", networth: "" };
 
     useEffect(() => {
-        setLoading(true); // Set loading ke true sebelum mulai fetch data
+        setLoading(true);
         const fetchNftData = async () => {
             try {
                 if (!tokenURI) return;
@@ -75,66 +87,116 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 const base64Data = (tokenURI as string).split(",")[1];
                 const metadata = JSON.parse(atob(base64Data));
 
-                setNfts([{
-                    id: nftData,
-                    name: metadata.name,
-                    image: metadata.image,
-                    traits: metadata.traits
-                }]);
+                setNfts([
+                    {
+                        id: nftData,
+                        name: metadata.name,
+                        image: metadata.image,
+                        traits: metadata.traits,
+                    },
+                ]);
             } catch (error) {
-                console.error("Error fetching NFTs:", (error as BaseError).shortMessage);
+                console.error(
+                    "Error fetching NFTs:",
+                    (error as BaseError).shortMessage
+                );
             }
         };
 
         fetchNftData();
-        // console.log(tokenURI)
-        // console.log(nftData)
     }, [nftData, tokenURI]);
 
-    // Gunakan useEffect untuk menangani perubahan loading berdasarkan isLoading dari wagmi hooks
     useEffect(() => {
         if (!isLoadingTokenURI && !isLoadingNftAcc) {
             setLoading(false);
         }
     }, [isLoadingTokenURI, isLoadingNftAcc]);
 
+    if (loading) {
+        return (
+            <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-3 animate-pulse">
+                <div className="aspect-square w-full rounded-xl bg-white/10" />
+                <div className="mt-3 h-3 w-2/3 rounded bg-white/10" />
+                <div className="mt-2 h-3 w-1/2 rounded bg-white/5" />
+                <div className="mt-3 h-8 w-full rounded-lg bg-white/5" />
+            </div>
+        );
+    }
+
     return (
         <>
-            {loading ? (
-                <div className="flex flex-col bg-white/10 p-2 rounded-2xl text-white items-center">
-                    <div className="h-36 w-36 bg-gray-500 rounded-2xl animate-pulse"></div>
-                    <div className="mt-4 h-4 w-3/4 bg-gray-600 rounded animate-pulse"></div>
-                    <div className="mt-2 h-4 w-3/4 bg-gray-600 rounded animate-pulse"></div>
-                </div>
-            ) : (
-                nfts.map((nft) => (
-                    <div key={nft.id} className="flex flex-col bg-white/10 p-2 rounded-2xl text-white items-center">
-                        <Image
-                            className="bg-black/20 rounded-md"
+            {nfts.map((nft) => (
+                <article
+                    key={nft.id}
+                    className="group flex w-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/50 shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all hover:border-primary-500/30 hover:bg-black/60"
+                >
+                    <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-neutral-900 to-black">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                             src={nft.image}
                             alt={nft.name}
-                            width={200}
-                            height={200}
+                            className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-[1.03] rounded-2xl"
                         />
-                        <h3 className="text-primary-900 text-sm font-mono my-1">{nft.name}</h3>
-                        {specialTrait.category != "" && <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center py-2 px-2">
-                            <span className="text-xs font-mono text-primary-900/70">{specialTrait.category}</span>
-                            <span className="text-xs font-mono text-primary-900/70">Networth : {specialTrait.networth}</span>
-                        </div>}
-                        {listOfAccessories.length > 0 ? (
-                            <button onClick={() => setShowModal(true)} className="text-xs font-mono border border-white py-1 px-2 bg-neutral-900 rounded-sm hover:bg-black/30 my-2">
-                                View Trait
-                            </button>
-                        ) : (
-                            <p className="text-xs font-mono text-white/20 border border-white/60 py-1 px-2 rounded-sm bg-neutral-950/50 my-2">No accessories</p>
+                        <span className="absolute left-4 top-4 rounded-md bg-black/70 px-4 py-0.5 text-[10px] font-medium text-primary-400 backdrop-blur-sm border border-primary-500/20">
+                            #{nft.id}
+                        </span>
+                        {listOfAccessories.length > 0 && (
+                            <span className="absolute right-4 top-4 rounded-md bg-black/70 px-4 py-0.5 text-[10px] text-neutral-300 backdrop-blur-sm border border-white/10">
+                                {listOfAccessories.length} traits
+                            </span>
                         )}
                     </div>
-                ))
-            )}
+
+                    <div className="flex flex-1 flex-col gap-2 p-3">
+                        <h3 className="truncate text-sm font-semibold text-white">
+                            {nft.name}
+                        </h3>
+
+                        {specialTrait.category ? (
+                            <div className="grid grid-cols-2 gap-1.5">
+                                <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5">
+                                    <p className="text-[9px] uppercase tracking-wider text-neutral-500">
+                                        Goal
+                                    </p>
+                                    <p className="truncate text-[11px] font-medium text-neutral-200">
+                                        {specialTrait.category}
+                                    </p>
+                                </div>
+                                <div className="rounded-lg border border-primary-500/20 bg-primary-500/10 px-2 py-1.5">
+                                    <p className="text-[9px] uppercase tracking-wider text-primary-400/70">
+                                        Net worth
+                                    </p>
+                                    <p className="truncate text-[11px] font-medium text-primary-400">
+                                        {specialTrait.networth || "—"}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : null}
+
+                        {listOfAccessories.length > 0 ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowModal(true)}
+                                className="mt-auto w-full rounded-xl border border-primary-500/30 bg-primary-500/10 py-2 text-xs font-semibold text-primary-400 transition-colors hover:bg-primary-500/20 hover:border-primary-500/50"
+                            >
+                                View traits
+                            </button>
+                        ) : (
+                            <p className="mt-auto rounded-xl border border-dashed border-white/10 py-2 text-center text-[11px] text-neutral-600">
+                                No accessories yet
+                            </p>
+                        )}
+                    </div>
+                </article>
+            ))}
 
             {showModal && (
                 <AccessoryModal
                     accessories={listOfAccessories}
+                    specialTrait={specialTrait}
+                    pengoName={nfts[0]?.name}
+                    nftId={nftData}
+                    currencySymbol={currencySymbol}
                     setSelectedAccessory={setSelectedAccessory}
                     setShowModal={setShowModal}
                     setShowSellAccessoryModal={setShowSellAccessoryModal}

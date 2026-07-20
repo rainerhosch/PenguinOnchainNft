@@ -23,6 +23,8 @@ interface SelectFieldProps {
   disabled?: boolean;
   required?: boolean;
   name?: string;
+  /** xs = 10px, sm = 12px, md = default ~14px */
+  size?: "xs" | "sm" | "md";
   onChange?: (e: ChangeEventLike) => void;
 }
 
@@ -42,8 +44,44 @@ export default function SelectField({
   disabled = false,
   required = false,
   name,
+  size = "md",
   onChange,
 }: SelectFieldProps) {
+  const sizeStyles = {
+    xs: {
+      text: "text-[10px]",
+      label: "mb-1 block text-[10px] font-medium uppercase tracking-wider text-neutral-400",
+      pad: "py-1.5 pl-2 pr-2",
+      itemPad: "px-2 py-1.5",
+      icon: "h-3 w-3",
+      listPy: "py-1",
+      hint: "text-[9px]",
+    },
+    sm: {
+      text: "text-[12px]",
+      label: "mb-1 block text-[11px] font-medium uppercase tracking-wider text-neutral-400",
+      pad: "py-2 pl-2.5 pr-2.5",
+      itemPad: "px-2.5 py-1.5",
+      icon: "h-3.5 w-3.5",
+      listPy: "py-1",
+      hint: "text-[10px]",
+    },
+    md: {
+      text: "text-sm",
+      label: "mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-neutral-400",
+      pad: "py-2.5 pl-3 pr-3",
+      itemPad: "px-3 py-2",
+      icon: "h-4 w-4",
+      listPy: "py-1.5",
+      hint: "text-[10px]",
+    },
+  } as const;
+  const s = sizeStyles[size] ?? sizeStyles.md;
+  const textCls = s.text;
+  const labelCls = s.label;
+  const padCls = s.pad;
+  const itemPadCls = s.itemPad;
+  const iconCls = s.icon;
   const autoId = useId();
   const selectId = id || autoId;
   const listboxId = `${selectId}-listbox`;
@@ -159,10 +197,7 @@ export default function SelectField({
       className={`relative ${fullWidth ? "w-full" : "w-auto"} ${className}`}
     >
       {label && (
-        <span
-          id={`${selectId}-label`}
-          className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-neutral-400"
-        >
+        <span id={`${selectId}-label`} className={labelCls}>
           {label}
           {required ? <span className="text-primary-500"> *</span> : null}
         </span>
@@ -182,14 +217,16 @@ export default function SelectField({
         onClick={() => (open ? close() : openMenu())}
         onKeyDown={onKeyDown}
         className={[
-          "select-field relative flex w-full items-center justify-between gap-2 text-left",
+          "select-field relative flex w-full items-center justify-between gap-1.5 text-left",
+          padCls,
+          textCls,
           fullWidth ? "w-full" : "min-w-[10rem]",
           hasValue ? "text-white" : "text-neutral-400",
           open ? "border-primary-500 ring-2 ring-primary-500/25" : "",
           disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         ].join(" ")}
       >
-        <span className="truncate pr-1">
+        <span className="truncate pr-1 leading-tight">
           {hasValue ? selected!.label : placeholder}
         </span>
         <span
@@ -199,7 +236,7 @@ export default function SelectField({
           ].join(" ")}
           aria-hidden
         >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={iconCls} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </span>
@@ -213,10 +250,13 @@ export default function SelectField({
           role="listbox"
           aria-labelledby={label ? `${selectId}-label` : selectId}
           tabIndex={-1}
-          className="select-listbox absolute left-0 right-0 z-[80] mt-1.5 max-h-56 overflow-y-auto overscroll-contain py-1.5 outline-none"
+          className={[
+            "select-listbox absolute left-0 right-0 z-[80] mt-1 max-h-48 overflow-y-auto overscroll-contain outline-none",
+            s.listPy,
+          ].join(" ")}
         >
           {options.length === 0 ? (
-            <li className="px-3 py-2.5 text-sm text-neutral-500">No options</li>
+            <li className={`px-2 py-2 text-neutral-500 ${textCls}`}>No options</li>
           ) : (
             options.map((opt, index) => {
               const isSelected = opt.value === value;
@@ -229,12 +269,13 @@ export default function SelectField({
                   aria-disabled={opt.disabled || undefined}
                   onMouseEnter={() => !opt.disabled && setHighlight(index)}
                   onMouseDown={(e) => {
-                    // prevent button blur race
                     e.preventDefault();
                     pick(opt);
                   }}
                   className={[
-                    "select-listbox-item mx-1.5 flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                    "select-listbox-item mx-1 flex cursor-pointer items-center justify-between gap-2 rounded-md transition-colors",
+                    itemPadCls,
+                    textCls,
                     opt.disabled ? "cursor-not-allowed opacity-40" : "",
                     isSelected
                       ? "bg-primary-500/15 text-primary-400 font-medium"
@@ -243,10 +284,10 @@ export default function SelectField({
                         : "text-neutral-200 hover:bg-white/10 hover:text-white",
                   ].join(" ")}
                 >
-                  <span className="truncate">{opt.label}</span>
+                  <span className="truncate leading-tight">{opt.label}</span>
                   {isSelected && (
                     <svg
-                      className="h-4 w-4 shrink-0 text-primary-400"
+                      className={`${iconCls} shrink-0 text-primary-400`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -267,7 +308,7 @@ export default function SelectField({
         </ul>
       )}
 
-      {hint && <p className="mt-1 text-[10px] text-neutral-500">{hint}</p>}
+      {hint && <p className={`mt-1 text-neutral-500 ${s.hint}`}>{hint}</p>}
     </div>
   );
 }

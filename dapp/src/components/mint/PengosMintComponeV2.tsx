@@ -13,6 +13,12 @@ import { toast } from 'react-hot-toast';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
 import { usePengoContract } from "../../hooks/usePengoContract";
+import {
+    txToastError,
+    txToastPending,
+    txToastSuccess,
+    txToastWallet,
+} from "@/lib/txToast";
 
 export interface MintData {
     maxSupply: string;
@@ -26,7 +32,7 @@ interface PengosMintComponentProps {
 
 export default function PengosMintComponent({ onDataLoad }: PengosMintComponentProps) {
     const { address, status, chain } = useAccount();
-    const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
+    const MINT_TX_TOAST = "mint-pengo-tx";
 
     const networkContract = chain?.id !== undefined
         ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
@@ -56,28 +62,105 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
         }
     }, [isLoading, maxSupply, mintLimit, totalMinted, onDataLoad]);
 
-    // Check if the connected user's chain matches the expected chain
-    if (!networkContract) {
-        toast.error("Please connect to the correct network.");
-    }
-
     // State for contract data
     const [totalMint, setTotalMint] = React.useState(1);
+    const warnedNetworkRef = React.useRef(false);
+
+    // Warn once when connected on an unsupported chain
+    React.useEffect(() => {
+        if (status !== "connected" || !chain) {
+            warnedNetworkRef.current = false;
+            return;
+        }
+        if (!networkContract && !warnedNetworkRef.current) {
+            warnedNetworkRef.current = true;
+            toast.error("Please switch to a supported network to mint.", {
+                id: "mint-network",
+            });
+        }
+    }, [status, chain, networkContract]);
 
     // Hook minting transaction
-    const { data: hash, error, isPending, writeContract } = useWriteContract();
+    const {
+        data: hash,
+        error,
+        isPending,
+        writeContract,
+        reset: resetWrite,
+    } = useWriteContract();
 
-    const { isSuccess: isConfirmed } =
-        useWaitForTransactionReceipt({ hash });
+    const {
+        isSuccess: isConfirmed,
+        isLoading: isConfirming,
+        isError: isReceiptError,
+        error: receiptError,
+    } = useWaitForTransactionReceipt({ hash });
+
+    const handledErrorRef = React.useRef<string | null>(null);
+    const handledSuccessRef = React.useRef(false);
+    const handledHashRef = React.useRef<string | null>(null);
+
+    React.useEffect(() => {
+        if (!error) return;
+        const key = error.message;
+        if (handledErrorRef.current === key) return;
+        handledErrorRef.current = key;
+        txToastError(
+            MINT_TX_TOAST,
+            (error as BaseError).shortMessage || error.message || "Mint failed"
+        );
+    }, [error]);
+
+    React.useEffect(() => {
+        if (!hash) return;
+        if (handledHashRef.current === hash) return;
+        handledHashRef.current = hash;
+        txToastPending(MINT_TX_TOAST, hash, networkContract?.explore);
+    }, [hash, networkContract?.explore]);
+
+    React.useEffect(() => {
+        if (!isConfirmed || !hash || handledSuccessRef.current) return;
+        handledSuccessRef.current = true;
+        txToastSuccess(MINT_TX_TOAST, {
+            title: "Pengo minted successfully",
+            hash,
+            explorer: networkContract?.explore,
+            reloadMs: 1800,
+        });
+    }, [isConfirmed, hash, networkContract?.explore]);
+
+    React.useEffect(() => {
+        if (!isReceiptError || !receiptError) return;
+        txToastError(
+            MINT_TX_TOAST,
+            (receiptError as BaseError).shortMessage ||
+                receiptError.message ||
+                "Transaction reverted"
+        );
+    }, [isReceiptError, receiptError]);
 
     // Send mint transaction
     async function handleMint(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (isPending || isConfirming) return;
         if (!totalMint || totalMint < 1) return;
-        if (Number(balanceCount) + totalMint > Number(mintLimit)) {
-            toast.error("Mint limit exceeded!");
+        if (!networkContract || !contractAddress || !abi) {
+            toast.error("Please switch to a supported network to mint.", {
+                id: "mint-network",
+            });
             return;
         }
+        if (Number(balanceCount) + totalMint > Number(mintLimit)) {
+            toast.error("Mint limit exceeded for this wallet.", { id: "mint-limit" });
+            return;
+        }
+
+        handledErrorRef.current = null;
+        handledSuccessRef.current = false;
+        handledHashRef.current = null;
+        resetWrite();
+
+        txToastWallet(MINT_TX_TOAST, "Confirm mint in your wallet…");
 
         writeContract({
             address: contractAddress as Address,
@@ -87,39 +170,6 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
             value: (price ?? BigInt(0)) * BigInt(totalMint),
         });
     }
-
-    React.useEffect(() => {
-        if (error) {
-            toast.error(<p className="text-sm">Error: {(error as BaseError).shortMessage || error.message}</p>)
-        }
-    }, [error]);
-
-    React.useEffect(() => {
-        if (isConfirmed) {
-            if (loadingToast) {
-                setLoadingToast(false);
-            }
-            toast.success(<p className="text-sm text-green-400">Transaction confirmed!</p>)
-        }
-    }, [isConfirmed, loadingToast]);
-
-    React.useEffect(() => {
-        if (hash && networkContract?.explore) {
-            toast.success(
-                <p className="text-sm">
-                    Transaction Hash:<br />
-                    <a
-                        href={`${networkContract.explore}/tx/${hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent-400 underline hover:text-primary-300"
-                    >
-                        {`${hash?.slice(0, 6)}...${hash?.slice(-8)}`}
-                    </a>
-                </p>
-            );
-        }
-    }, [hash, networkContract?.explore]);
 
     return (
         <div className="glass-card p-6 sm:p-8">
@@ -202,16 +252,18 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
                 ) : (
                     <button
                         type="submit"
-                        disabled={isPending}
-                        className={`w-full btn-primary py-4 text-lg font-bold ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isPending || isConfirming}
+                        className={`w-full btn-primary py-4 text-lg font-bold ${
+                            isPending || isConfirming ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     >
-                        {isPending ? (
+                        {isPending || isConfirming ? (
                             <span className="flex items-center justify-center gap-2">
                                 <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                Confirming...
+                                {isPending ? "Confirm in wallet…" : "Confirming…"}
                             </span>
                         ) : (
                             <span className="flex items-center justify-center gap-2">

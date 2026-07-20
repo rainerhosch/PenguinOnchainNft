@@ -7,7 +7,6 @@ import React, {
     useState,
     useEffect,
     MouseEvent,
-    KeyboardEvent
 } from "react";
 import { Abi, Address } from "viem";
 import { toast } from 'react-hot-toast';
@@ -20,6 +19,12 @@ import {
 } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
 import SelectField from "@/components/ui/SelectField";
+import {
+    txToastError,
+    txToastPending,
+    txToastSuccess,
+    txToastWallet,
+} from "@/lib/txToast";
 
 const CANVAS_SIZE = 300 * 2;
 const PIXEL_SIZE = 10 * 2;
@@ -85,8 +90,6 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     const factoryAddress = networkContract?.factoryAddress as Address;
 
 
-    const [loadingToast, setLoadingToast] = React.useState<boolean | true>(true);
-
     // Read list of NFT token IDs owned by the user
     const { data: listOf } = useReadContract({
         address: contractAddress,
@@ -111,6 +114,47 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     });
     const allowedPixelPart: string[] = (pixelPart as string[]) || [];
 
+    // Live preview: on-chain art for the selected Target Pengo
+    const { data: selectedTokenURI, isLoading: isLoadingTokenURI } = useReadContract({
+        address: contractAddress,
+        abi: abi as Abi,
+        functionName: "tokenURI",
+        args: selectedPengo !== "" ? [BigInt(selectedPengo)] : undefined,
+        query: {
+            enabled: Boolean(contractAddress && selectedPengo !== ""),
+        },
+    });
+
+    const [pengoPreviewSrc, setPengoPreviewSrc] = useState<string | null>(null);
+    const [pengoPreviewName, setPengoPreviewName] = useState<string>("");
+
+    useEffect(() => {
+        setPengoPreviewSrc(null);
+        setPengoPreviewName("");
+        if (!selectedTokenURI || typeof selectedTokenURI !== "string") return;
+
+        try {
+            // data:application/json;base64,<payload>
+            const raw = selectedTokenURI.includes(",")
+                ? selectedTokenURI.split(",")[1]
+                : selectedTokenURI;
+            const metadata = JSON.parse(atob(raw)) as { name?: string; image?: string };
+            setPengoPreviewSrc(metadata.image || null);
+            setPengoPreviewName(metadata.name || `Pengo #${selectedPengo}`);
+        } catch (err) {
+            console.error("Failed to decode selected Pengo tokenURI", err);
+            setPengoPreviewSrc(null);
+        }
+    }, [selectedTokenURI, selectedPengo]);
+
+    // Accessory-only overlay SVG (drawn pixels), transparent bg — layered on selected Pengo
+    const accessoryOverlaySvg = useMemo(() => {
+        if (!rects.length) return "";
+        const svgRects = rects
+            .map((r) => `<rect x='${r.x}' y='${r.y}' width='1' height='1' fill='${r.color}'/>`)
+            .join("");
+        return `<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">${svgRects}</svg>`;
+    }, [rects]);
 
     useEffect(() => {
         if (listOfAddress !== undefined) {
@@ -465,73 +509,101 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         setAccessoryCode(svgRects);
     };
 
-    // Hook minting transaction
-    const { data: hash,
+    // Hook minting transaction — single toast id for the whole lifecycle
+    const ACC_TX_TOAST = "studio-mint-accessory";
+    const {
+        data: hash,
         error,
-        writeContract
+        isPending,
+        writeContract,
+        reset: resetWrite,
     } = useWriteContract();
-    const { isSuccess: isConfirmed } =
-        useWaitForTransactionReceipt({ hash });
+    const {
+        isSuccess: isConfirmed,
+        isLoading: isConfirming,
+        isError: isReceiptError,
+        error: receiptError,
+    } = useWaitForTransactionReceipt({ hash });
 
-    React.useEffect(() => {
-        if (error) {
-            toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `error-name-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
-        }
+    const handledErrorRef = useRef<string | null>(null);
+    const handledSuccessRef = useRef(false);
+    const handledHashRef = useRef<string | null>(null);
+
+    // 1) Wallet / write error
+    useEffect(() => {
+        if (!error) return;
+        const key = error.message;
+        if (handledErrorRef.current === key) return;
+        handledErrorRef.current = key;
+        const msg =
+            (error as BaseError).shortMessage || error.message || "Transaction failed";
+        txToastError(ACC_TX_TOAST, msg);
     }, [error]);
 
+    // 2) Hash received → waiting for confirmation (replace loading toast)
+    useEffect(() => {
+        if (!hash) return;
+        if (handledHashRef.current === hash) return;
+        handledHashRef.current = hash;
+        txToastPending(ACC_TX_TOAST, hash, networkContract?.explore);
+    }, [hash, networkContract?.explore]);
 
-    React.useEffect(() => {
-        if (isConfirmed) {
-            if (loadingToast) {
-                setLoadingToast(false);
-            }
-            toast.success(`Transaction confirmed!`, { id: `toast-success`, style: { background: 'rgba(72, 255, 0, 0.603)', color: '#fff', fontFamily: 'monospace' } });
-        }
-    }, [isConfirmed, loadingToast]);
+    // 3) Confirmed → success with hash, then reload collection
+    useEffect(() => {
+        if (!isConfirmed || !hash || handledSuccessRef.current) return;
+        handledSuccessRef.current = true;
+        txToastSuccess(ACC_TX_TOAST, {
+            title: "Accessory minted on-chain",
+            hash,
+            explorer: networkContract?.explore,
+            reloadMs: 1800,
+        });
+    }, [isConfirmed, hash, networkContract?.explore]);
 
-
-    React.useEffect(() => {
-        if (!loadingToast) {
-            if (hash && networkContract?.explore) {
-                toast.success(
-                    <p className="text-sm font-mono text-black/30">
-                        Transaction Hash:<br />
-                        <a
-                            href={`${networkContract.explore}/tx/${hash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary-500 underline"
-                        >
-                            {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
-                        </a>
-                    </p>
-                );
-                // window.location.reload(); // Reload the page after showing the toast
-            }
-        }
-    }, [hash, loadingToast, networkContract?.explore]);
+    // Receipt failure
+    useEffect(() => {
+        if (!isReceiptError || !receiptError) return;
+        const msg =
+            (receiptError as BaseError).shortMessage ||
+            receiptError.message ||
+            "Transaction reverted";
+        txToastError(ACC_TX_TOAST, msg);
+    }, [isReceiptError, receiptError]);
 
     async function handleMintAcc(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (accName === "") {
-            toast.error(`Error: Name accessory can't be null`, { id: `error-name-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace' } });
-            return; // Exit if accName is empty
+        if (isPending || isConfirming) return;
+
+        if (!selectedPengo) {
+            toast.error("Select a Target Pengo first", { id: "acc-validation" });
+            return;
+        }
+        if (accName.trim() === "") {
+            toast.error("Enter an accessory name", { id: "acc-validation" });
+            return;
         }
         if (svgToBytecode(accessoryCode) === "") {
-            toast.error(`Error: Pixel accessory can't be null`, { id: `error-pixel-null`, style: { background: 'rgba(255, 0, 85, 0.404)', color: '#fff', fontFamily: 'monospace', position: 'relative' } });
-            return; // Exit if accessoryCode is empty
+            toast.error("Draw at least one pixel before minting", { id: "acc-validation" });
+            return;
         }
+
+        handledErrorRef.current = null;
+        handledSuccessRef.current = false;
+        handledHashRef.current = null;
+        resetWrite();
+
+        txToastWallet(ACC_TX_TOAST, "Confirm accessory mint in your wallet…");
 
         writeContract({
             address: contractAddress as Address,
-            abi: abi as Abi, // Ensure abi is correctly typed
+            abi: abi as Abi,
             functionName: "addAccessory",
             args: [
                 selectedPengo,
-                selectedAcc || "", // Provide a default value if selectedAcc is undefined
-                accName,
-                svgToBytecode(accessoryCode)
-            ]
+                selectedAcc || "",
+                accName.trim(),
+                svgToBytecode(accessoryCode),
+            ],
         });
     }
 
@@ -615,19 +687,51 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                 </div>
 
                 <div className="mb-4">
-                    <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-                        Live preview
-                    </p>
-                    <div className="flex min-h-[100px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 p-3">
-                        {svgCode ? (
-                            <div
-                                className="max-h-32 w-full [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-h-28 [&_svg]:w-auto"
-                                dangerouslySetInnerHTML={{ __html: svgCode }}
-                            />
-                        ) : (
-                            <p className="text-center text-xs text-neutral-600">Draw pixels to preview</p>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+                            Live preview
+                        </p>
+                        {selectedPengo !== "" && (
+                            <span className="truncate text-[10px] text-primary-400/90">
+                                {pengoPreviewName || `Pengo #${selectedPengo}`}
+                            </span>
                         )}
                     </div>
+                    <div className="relative mx-auto flex aspect-square w-full max-w-[160px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 p-2">
+                        {!selectedPengo ? (
+                            <p className="px-2 text-center text-[10px] text-neutral-600">
+                                Select a Target Pengo
+                            </p>
+                        ) : isLoadingTokenURI && !pengoPreviewSrc ? (
+                            <p className="text-center text-[10px] text-neutral-500 animate-pulse">
+                                Loading Pengo…
+                            </p>
+                        ) : pengoPreviewSrc ? (
+                            <>
+                                {/* On-chain art for selected Target Pengo */}
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={pengoPreviewSrc}
+                                    alt={pengoPreviewName || `Pengo #${selectedPengo}`}
+                                    className="absolute inset-0 h-full w-full object-contain"
+                                />
+                                {/* Live accessory strokes composited on top */}
+                                {accessoryOverlaySvg ? (
+                                    <div
+                                        className="pointer-events-none absolute inset-0 [&_svg]:h-full [&_svg]:w-full"
+                                        dangerouslySetInnerHTML={{ __html: accessoryOverlaySvg }}
+                                    />
+                                ) : null}
+                            </>
+                        ) : (
+                            <p className="px-2 text-center text-[10px] text-neutral-600">
+                                Could not load Pengo art
+                            </p>
+                        )}
+                    </div>
+                    <p className="mt-1.5 text-center text-[9px] text-neutral-600">
+                        Updates when you change Target Pengo or paint
+                    </p>
                 </div>
 
                 <form onSubmit={handleMintAcc} className="flex flex-col gap-3">
@@ -645,15 +749,16 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                     </div>
 
                     <SelectField
+                        size="sm"
                         label="Target Pengo"
                         value={selectedPengo}
                         onChange={(e) => setSelectedPengo(e.target.value)}
                         options={
                             !loading
                                 ? listOfAddress.map((tokenId) => ({
-                                      value: `${tokenId}`,
-                                      label: `Pengo #${tokenId}`,
-                                  }))
+                                    value: `${tokenId}`,
+                                    label: `Pengo #${tokenId}`,
+                                }))
                                 : []
                         }
                         placeholder={loading ? "Loading…" : "Select Pengo"}
@@ -665,6 +770,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                     />
 
                     <SelectField
+                        size="sm"
                         label="Accessory slot"
                         value={selectedAcc}
                         onChange={(e) => {
@@ -678,8 +784,18 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                         placeholder="Select slot"
                     />
 
-                    <button type="submit" className="btn-primary mt-1 w-full py-2.5 text-sm">
-                        Mint Accessory
+                    <button
+                        type="submit"
+                        disabled={isPending || isConfirming}
+                        className={`btn-primary mt-1 w-full py-2.5 text-sm ${
+                            isPending || isConfirming ? "opacity-60 cursor-not-allowed" : ""
+                        }`}
+                    >
+                        {isPending
+                            ? "Confirm in wallet…"
+                            : isConfirming
+                              ? "Confirming…"
+                              : "Mint Accessory"}
                     </button>
                 </form>
             </aside>

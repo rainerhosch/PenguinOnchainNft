@@ -167,7 +167,8 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
                 {!isYour ? (
                     <div className="space-y-2.5">
                         <SelectField
-                            label="Apply to"
+                            size="sm"
+                            label="Equip On"
                             placeholder={loading ? "Loading Pengos…" : "Select target Pengo"}
                             value={selectedPengo}
                             onChange={(e) => setSelectedPengo(e.target.value)}
@@ -175,9 +176,9 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
                             options={
                                 !loading
                                     ? listOfAddress.map((id) => ({
-                                          value: `${id}`,
-                                          label: `Pengo #${id}`,
-                                      }))
+                                        value: `${id}`,
+                                        label: `Pengo #${id}`,
+                                    }))
                                     : []
                             }
                             hint={
@@ -191,8 +192,8 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
                             onClick={handlePurchase}
                             disabled={!selectedPengo}
                             className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-all ${selectedPengo
-                                    ? 'btn-primary'
-                                    : 'bg-white/5 text-neutral-500 cursor-not-allowed border border-white/10'
+                                ? 'btn-primary'
+                                : 'bg-white/5 text-neutral-500 cursor-not-allowed border border-white/10'
                                 }`}
                         >
                             Buy Now
