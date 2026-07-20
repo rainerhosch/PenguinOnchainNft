@@ -1,8 +1,8 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d",
-    "factoryAddress": "0xF44DE6051efC6539FD66c93Ee5439737398bCd57",
+    "address": "0x511329b09C5d8AeaF8D9192D472Bc25e11cD6262",
+    "factoryAddress": "0x3993bAddb467Bd155a83A63567e1B2B34E1926C6",
     "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
     "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
     "constructorArgs": [],
@@ -12,14 +12,14 @@
     "factoryDeps": [],
     "networkDeployment": [
         {
-            "name": "Sepolia Testnet",
-            "chainId": "11155111",
+            "name": "Robinhood Chain",
+            "chainId": "4663",
             "me": "https://magiceden.io/collections/monad-testnet/",
-            "explore": "https://sepolia.etherscan.io/",
-            "verifyUrl": "https://api-sepolia.etherscan.io/api",
+            "explore": "https://robinhoodchain.blockscout.com/",
+            "verifyUrl": "https://robinhoodchain.blockscout.com/api",
             "currency": "ETH",
-            "PengoAddress": "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d",
-            "factoryAddress": "0xF44DE6051efC6539FD66c93Ee5439737398bCd57",
+            "PengoAddress": "0x511329b09C5d8AeaF8D9192D472Bc25e11cD6262",
+            "factoryAddress": "0x3993bAddb467Bd155a83A63567e1B2B34E1926C6",
             "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
             "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
             "abi": [
