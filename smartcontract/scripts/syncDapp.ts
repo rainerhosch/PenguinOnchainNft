@@ -1,0 +1,78 @@
+import fs from "fs";
+import path from "path";
+import hre from "hardhat";
+
+async function main() {
+  const chainId = hre.network.config.chainId;
+  const networkName = hre.network.name;
+
+  console.log(`Syncing DApp for network: ${networkName} (Chain ID: ${chainId})`);
+
+  // 1. Read the deployed addresses from Ignition
+  const deploymentDir = path.join(__dirname, "..", "ignition", "deployments", `chain-${chainId}`);
+  const addressesFile = path.join(deploymentDir, "deployed_addresses.json");
+
+  if (!fs.existsSync(addressesFile)) {
+    console.error(`Error: Deployment file not found at ${addressesFile}`);
+    console.error("Make sure you run the ignition deploy first.");
+    process.exit(1);
+  }
+
+  const deployedAddresses = JSON.parse(fs.readFileSync(addressesFile, "utf-8"));
+  
+  // Support both standard module and hotfix module names
+  const factoryAddress = deployedAddresses["PenguinOnchainModule#PengoFactory"] || deployedAddresses["PenguinOnchainHotfix#PengoFactory"];
+  const penguinAddress = deployedAddresses["PenguinOnchainModule#PenguinOnchain"] || deployedAddresses["PenguinOnchainHotfix#PenguinOnchain"];
+
+  if (!factoryAddress || !penguinAddress) {
+    console.error("Could not find required addresses in deployed_addresses.json");
+    process.exit(1);
+  }
+
+  // 2. Read the ABI from Artifacts
+  const penguinArtifact = await hre.artifacts.readArtifact("PenguinOnchain");
+
+  // 3. Update PengoContract.json
+  const dappConstantsPath = path.join(__dirname, "..", "..", "dapp", "src", "constants");
+  const contractJsonPath = path.join(dappConstantsPath, "PengoContract.json");
+  const abiJsonPath = path.join(dappConstantsPath, "PengoAbi.json");
+
+  let contractJson: any = {};
+  if (fs.existsSync(contractJsonPath)) {
+    contractJson = JSON.parse(fs.readFileSync(contractJsonPath, "utf-8"));
+  }
+
+  // Update root addresses
+  contractJson.address = penguinAddress;
+  contractJson.factoryAddress = factoryAddress;
+
+  // Find the correct network deployment entry
+  if (contractJson.networkDeployment && contractJson.networkDeployment.length > 0) {
+    let networkEntryIndex = contractJson.networkDeployment.findIndex((n: any) => n.chainId === String(chainId));
+    
+    if (networkEntryIndex === -1) {
+      // If we are deploying to a new chain, let's just update the first entry (default one)
+      networkEntryIndex = 0; 
+    }
+
+    contractJson.networkDeployment[networkEntryIndex].name = networkName === 'robinhood' ? 'Robinhood Chain' : networkName;
+    contractJson.networkDeployment[networkEntryIndex].chainId = String(chainId);
+    contractJson.networkDeployment[networkEntryIndex].PengoAddress = penguinAddress;
+    contractJson.networkDeployment[networkEntryIndex].factoryAddress = factoryAddress;
+  }
+
+  // Write updated PengoContract.json
+  fs.writeFileSync(contractJsonPath, JSON.stringify(contractJson, null, 4));
+  console.log(`✅ Updated ${contractJsonPath} successfully!`);
+  console.log(`   - PengoFactory: ${factoryAddress}`);
+  console.log(`   - PenguinOnchain: ${penguinAddress}`);
+
+  // 4. Update PengoAbi.json
+  fs.writeFileSync(abiJsonPath, JSON.stringify(penguinArtifact.abi, null, 2));
+  console.log(`✅ Updated ${abiJsonPath} successfully!`);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

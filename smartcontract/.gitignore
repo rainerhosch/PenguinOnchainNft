@@ -16,3 +16,12 @@ node_modules
 
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
+
+# Hardhat Ignition deployment artifacts (used for resuming deployments)
+# We keep this file to allow restarting deployments without redeploying everything
+# However, we ignore the generated JSON files so they don't cause Git conflicts
+!ignition/deployments/**/compiled-contracts.json
+!ignition/deployments/**/module.json
+!ignition/deployments/**/deployed_addresses.json
+
+*deployment-info

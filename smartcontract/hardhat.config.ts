@@ -1,8 +1,21 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
-import { vars } from "hardhat/config";
+import { vars, task } from "hardhat/config";
 import "@matterlabs/hardhat-zksync";
 require("hardhat-gas-reporter");
+import { execSync } from "child_process";
+
+task("deploy-sync", "Deploys via Ignition and syncs to DApp")
+  .addOptionalParam("module", "The ignition module to deploy", "PenguinOnchain")
+  .setAction(async (taskArgs, hre) => {
+    // 1. Run ignition deploy via CLI
+    console.log(`Starting deployment for module: ${taskArgs.module} on network: ${hre.network.name}`);
+    execSync(`npx hardhat ignition deploy ignition/modules/${taskArgs.module}.ts --network ${hre.network.name}`, { stdio: "inherit" });
+    
+    // 2. Run sync script
+    console.log("Deployment complete! Syncing DApp...");
+    execSync(`npx hardhat run scripts/syncDapp.ts --network ${hre.network.name}`, { stdio: "inherit" });
+  });
 
 function optionalVar(name: string, fallback = ""): string {
   try {
