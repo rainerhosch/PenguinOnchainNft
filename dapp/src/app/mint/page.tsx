@@ -19,17 +19,17 @@ const traits = [
 ];
 
 const rarityColors: { [key: string]: string } = {
-    legendary: "text-yellow-400",
-    epic: "text-primary-400",
-    rare: "text-accent-400",
+    legendary: "text-amber-400",
+    epic: "text-purple-400",
+    rare: "text-blue-400",
     uncommon: "text-green-400",
     common: "text-neutral-400"
 };
 
 const rarityBadgeColors: { [key: string]: string } = {
-    legendary: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-    epic: "bg-primary-500/20 text-primary-400 border-primary-500/30",
-    rare: "bg-accent-500/20 text-accent-400 border-accent-500/30",
+    legendary: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    epic: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    rare: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     uncommon: "bg-green-500/20 text-green-400 border-green-500/30",
     common: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30"
 };
@@ -133,7 +133,7 @@ export default function MintPage() {
                                             className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-yellow-400' : trait.rarity === 'epic' ? 'bg-primary-400' : trait.rarity === 'rare' ? 'bg-accent-400' : trait.rarity === 'uncommon' ? 'bg-green-400' : 'bg-neutral-400'}`} />
+                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-amber-400' : trait.rarity === 'epic' ? 'bg-purple-400' : trait.rarity === 'rare' ? 'bg-blue-400' : trait.rarity === 'uncommon' ? 'bg-green-400' : 'bg-neutral-400'}`} />
                                                 <div>
                                                     <div className={`font-medium ${rarityColors[trait.rarity]}`}>{trait.name}</div>
                                                     <div className="text-xs text-neutral-500">{trait.category}</div>
@@ -155,15 +155,15 @@ export default function MintPage() {
                                 <h3 className="text-sm font-semibold text-neutral-400 mb-3">Rarity Tiers</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {[
-                                        { name: "Legendary", color: "bg-yellow-400" },
-                                        { name: "Epic", color: "bg-primary-400" },
-                                        { name: "Rare", color: "bg-accent-400" },
+                                        { name: "Legendary", color: "bg-amber-400" },
+                                        { name: "Epic", color: "bg-purple-400" },
+                                        { name: "Rare", color: "bg-blue-400" },
                                         { name: "Uncommon", color: "bg-green-400" },
-                                        { name: "Common", color: "bg-neutral-400" },
-                                    ].map((rarity) => (
-                                        <div key={rarity.name} className="flex items-center gap-2 text-sm text-neutral-300">
-                                            <div className={`w-3 h-3 rounded-full ${rarity.color}`} />
-                                            {rarity.name}
+                                        { name: "Common", color: "bg-neutral-400" }
+                                    ].map((tier) => (
+                                        <div key={tier.name} className="flex items-center gap-2 text-sm text-neutral-300">
+                                            <div className={`w-3 h-3 rounded-full ${tier.color}`} />
+                                            {tier.name}
                                         </div>
                                     ))}
                                 </div>

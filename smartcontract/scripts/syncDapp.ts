@@ -46,19 +46,30 @@ async function main() {
   contractJson.address = penguinAddress;
   contractJson.factoryAddress = factoryAddress;
 
-  // Find the correct network deployment entry
-  if (contractJson.networkDeployment && contractJson.networkDeployment.length > 0) {
-    let networkEntryIndex = contractJson.networkDeployment.findIndex((n: any) => n.chainId === String(chainId));
-    
-    if (networkEntryIndex === -1) {
-      // If we are deploying to a new chain, let's just update the first entry (default one)
-      networkEntryIndex = 0; 
-    }
+  // Find or create the correct network deployment entry
+  if (!contractJson.networkDeployment) {
+    contractJson.networkDeployment = [];
+  }
 
+  let networkEntryIndex = contractJson.networkDeployment.findIndex((n: any) => n.chainId === String(chainId));
+  
+  if (networkEntryIndex === -1) {
+    // If we are deploying to a new chain, append a new entry
+    contractJson.networkDeployment.push({
+      name: networkName === 'robinhood' ? 'Robinhood Chain' : networkName,
+      chainId: String(chainId),
+      currency: "ETH",
+      explore: networkName === 'robinhood' ? "https://robinhoodchain.blockscout.com/" : "https://sepolia.etherscan.io/",
+      PengoAddress: penguinAddress,
+      factoryAddress: factoryAddress,
+      abi: penguinArtifact.abi
+    });
+  } else {
+    // Update existing entry
     contractJson.networkDeployment[networkEntryIndex].name = networkName === 'robinhood' ? 'Robinhood Chain' : networkName;
-    contractJson.networkDeployment[networkEntryIndex].chainId = String(chainId);
     contractJson.networkDeployment[networkEntryIndex].PengoAddress = penguinAddress;
     contractJson.networkDeployment[networkEntryIndex].factoryAddress = factoryAddress;
+    contractJson.networkDeployment[networkEntryIndex].abi = penguinArtifact.abi;
   }
 
   // Write updated PengoContract.json
