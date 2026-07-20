@@ -2,7 +2,7 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 export default buildModule("PenguinOnchainHotfix", (m) => {
     // Load the existing factory that was already deployed
-    const pengoFactory = m.contractAt("PengoFactory", "0xF44DE6051efC6539FD66c93Ee5439737398bCd57");
+    const pengoFactory = m.contractAt("PengoFactory", "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d");
 
     // Deploy the updated PenguinOnchain contract with the new mint price
     const penguinOnchain = m.contract("PenguinOnchain");
