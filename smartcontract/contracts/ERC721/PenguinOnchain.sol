@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
-* ** author  : Onchain Pengo Lab
-* ** package : @contracts/ERC721/PenguinOnchain.sol
-* Security + gas-optimized (ABI surface preserved for dapp)
-*/
+ * ** author  : Onchain Pengo Lab
+ * ** package : @contracts/ERC721/PenguinOnchain.sol
+ * Security + gas-optimized (ABI surface preserved for dapp)
+ */
 pragma solidity ^0.8.20;
 
 import "erc721a/contracts/extensions/ERC721AQueryable.sol";
@@ -54,7 +54,7 @@ contract PenguinOnchain is
                                CONSTANTS
     //////////////////////////////////////////////////////////////*/
     uint256 public constant MAX_SUPPLY = 20000;
-    uint256 public constant MINT_PRICE = 0.25 ether;
+    uint256 public constant MINT_PRICE = 0.01 ether;
     uint256 public constant MAX_MINT_PER_WALLET = 100;
     uint256 public constant ROYALTY_PERCENT = 5;
 
@@ -75,9 +75,16 @@ contract PenguinOnchain is
     mapping(address => uint256) public offerBalances;
     AccessoryForSale[] public accessoriesForSale;
 
-    event AccessoryAdded(uint256 indexed tokenId, string trait_type, uint256 accessoryId);
+    event AccessoryAdded(
+        uint256 indexed tokenId,
+        string trait_type,
+        uint256 accessoryId
+    );
     event AccessoryListed(uint256 indexed accessoryId, uint256 price);
-    event AccessoryDeleted(uint256 indexed accessoryId, uint256 indexed fromTokenId);
+    event AccessoryDeleted(
+        uint256 indexed accessoryId,
+        uint256 indexed fromTokenId
+    );
     event AccessorySold(
         string accessoryType,
         uint256 indexed accessoryId,
@@ -87,7 +94,10 @@ contract PenguinOnchain is
         address buyer,
         uint256 price
     );
-    event AccessorySaleCancelled(uint256 indexed accessoryId, address accessoryOwner);
+    event AccessorySaleCancelled(
+        uint256 indexed accessoryId,
+        address accessoryOwner
+    );
     event AccessoryOfferMade(
         uint256 indexed accessoryId,
         uint256 indexed fromTokenId,
@@ -113,19 +123,17 @@ contract PenguinOnchain is
     /*//////////////////////////////////////////////////////////////
                                   MINT
     //////////////////////////////////////////////////////////////*/
-    function mintPengo(uint256 _mintAmount)
-        public
-        payable
-        nonReentrant
-        returns (uint256[] memory)
-    {
+    function mintPengo(
+        uint256 _mintAmount
+    ) public payable nonReentrant returns (uint256[] memory) {
         if (_mintAmount == 0) revert ZeroMintAmount();
         uint256 supply = totalSupply();
         if (supply + _mintAmount > MAX_SUPPLY) revert SoldOut();
         if (msg.value < _mintAmount * MINT_PRICE) revert InsufficientPayment();
 
         uint256 minted = mintedCount[msg.sender];
-        if (minted + _mintAmount > MAX_MINT_PER_WALLET) revert MaxMintPerWalletReached();
+        if (minted + _mintAmount > MAX_MINT_PER_WALLET)
+            revert MaxMintPerWalletReached();
 
         // Capture IDs before ERC721A advances counter
         uint256 startTokenId = _nextTokenId();
@@ -190,7 +198,13 @@ contract PenguinOnchain is
         uint256 validCount;
         for (uint256 i; i < numPixels; ) {
             uint256 offset = i * 7;
-            if (factory.isValidCoordinate(trait_type, uint8(data[offset]), uint8(data[offset + 1]))) {
+            if (
+                factory.isValidCoordinate(
+                    trait_type,
+                    uint8(data[offset]),
+                    uint8(data[offset + 1])
+                )
+            ) {
                 unchecked {
                     ++validCount;
                 }
@@ -216,7 +230,11 @@ contract PenguinOnchain is
                 pixels[base + 3] = uint8(data[offset + 3]);
                 // colors stored as 3 raw hex chars via encodePacked of bytes
                 colors[counter] = string(
-                    abi.encodePacked(data[offset + 4], data[offset + 5], data[offset + 6])
+                    abi.encodePacked(
+                        data[offset + 4],
+                        data[offset + 5],
+                        data[offset + 6]
+                    )
                 );
                 unchecked {
                     ++counter;
@@ -251,7 +269,11 @@ contract PenguinOnchain is
         emit AccessoryAdded(tokenId, trait_type, accessoryId);
     }
 
-    function listAccessoryForSale(uint256 tokenId, uint256 accessoryId, uint256 price) public {
+    function listAccessoryForSale(
+        uint256 tokenId,
+        uint256 accessoryId,
+        uint256 price
+    ) public {
         Accessory storage acc = accessories[tokenId][accessoryId];
         if (acc.owner != msg.sender) revert NotAccessoryOwner();
         if (acc.forSale) revert AlreadyListed();
@@ -261,7 +283,11 @@ contract PenguinOnchain is
         acc.forSale = true;
 
         accessoriesForSale.push(
-            AccessoryForSale({tokenId: tokenId, accessoryId: accessoryId, accessory: acc})
+            AccessoryForSale({
+                tokenId: tokenId,
+                accessoryId: accessoryId,
+                accessory: acc
+            })
         );
 
         emit AccessoryListed(accessoryId, price);
@@ -278,7 +304,10 @@ contract PenguinOnchain is
         updateTraits(tokenId);
     }
 
-    function _saveRemoveAccessory(uint256 fromTokenId, uint256 accessoryId) private {
+    function _saveRemoveAccessory(
+        uint256 fromTokenId,
+        uint256 accessoryId
+    ) private {
         if (accessories[fromTokenId][accessoryId].forSale) {
             removeAccessoryFromSale(fromTokenId, accessoryId);
         }
@@ -301,15 +330,19 @@ contract PenguinOnchain is
         emit AccessoryDeleted(accessoryId, fromTokenId);
     }
 
-    function getAllAccessoriesForSale() public view returns (AccessoryForSale[] memory) {
+    function getAllAccessoriesForSale()
+        public
+        view
+        returns (AccessoryForSale[] memory)
+    {
         return accessoriesForSale;
     }
 
-    function purchaseAccessory(uint256 accessoryId, uint256 fromTokenId, uint256 toTokenId)
-        public
-        payable
-        nonReentrant
-    {
+    function purchaseAccessory(
+        uint256 accessoryId,
+        uint256 fromTokenId,
+        uint256 toTokenId
+    ) public payable nonReentrant {
         // Buyer must own destination NFT
         if (ownerOf(toTokenId) != msg.sender) revert NotTokenOwner();
 
@@ -321,7 +354,8 @@ contract PenguinOnchain is
         if (msg.value < price) revert InsufficientPayment();
 
         string memory accessoryType = fromAcc.trait_type;
-        if (accessoryOfTokenExists[toTokenId][accessoryType]) revert SlotFilled();
+        if (accessoryOfTokenExists[toTokenId][accessoryType])
+            revert SlotFilled();
 
         address previousOwner = fromAcc.owner;
         string memory traitName = fromAcc.trait_name;
@@ -329,7 +363,9 @@ contract PenguinOnchain is
 
         uint256 royalty = (price * ROYALTY_PERCENT) / 100;
         uint256 sellerAmount = price - royalty;
-        address royaltyTo = ROYALTY_ADDRESS == address(0) ? owner() : ROYALTY_ADDRESS;
+        address royaltyTo = ROYALTY_ADDRESS == address(0)
+            ? owner()
+            : ROYALTY_ADDRESS;
 
         // Effects first
         accessories[toTokenId][accessoryId] = Accessory({
@@ -351,11 +387,15 @@ contract PenguinOnchain is
         updateTraits(fromTokenId);
 
         // Interactions
-        (bool successSeller, ) = payable(previousOwner).call{value: sellerAmount}("");
+        (bool successSeller, ) = payable(previousOwner).call{
+            value: sellerAmount
+        }("");
         if (!successSeller) revert TransferFailed();
 
         if (royalty > 0) {
-            (bool successRoyalty, ) = payable(royaltyTo).call{value: royalty}("");
+            (bool successRoyalty, ) = payable(royaltyTo).call{value: royalty}(
+                ""
+            );
             if (!successRoyalty) revert TransferFailed();
         }
 
@@ -369,11 +409,20 @@ contract PenguinOnchain is
         }
 
         emit AccessorySold(
-            accessoryType, accessoryId, fromTokenId, toTokenId, previousOwner, msg.sender, price
+            accessoryType,
+            accessoryId,
+            fromTokenId,
+            toTokenId,
+            previousOwner,
+            msg.sender,
+            price
         );
     }
 
-    function removeAccessoryFromSale(uint256 fromTokenId, uint256 accessoryId) private {
+    function removeAccessoryFromSale(
+        uint256 fromTokenId,
+        uint256 accessoryId
+    ) private {
         uint256 index = findAccessoryIndex(fromTokenId, accessoryId);
         if (index >= accessoriesForSale.length) revert NotForSale();
 
@@ -387,12 +436,15 @@ contract PenguinOnchain is
         accessoriesForSale.pop();
     }
 
-    function findAccessoryIndex(uint256 tokenId, uint256 accessoryId) public view returns (uint256) {
+    function findAccessoryIndex(
+        uint256 tokenId,
+        uint256 accessoryId
+    ) public view returns (uint256) {
         uint256 len = accessoriesForSale.length;
         for (uint256 i; i < len; ) {
             if (
-                accessoriesForSale[i].tokenId == tokenId
-                    && accessoriesForSale[i].accessoryId == accessoryId
+                accessoriesForSale[i].tokenId == tokenId &&
+                accessoriesForSale[i].accessoryId == accessoryId
             ) {
                 return i;
             }
@@ -406,20 +458,22 @@ contract PenguinOnchain is
     /*//////////////////////////////////////////////////////////////
                                  OFFERS
     //////////////////////////////////////////////////////////////*/
-    function makeOffer(uint256 accessoryId, uint256 fromTokenId, uint256 toTokenId)
-        public
-        payable
-        nonReentrant
-    {
+    function makeOffer(
+        uint256 accessoryId,
+        uint256 fromTokenId,
+        uint256 toTokenId
+    ) public payable nonReentrant {
         if (msg.value == 0) revert ZeroPrice();
         if (ownerOf(toTokenId) != msg.sender) revert NotTokenOwner();
 
         Accessory storage acc = accessories[fromTokenId][accessoryId];
         if (acc.owner == msg.sender) revert OwnerCannotOffer();
-        if (accessoryOfTokenExists[toTokenId][acc.trait_type]) revert SlotFilled();
+        if (accessoryOfTokenExists[toTokenId][acc.trait_type])
+            revert SlotFilled();
 
         Offer storage currentOffer = offers[fromTokenId][accessoryId];
-        if (currentOffer.active && msg.value <= currentOffer.price) revert OfferTooLow();
+        if (currentOffer.active && msg.value <= currentOffer.price)
+            revert OfferTooLow();
 
         // Refund previous offerer (accounting first)
         if (currentOffer.active) {
@@ -431,15 +485,28 @@ contract PenguinOnchain is
             if (!success) revert TransferFailed();
         }
 
-        offers[fromTokenId][accessoryId] =
-            Offer({buyer: msg.sender, toTokenId: toTokenId, price: msg.value, active: true});
+        offers[fromTokenId][accessoryId] = Offer({
+            buyer: msg.sender,
+            toTokenId: toTokenId,
+            price: msg.value,
+            active: true
+        });
         offerBalances[msg.sender] += msg.value;
         totalOfferBalance += msg.value;
 
-        emit AccessoryOfferMade(accessoryId, fromTokenId, toTokenId, msg.sender, msg.value);
+        emit AccessoryOfferMade(
+            accessoryId,
+            fromTokenId,
+            toTokenId,
+            msg.sender,
+            msg.value
+        );
     }
 
-    function cancelOffer(uint256 accessoryId, uint256 fromTokenId) public nonReentrant {
+    function cancelOffer(
+        uint256 accessoryId,
+        uint256 fromTokenId
+    ) public nonReentrant {
         Offer storage currentOffer = offers[fromTokenId][accessoryId];
         if (!currentOffer.active) revert NoActiveOffer();
         if (currentOffer.buyer != msg.sender) revert NotYourOffer();
@@ -454,10 +521,19 @@ contract PenguinOnchain is
         (bool success, ) = payable(msg.sender).call{value: refundAmount}("");
         if (!success) revert TransferFailed();
 
-        emit AccessoryOfferCancelled(accessoryId, fromTokenId, toTokenId, msg.sender, refundAmount);
+        emit AccessoryOfferCancelled(
+            accessoryId,
+            fromTokenId,
+            toTokenId,
+            msg.sender,
+            refundAmount
+        );
     }
 
-    function approveOffer(uint256 fromTokenId, uint256 accessoryId) public nonReentrant {
+    function approveOffer(
+        uint256 fromTokenId,
+        uint256 accessoryId
+    ) public nonReentrant {
         Offer memory offer = offers[fromTokenId][accessoryId];
         if (!offer.active) revert NoActiveOffer();
 
@@ -500,7 +576,15 @@ contract PenguinOnchain is
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         if (!success) revert TransferFailed();
 
-        emit AccessorySold(traitType, accessoryId, fromTokenId, toTokenId, msg.sender, buyer, amount);
+        emit AccessorySold(
+            traitType,
+            accessoryId,
+            fromTokenId,
+            toTokenId,
+            msg.sender,
+            buyer,
+            amount
+        );
     }
 
     function updateTraits(uint256 tokenId) internal {
@@ -556,18 +640,23 @@ contract PenguinOnchain is
 
     /// @dev Not VRF — cosmetic traits only. Documented for security review.
     function _pseudoRandom(uint256 tokenId) private view returns (uint256) {
-        return uint256(
-            keccak256(
-                abi.encodePacked(block.prevrandao, block.timestamp, msg.sender, tokenId, address(this))
-            )
-        );
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.prevrandao,
+                        block.timestamp,
+                        msg.sender,
+                        tokenId,
+                        address(this)
+                    )
+                )
+            );
     }
 
-    function getNFTDetails(uint256 tokenId)
-        public
-        view
-        returns (Accessory[] memory, SpecialTrait memory)
-    {
+    function getNFTDetails(
+        uint256 tokenId
+    ) public view returns (Accessory[] memory, SpecialTrait memory) {
         uint256 count = accessoryIds[tokenId].length;
         Accessory[] memory tempAccessories = new Accessory[](count);
         for (uint256 i; i < count; ) {
@@ -579,12 +668,9 @@ contract PenguinOnchain is
         return (tempAccessories, specialTraits[tokenId]);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721A, IERC721A)
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(ERC721A, IERC721A) returns (string memory) {
         if (!_exists(tokenId)) revert TokenDoesNotExist();
         return factory.tokenURI(tokenId, seeds[tokenId]);
     }
@@ -601,7 +687,9 @@ contract PenguinOnchain is
         ROYALTY_ADDRESS = _royaltyAddress;
     }
 
-    function setBeneficiaryAddress(address _beneficiaryAddress) public onlyOwner {
+    function setBeneficiaryAddress(
+        address _beneficiaryAddress
+    ) public onlyOwner {
         if (_beneficiaryAddress == address(0)) revert ZeroAddress();
         BENEFICARY_ADDRESS = _beneficiaryAddress;
     }
@@ -618,18 +706,18 @@ contract PenguinOnchain is
         address beneficiary = BENEFICARY_ADDRESS;
         if (beneficiary == address(0)) revert InvalidBeneficiary();
 
-        (bool success, ) = payable(beneficiary).call{value: withdrawableAmount}("");
+        (bool success, ) = payable(beneficiary).call{value: withdrawableAmount}(
+            ""
+        );
         if (!success) revert TransferFailed();
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(IERC165, ERC721A, IERC721A)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, ERC721A, IERC721A) returns (bool) {
         // EIP-4906 MetadataUpdate
-        return interfaceId == bytes4(0x49064906) || super.supportsInterface(interfaceId);
+        return
+            interfaceId == bytes4(0x49064906) ||
+            super.supportsInterface(interfaceId);
     }
 }
