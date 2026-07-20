@@ -34,8 +34,20 @@ function normalizePrivateKey(raw: string): string | undefined {
   return value.startsWith("0x") ? value : `0x${value}`;
 }
 
+function resolveRobinhoodRpc(raw: string): string {
+  const value = (raw || "").trim();
+  if (!value) {
+    return "https://rpc.mainnet.chain.robinhood.com";
+  }
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+  return `https://robinhood-mainnet.g.alchemy.com/v2/${value}`;
+}
+
 const privateKey = normalizePrivateKey(optionalVar("PRIVATE_KEY"));
 const sepoliaRpc = resolveSepoliaRpc(optionalVar("ALCHEMY_SEPOLIA_URI"));
+const robinhoodRpc = resolveRobinhoodRpc(optionalVar("ALCHEMY_ROBINHOOD_URI"));
 const cmcKey = optionalVar("CMC_API_KEY");
 
 const config: HardhatUserConfig = {
@@ -66,6 +78,12 @@ const config: HardhatUserConfig = {
       url: sepoliaRpc,
       accounts: privateKey ? [privateKey] : [],
       chainId: 11155111,
+      timeout: 180000,
+    },
+    robinhood: {
+      url: robinhoodRpc,
+      accounts: privateKey ? [privateKey] : [],
+      chainId: 4663,
       timeout: 180000,
     },
   },
