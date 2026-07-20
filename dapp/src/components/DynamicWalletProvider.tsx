@@ -72,12 +72,12 @@ const connectors = connectorsForWallets(
 export const config = createConfig({
   connectors,
   chains: [
-    robinhoodChain,
-    // sepolia
+    // robinhoodChain,
+    sepolia
   ],
   transports: {
-    [robinhoodChain.id]: http('https://robinhood-mainnet.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
-    // [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
+    // [robinhoodChain.id]: http('https://robinhood-mainnet.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
+    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB'),
   },
   ssr: false,
 });

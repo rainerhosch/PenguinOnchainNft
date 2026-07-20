@@ -138,136 +138,47 @@ Fund the deployer with Sepolia ETH (gas) on the target network.
 
 ---
 
-## Deploy the new contracts
+## Deploy & Sync to DApp (Recommended)
 
-### Option A — Hardhat Ignition (recommended)
+We have created an automated Hardhat task `deploy-sync` which uses Hardhat Ignition to deploy the contracts, and then automatically syncs the new contract addresses and ABIs directly into your frontend (`dapp/src/constants/PengoContract.json` & `PengoAbi.json`).
 
-Modules wire **NFT ↔ Factory** and initialize accessory coordinate slots:
+| Network / Target | Command |
+|------------------|---------|
+| **Local Node** | `npx hardhat deploy-sync --module PenguinOnchain --network localhost` |
+| **Sepolia Testnet** | `npx hardhat deploy-sync --module PenguinOnchainTestnet --network sepolia` |
+| **Robinhood Mainnet** | `npx hardhat deploy-sync --module PenguinOnchain --network robinhood` |
 
-| Module | Contract | Use |
-|--------|----------|-----|
-| `ignition/modules/PenguinOnchain.ts` | `PenguinOnchain` + `PengoFactory` | Production params |
-| `ignition/modules/PenguinOnchainTestnet.ts` | `PenguinOnchainTestnet` + `PengoFactory` | Cheaper mint / higher supply |
+### Modifiers & Hotfixes
 
-#### 1) Local / Hardhat network
-
-```powershell
-cd smartcontract
-npx hardhat compile
-
-# Terminal A
-npx hardhat node
-
-# Terminal B — deploy testnet-style module to localhost
-npx hardhat ignition deploy ignition/modules/PenguinOnchainTestnet.ts --network localhost
-```
-
-#### 2) Sepolia (or configured network)
+If you only need to redeploy the `PenguinOnchain` NFT contract (e.g. to change the mint price) without redeploying the expensive `PengoFactory` and re-running the initialization transactions, you can use the Hotfix module:
 
 ```powershell
-cd smartcontract
-npx hardhat compile
-
-# Testnet collection
-npx hardhat ignition deploy ignition/modules/PenguinOnchainTestnet.ts --network sepolia
-
-# Production-parameter collection
-npx hardhat ignition deploy ignition/modules/PenguinOnchain.ts --network sepolia
+npx hardhat deploy-sync --module PenguinOnchainHotfix --network robinhood
 ```
+*(Ensure your wallet is funded with sufficient ETH for gas before running).*
 
-Ignition prints deployed addresses and stores journals under:
+### After Deploy Checklist
 
-```text
-ignition/deployments/chain-<chainId>/
-  deployed_addresses.json
-```
-
-#### 3) After deploy — admin checklist
-
-Connect as **owner** (deployer) and verify:
-
-1. `PenguinOnchain.factory` → factory address  
-2. `PengoFactory.pengoContract` → NFT address  
-3. Allowed parts exist (`getAllAllowedParts`) after `initializeCoordinates` calls  
-4. Optional: `setBeneficiaryAddress`, `setRoyaltyAddress`  
-5. Smoke mint: `mintPengo{value: MINT_PRICE}(1)` then `tokenURI(tokenId)`  
-
-```text
-setFactory(factory)
-setPengoContract(nft)          # already in Ignition module
-initializeCoordinates(...)     # already in Ignition module (4 parts)
-setBeneficiaryAddress(treasury)
-setRoyaltyAddress(royaltyWallet)
-```
+Connect as **owner** (deployer) via block explorer or console and verify:
+1. `PenguinOnchain.factory()` returns your factory address.
+2. `PengoFactory.pengoContract()` returns your NFT address.
+3. Call `setBeneficiaryAddress(treasuryWallet)`.
+4. Call `setRoyaltyAddress(royaltyWallet)`.
 
 ---
 
-### Option B — Manual deploy (console / script)
+## Manual Deployment Options
+
+If you prefer to deploy manually without syncing to the DApp:
 
 ```powershell
-npx hardhat console --network sepolia
+# Deploy just via standard Ignition CLI
+npx hardhat ignition deploy ignition/modules/PenguinOnchain.ts --network robinhood
 ```
 
-```js
-const Factory = await ethers.getContractFactory("PengoFactory");
-const factory = await Factory.deploy();
-await factory.waitForDeployment();
-
-const NFT = await ethers.getContractFactory("PenguinOnchain"); // or PenguinOnchainTestnet
-const nft = await NFT.deploy();
-await nft.waitForDeployment();
-
-await (await nft.setFactory(await factory.getAddress())).wait();
-await (await factory.setPengoContract(await nft.getAddress())).wait();
-
-// Then initializeCoordinates for each accessory slot (see ignition module for byte data)
-```
-
----
-
-### Option C — Foundry create (advanced)
-
-```powershell
-$env:Path = "$env:USERPROFILE\.foundry\bin;$env:Path"
-forge create contracts/utils/PengoFactory.sol:PengoFactory --rpc-url $env:RPC --private-key $env:PK
-forge create contracts/ERC721/PenguinOnchain.sol:PenguinOnchain --rpc-url $env:RPC --private-key $env:PK
-# Then cast send setFactory / setPengoContract / initializeCoordinates
-```
-
-Prefer **Ignition** for the full wiring sequence.
-
----
-
-## Wire the dapp after redeploy
-
-Update `dapp/src/constants/PengoContract.json` (or your network entry):
-
-```json
-{
-  "networkDeployment": [
-    {
-      "name": "Sepolia Testnet",
-      "chainId": "11155111",
-      "currency": "ETH",
-      "explore": "https://sepolia.etherscan.io",
-      "PengoAddress": "0xYOUR_NEW_NFT",
-      "factoryAddress": "0xYOUR_NEW_FACTORY",
-      "abi": [ /* paste from artifacts/contracts/ERC721/PenguinOnchain.sol/PenguinOnchain.json */ ]
-    }
-  ]
-}
-```
-
-ABI sources:
-
-```text
-artifacts/contracts/ERC721/PenguinOnchain.sol/PenguinOnchain.json
-artifacts/contracts/ERC721/PenguinOnchainTestnet.sol/PenguinOnchainTestnet.json
-# or Foundry:
-out/PenguinOnchain.sol/PenguinOnchain.json
-```
-
-Restart the dapp (`cd dapp && npm run dev`) and mint / studio / marketplace against the new addresses.
+If you deploy manually, you will need to manually copy the deployed addresses and ABI into the DApp frontend files:
+- Addresses: `dapp/src/constants/PengoContract.json`
+- ABI: `dapp/src/constants/PengoAbi.json`
 
 ---
 

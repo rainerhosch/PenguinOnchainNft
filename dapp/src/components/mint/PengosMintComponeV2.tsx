@@ -134,8 +134,8 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
         txToastError(
             MINT_TX_TOAST,
             (receiptError as BaseError).shortMessage ||
-                receiptError.message ||
-                "Transaction reverted"
+            receiptError.message ||
+            "Transaction reverted"
         );
     }, [isReceiptError, receiptError]);
 
@@ -253,9 +253,8 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
                     <button
                         type="submit"
                         disabled={isPending || isConfirming}
-                        className={`w-full btn-primary py-4 text-lg font-bold ${
-                            isPending || isConfirming ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
+                        className={`w-full btn-primary py-4 text-lg font-bold ${isPending || isConfirming ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                     >
                         {isPending || isConfirming ? (
                             <span className="flex items-center justify-center gap-2">

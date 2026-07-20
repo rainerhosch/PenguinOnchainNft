@@ -24,3 +24,7 @@ PenguinOnchainModule#PengoFactory - 0x3993bAddb467Bd155a83A63567e1B2B34E1926C6
 PenguinOnchainModule#PenguinOnchain - 0x511329b09C5d8AeaF8D9192D472Bc25e11cD6262 # Price 0.25Eth
 
 ## New Deploy PeguinOnChain Price 0.01 Eth
+
+## Sepolia Deployment Contract
+0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d # PengoFactory
+0xF44DE6051efC6539FD66c93Ee5439737398bCd57 # PenguinOnchain
