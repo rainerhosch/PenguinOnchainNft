@@ -42,17 +42,20 @@
 * ** author  : Onchain Pengo Lab
 * ** package : @contracts/utils/PengoFactory.sol
 */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
-import "../libraries/base64.sol";
+import {Base64} from "solady/src/utils/Base64.sol";
+import {LibString} from "solady/src/utils/LibString.sol";
+import {DynamicBufferLib} from "solady/src/utils/DynamicBufferLib.sol";
 import "../libraries/pengoConverter.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/// @notice On-chain SVG / metadata factory. Public structure preserved; assembly uses Solady buffers.
 contract PengoFactory is IPengoFactory, Ownable {
-    using Strings for uint256;
+    using DynamicBufferLib for DynamicBufferLib.DynamicBuffer;
+
     mapping(string => mapping(uint8 => mapping(uint8 => bool))) public pixelMapCoordinates;
     mapping(string => bool) public allowedParts;
     mapping(string => uint8[]) private partPixelsX;
@@ -85,206 +88,197 @@ contract PengoFactory is IPengoFactory, Ownable {
         uint256 tokenId,
         uint256 seed
     ) external view virtual returns (string memory) {
-        // Get Color for Base Trait
         Color memory baseColor = getBaseColor("Body", seed);
         Color memory topEyeColor = getBaseColor("top_eye", seed);
 
-        (IPenguinOnchain.Accessory[] memory accessories,IPenguinOnchain.SpecialTrait memory specialTraits) = pengoContract.getNFTDetails(tokenId);
-        string memory rawPengo = string(
-            abi.encodePacked(
-                '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">',
-                '<rect width="100%" height="100%" fill="#acff00"/>'
-            )
-        );
+        (IPenguinOnchain.Accessory[] memory accessories, IPenguinOnchain.SpecialTrait memory specialTraits) =
+            pengoContract.getNFTDetails(tokenId);
 
-        // Get all pixel data on array uint256[]
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BODY, baseColor.value)));
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BELLY, "")));
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BILL, "")));
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_TOP_EYE, topEyeColor.value)));
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_BOT_EYE, "")));
-        rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(BYTE_FEET, "")));
-
-        string memory accessoriesCollected = "";
-        // Looping for accessories
-        for (uint256 i = 0; i < accessories.length; i++) {
-            rawPengo = string(abi.encodePacked(rawPengo, parsePixelData(accessories[i].bytePixel, "")));
-
-            // Add metadata accessories
-            accessoriesCollected = string(
-                abi.encodePacked(
-                    accessoriesCollected,
-                    bytes(accessoriesCollected).length > 0 ? "," : "",
-                    '{"trait_type": "', accessories[i].trait_type, '", "value": "', accessories[i].trait_name, '"}'
-                )
-            );
-        }
-
-        rawPengo = string(abi.encodePacked(rawPengo, SVG_END_TAG));
-
-        // create metadata
-        string memory metadata = Base64.encode(
+        // SVG assembly via Solady DynamicBuffer (cheaper than repeated string concat)
+        DynamicBufferLib.DynamicBuffer memory svg;
+        svg = svg.p(
             bytes(
-                string(
-                    abi.encodePacked(
-                        "{",
-                        '"name": "Pengo #', tokenId.toString(), '",',
-                        '"description": "Penguin Onchain is an innovative on-chain NFT project that pushes the boundaries of generative art and blockchain customization. Unlike traditional NFT collections that are pre-generated and stored off-chain, every Penguin NFT is generated using an algorithm directly on the blockchain, ensuring true decentralization and immutability.",',
-                        '"image": "data:image/svg+xml;base64,', Base64.encode(bytes(rawPengo)), '",',
-                        '"attributes": [',
-                        '{"trait_type": "Pengo Type", "value": "', baseColor.name, '"},',
-                        '{"trait_type": "Eye Type", "value": "', topEyeColor.name, '"},',
-                        '{"trait_type": "Life Goal", "value": "', specialTraits.category, '"},',
-                        '{"trait_type": "Net Worth", "value": "', specialTraits.networth, '"}',
-                        bytes(accessoriesCollected).length > 0 ? "," : "",
-                        accessoriesCollected,
-                        "]"
-                        "}"
-                    )
-                )
+                '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#acff00"/>'
             )
         );
+        svg = svg.p(bytes(parsePixelData(BYTE_BODY, baseColor.value)));
+        svg = svg.p(bytes(parsePixelData(BYTE_BELLY, "")));
+        svg = svg.p(bytes(parsePixelData(BYTE_BILL, "")));
+        svg = svg.p(bytes(parsePixelData(BYTE_TOP_EYE, topEyeColor.value)));
+        svg = svg.p(bytes(parsePixelData(BYTE_BOT_EYE, "")));
+        svg = svg.p(bytes(parsePixelData(BYTE_FEET, "")));
 
-        return
-            string(abi.encodePacked("data:application/json;base64,", metadata));
+        DynamicBufferLib.DynamicBuffer memory attrs;
+        uint256 accLen = accessories.length;
+        for (uint256 i; i < accLen; ) {
+            svg = svg.p(bytes(parsePixelData(accessories[i].bytePixel, "")));
+            if (i != 0) {
+                attrs = attrs.p(bytes(","));
+            }
+            attrs = attrs.p(
+                bytes('{"trait_type": "'),
+                bytes(accessories[i].trait_type),
+                bytes('", "value": "'),
+                bytes(accessories[i].trait_name),
+                bytes('"}')
+            );
+            unchecked {
+                ++i;
+            }
+        }
+        svg = svg.p(bytes(SVG_END_TAG));
+
+        string memory imageB64 = Base64.encode(bytes(svg.s()));
+
+        DynamicBufferLib.DynamicBuffer memory meta;
+        meta = meta.p(bytes('{"name": "Pengo #'));
+        meta = meta.p(bytes(LibString.toString(tokenId)));
+        meta = meta.p(
+            bytes(
+                '","description": "Penguin Onchain is an innovative on-chain NFT project that pushes the boundaries of generative art and blockchain customization. Unlike traditional NFT collections that are pre-generated and stored off-chain, every Penguin NFT is generated using an algorithm directly on the blockchain, ensuring true decentralization and immutability.","image": "data:image/svg+xml;base64,'
+            )
+        );
+        meta = meta.p(bytes(imageB64));
+        meta = meta.p(bytes('","attributes": [{"trait_type": "Pengo Type", "value": "'));
+        meta = meta.p(bytes(baseColor.name));
+        meta = meta.p(bytes('"},{"trait_type": "Eye Type", "value": "'));
+        meta = meta.p(bytes(topEyeColor.name));
+        meta = meta.p(bytes('"},{"trait_type": "Life Goal", "value": "'));
+        meta = meta.p(bytes(specialTraits.category));
+        meta = meta.p(bytes('"},{"trait_type": "Net Worth", "value": "'));
+        meta = meta.p(bytes(specialTraits.networth));
+        meta = meta.p(bytes('"}'));
+        if (accLen > 0) {
+            meta = meta.p(bytes(","));
+            meta = meta.p(bytes(attrs.s()));
+        }
+        meta = meta.p(bytes("]}"));
+
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(meta.s()))));
     }
 
     function _createContractURI() external view virtual returns (string memory) {
-                // create metadata
-        string memory metadata = Base64.encode(
+        DynamicBufferLib.DynamicBuffer memory meta;
+        meta = meta.p(
             bytes(
-                string(
-                    abi.encodePacked(
-                        "{",
-                        '"name": "Penguin Onchain",',
-                        '"description": "Penguin Onchain is an innovative on-chain NFT project that pushes the boundaries of generative art and blockchain customization. Unlike traditional NFT collections that are pre-generated and stored off-chain, every Penguin NFT is generated using an algorithm directly on the blockchain, ensuring true decentralization and immutability.",',
-                        '"image": "https://penguinonchain.top/pengo-icon.png",',
-                        '"external_url": "https://penguinonchain.top",',
-                        '"seller_fee_basis_points": "500",',
-                        '"fee_recipient": "', owner(), '",',
-                        "}"
-                    )
-                )
+                '{"name": "Penguin Onchain","description": "Penguin Onchain is an innovative on-chain NFT project that pushes the boundaries of generative art and blockchain customization. Unlike traditional NFT collections that are pre-generated and stored off-chain, every Penguin NFT is generated using an algorithm directly on the blockchain, ensuring true decentralization and immutability.","image": "https://penguinonchain.top/pengo-icon.png","external_url": "https://penguinonchain.top","seller_fee_basis_points": "500","fee_recipient": "'
             )
         );
+        meta = meta.p(bytes(LibString.toHexStringChecksummed(owner())));
+        meta = meta.p(bytes('"}'));
 
-        return
-            string(abi.encodePacked("data:application/json;base64,", metadata));
+        return string(abi.encodePacked("data:application/json;base64,", Base64.encode(bytes(meta.s()))));
     }
 
-
-    function parsePixelData(string memory _datapixel, string memory customColor) internal pure returns (string memory) {
+    /// @dev Pixel hex → SVG rects using DynamicBuffer + LibString (same 7-byte pixel layout).
+    function parsePixelData(string memory _datapixel, string memory customColor)
+        internal
+        pure
+        returns (string memory)
+    {
         bytes memory data = PengoConverter.hexStringToBytes(_datapixel);
-        // uint256 length = data.length;
         require(data.length % 7 == 0, "Invalid pixel data length");
-        string memory svgPart = "";
 
         uint256 numPixels = data.length / 7;
-        uint256[] memory pixels = new uint256[](numPixels * 4); // 4 element per pixel (x, y, w, h)
-        string[] memory colors = new string[](numPixels); //1 element for color pixel
+        bool useCustom = bytes(customColor).length > 0;
 
-        for (uint256 i = 0; i < numPixels; i++) {
-            uint256 offset = i * 7; // one pixel  is 7 bytes
+        DynamicBufferLib.DynamicBuffer memory buf;
+        // Rough reserve: ~48 bytes per rect
+        buf = buf.reserve(numPixels * 48);
 
-            pixels[i * 4] = uint8(data[offset]);   // x
-            pixels[i * 4 + 1] = uint8(data[offset + 1]);   // y
-            pixels[i * 4 + 2] = uint8(data[offset + 2]);   // width
-            pixels[i * 4 + 3] = uint8(data[offset + 3]);   // height
-            colors[i] = string(abi.encodePacked(
-                PengoConverter.toHexChar(data[offset + 4]),
-                PengoConverter.toHexChar(data[offset + 5]),
-                PengoConverter.toHexChar(data[offset + 6])
-            )); //color
-        
-        }
+        for (uint256 i; i < numPixels; ) {
+            uint256 offset = i * 7;
+            string memory colorHex = useCustom
+                ? customColor
+                : string(
+                    abi.encodePacked(
+                        PengoConverter.toHexChar(data[offset + 4]),
+                        PengoConverter.toHexChar(data[offset + 5]),
+                        PengoConverter.toHexChar(data[offset + 6])
+                    )
+                );
 
-        for (uint256 i = 0; i < pixels.length; i += 4) {  // Loop per pixel
-            uint256 x = pixels[i];
-            uint256 y = pixels[i + 1];
-            uint256 w = pixels[i + 2];
-            uint256 h = pixels[i + 3];
+            buf = buf.p(bytes("<rect x='"));
+            buf = buf.p(bytes(LibString.toString(uint256(uint8(data[offset])))));
+            buf = buf.p(bytes("' y='"));
+            buf = buf.p(bytes(LibString.toString(uint256(uint8(data[offset + 1])))));
+            buf = buf.p(bytes("' width='"));
+            buf = buf.p(bytes(LibString.toString(uint256(uint8(data[offset + 2])))));
+            buf = buf.p(bytes("' height='"));
+            buf = buf.p(bytes(LibString.toString(uint256(uint8(data[offset + 3])))));
+            buf = buf.p(bytes("' fill='#"));
+            buf = buf.p(bytes(colorHex));
+            buf = buf.p(bytes("'/>"));
 
-            string memory colorHex = colors[i / 4];
-            if (bytes(customColor).length > 0) {
-                colorHex = customColor;
+            unchecked {
+                ++i;
             }
-
-            svgPart = string(abi.encodePacked(
-                svgPart,
-                "<rect x='", PengoConverter.uintToString(x),
-                "' y='", PengoConverter.uintToString(y),
-                "' width='", PengoConverter.uintToString(w),
-                "' height='", PengoConverter.uintToString(h),
-                "' fill='#", colorHex, "'/>"
-            ));
         }
 
-        return svgPart;
+        return buf.s();
     }
 
     
+    // Precomputed name hashes — avoid re-hashing string literals on every call
+    bytes32 private constant _HASH_BODY = keccak256("Body");
+    bytes32 private constant _HASH_TOP_EYE = keccak256("top_eye");
+    bytes32 private constant _HASH_ZOMBIE = keccak256("Zombie");
+
     function getBaseColor(
         string memory part,
         uint256 _seed
     ) private pure returns (Color memory) {
-        uint256 maxSupply = 50000; // change to 50K from 20K
+        uint256 maxSupply = 50000;
         uint256 seed = _seed % maxSupply;
+        bytes32 partHash = keccak256(bytes(part));
 
-        if (keccak256(abi.encodePacked(part)) == keccak256(abi.encodePacked("Body"))) {
-            uint256 remainingSupply = maxSupply;
-            
+        if (partHash == _HASH_BODY) {
             if (seed < 300) {
-                return Color("Zombie", "304a12"); // 300 NFT
+                return Color("Zombie", "304a12");
             }
-            remainingSupply -= 300;
-
             if (seed < 1000) {
-                return Color("Arctic", "52A0FF"); // 700 NFT
+                return Color("Arctic", "52A0FF");
             }
-            remainingSupply -= 700;
-
             if (seed < 2500) {
-                return Color("Fire", "990718"); // 1500 NFT
+                return Color("Fire", "990718");
             }
-            remainingSupply -= 1500;
-
-            uint256 femaleSupply = remainingSupply / 2;
+            uint256 femaleSupply = (maxSupply - 2500) / 2;
             if (seed < 2500 + femaleSupply) {
                 return Color("Female", "9B9B9B");
-            } else {
-                return Color("Male", "4B4C4F");
             }
+            return Color("Male", "4B4C4F");
         }
 
-        if (keccak256(abi.encodePacked(part)) == keccak256(abi.encodePacked("top_eye"))) {
-            Color memory baseColor = getBaseColor("Body", _seed); 
+        if (partHash == _HASH_TOP_EYE) {
+            Color memory baseColor = getBaseColor("Body", _seed);
 
-            if (keccak256(abi.encodePacked(baseColor.name)) == keccak256(abi.encodePacked("Zombie"))) {
-                return Color("Zombie Eye", "D74755"); // 300 NFT only for Zombie
+            if (keccak256(bytes(baseColor.name)) == _HASH_ZOMBIE) {
+                return Color("Zombie Eye", "D74755");
             }
 
-            uint256 remainingSupply = maxSupply - 300; // After getting Zombie type
-            uint256 ancestorsSupply = (remainingSupply * 5) / 100;  // 985 NFT (5% from remainingSupply)
-            uint256 sleepySupply = (remainingSupply * 10) / 100;    // 1970 NFT (10% from remainingSupply)
-            uint256 purpleShadeSupply = (remainingSupply * 30) / 100; // 5910 NFT (30% from remainingSupply)
+            uint256 remainingSupply = maxSupply - 300;
+            uint256 ancestorsSupply = (remainingSupply * 5) / 100;
+            uint256 sleepySupply = (remainingSupply * 10) / 100;
+            uint256 purpleShadeSupply = (remainingSupply * 30) / 100;
 
             if (seed < 300 + ancestorsSupply) {
-                return Color("Ancestors", "B0B0B0"); 
-            } else if (seed < 300 + ancestorsSupply + sleepySupply) {
-                return Color("Sleepy", "4872A4");
-            } else if (seed < 300 + ancestorsSupply + sleepySupply + purpleShadeSupply) {
-                return Color("Purple Shade", "A867E1");
-            } else {
-                return Color("Standard", "FFFFFF"); 
+                return Color("Ancestors", "B0B0B0");
             }
+            if (seed < 300 + ancestorsSupply + sleepySupply) {
+                return Color("Sleepy", "4872A4");
+            }
+            if (seed < 300 + ancestorsSupply + sleepySupply + purpleShadeSupply) {
+                return Color("Purple Shade", "A867E1");
+            }
+            return Color("Standard", "FFFFFF");
         }
-
 
         return Color("Unknown", "000000");
     }
 
 
-    function setPengoContract(address _pengoContract) external {
+    function setPengoContract(address _pengoContract) external onlyOwner {
+        require(_pengoContract != address(0), "zero address");
         pengoContract = IPenguinOnchain(_pengoContract);
     }
 
@@ -348,14 +342,12 @@ contract PengoFactory is IPengoFactory, Ownable {
         return parts;
     }
 
-    function isAllowedPart(
-        string calldata part
-    ) public view returns (bool) {
+    function isAllowedPart(string calldata part) external view returns (bool) {
         return allowedParts[part];
     }
 
     function isValidCoordinate(
-        string memory part,
+        string calldata part,
         uint8 x,
         uint8 y
     ) public view returns (bool) {

@@ -4,6 +4,40 @@ import { vars } from "hardhat/config";
 import "@matterlabs/hardhat-zksync";
 require("hardhat-gas-reporter");
 
+function optionalVar(name: string, fallback = ""): string {
+  try {
+    return vars.get(name);
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Accepts either a full RPC URL or a bare Alchemy API key.
+ * Invalid case (key only) caused: TypeError: Invalid URL
+ */
+function resolveSepoliaRpc(raw: string): string {
+  const value = (raw || "").trim();
+  if (!value) {
+    return "https://rpc.sepolia.org";
+  }
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+  // Bare Alchemy key → full Sepolia HTTPS endpoint
+  return `https://eth-sepolia.g.alchemy.com/v2/${value}`;
+}
+
+function normalizePrivateKey(raw: string): string | undefined {
+  const value = (raw || "").trim();
+  if (!value) return undefined;
+  return value.startsWith("0x") ? value : `0x${value}`;
+}
+
+const privateKey = normalizePrivateKey(optionalVar("PRIVATE_KEY"));
+const sepoliaRpc = resolveSepoliaRpc(optionalVar("ALCHEMY_SEPOLIA_URI"));
+const cmcKey = optionalVar("CMC_API_KEY");
+
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.27",
@@ -11,50 +45,32 @@ const config: HardhatUserConfig = {
       viaIR: true,
       optimizer: {
         enabled: true,
-        details: {
-          yulDetails: {
-            optimizerSteps: "u",
-          },
-        },
-      }
-    }
+        runs: 200,
+      },
+      evmVersion: "cancun",
+    },
   },
   gasReporter: {
-    enabled: true,       // Aktifkan gas reporter
-    currency: "USD",     // Pilihan: USD, EUR, dll.
-    gasPrice: 10,        // Harga gas (Gwei) untuk estimasi biaya
-    coinmarketcap: vars.get("CMC_API_KEY"),   // API Key (opsional) untuk menampilkan harga gas secara real-time
-    outputFile: "gas-report.txt", // Simpan hasil ke file (opsional)
-    noColors: false,     // Hapus warna terminal jika ingin output bersih
+    enabled: process.env.REPORT_GAS === "true",
+    currency: "USD",
+    gasPrice: 10,
+    ...(cmcKey ? { coinmarketcap: cmcKey } : {}),
+    outputFile: "gas-report.txt",
+    noColors: false,
   },
-  defaultNetwork: "sepolia",
+  defaultNetwork: "hardhat",
   networks: {
-    monadTestnet: {
-      url: vars.get("MONAD_RPC_URL"),
-      accounts: [vars.get("PRIVATE_KEY_MONAD")],
-      chainId: Number(vars.get("MONAD_CHAIN_ID")),
-    },
+    hardhat: {},
+    localhost: { url: "http://127.0.0.1:8545" },
     sepolia: {
-      // url: vars.get("INFURA_SEPOLIA_URI"),
-      url: vars.get("ALCHEMY_SEPOLIA_URI"),
-      accounts: [vars.get("PRIVATE_KEY")],
-      chainId: 11155111, // Sepolia's chain ID
-      timeout: 120000, // Perpanjang timeout
+      url: sepoliaRpc,
+      accounts: privateKey ? [privateKey] : [],
+      chainId: 11155111,
+      timeout: 180000,
     },
-    localhost: {
-      url: "http://127.0.0.1:8545"
-    },
-    hardhat: {
-    }
   },
-  sourcify: {
-    enabled: true,
-    apiUrl: "https://sourcify-api-monad.blockvision.org",
-    browserUrl: "https://testnet.monadexplorer.com"
-  },
-  etherscan: {
-    enabled: false
-  },
+  sourcify: { enabled: true },
+  etherscan: { enabled: false },
 };
 
 export default config;

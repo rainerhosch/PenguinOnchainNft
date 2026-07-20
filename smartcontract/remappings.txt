@@ -1,0 +1,4 @@
+@openzeppelin/=node_modules/@openzeppelin/
+erc721a/=node_modules/erc721a/
+solady/=node_modules/solady/
+forge-std/=lib/forge-std/src/

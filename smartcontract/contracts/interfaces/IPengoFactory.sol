@@ -51,6 +51,6 @@ interface IPengoFactory {
     // function toHexChar(bytes1 b) external view returns (string memory);
     // function hexStringToBytes(string memory s) external pure returns (bytes memory);
     function isAllowedPart( string calldata part) external view returns (bool);
-    function isValidCoordinate(string memory part, uint8 x, uint8 y) external view returns (bool);
+    function isValidCoordinate(string calldata part, uint8 x, uint8 y) external view returns (bool);
     function reconstructHexString(uint256[] memory pixels, string[] memory colors) external pure returns (string memory);
 }
