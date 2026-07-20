@@ -20,16 +20,16 @@ const traits = [
 
 const rarityColors: { [key: string]: string } = {
     legendary: "text-yellow-400",
-    epic: "text-purple-400",
-    rare: "text-cyan-400",
+    epic: "text-primary-400",
+    rare: "text-accent-400",
     uncommon: "text-green-400",
     common: "text-neutral-400"
 };
 
 const rarityBadgeColors: { [key: string]: string } = {
     legendary: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-    epic: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-    rare: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    epic: "bg-primary-500/20 text-primary-400 border-primary-500/30",
+    rare: "bg-accent-500/20 text-accent-400 border-accent-500/30",
     uncommon: "bg-green-500/20 text-green-400 border-green-500/30",
     common: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30"
 };
@@ -54,9 +54,9 @@ export default function MintPage() {
             <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
             {/* Glow Effects */}
-            <div className="fixed top-20 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="fixed bottom-0 right-0 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
-            <div className="fixed top-1/2 right-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed top-20 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed bottom-0 right-0 w-80 h-80 bg-accent-500/15 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed top-1/2 right-1/4 w-64 h-64 bg-primary-600/10 rounded-full blur-[100px] pointer-events-none" />
 
             <AppNavbar />
 
@@ -133,7 +133,7 @@ export default function MintPage() {
                                             className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-yellow-400' : trait.rarity === 'epic' ? 'bg-purple-400' : trait.rarity === 'rare' ? 'bg-cyan-400' : trait.rarity === 'uncommon' ? 'bg-green-400' : 'bg-neutral-400'}`} />
+                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-yellow-400' : trait.rarity === 'epic' ? 'bg-primary-400' : trait.rarity === 'rare' ? 'bg-accent-400' : trait.rarity === 'uncommon' ? 'bg-green-400' : 'bg-neutral-400'}`} />
                                                 <div>
                                                     <div className={`font-medium ${rarityColors[trait.rarity]}`}>{trait.name}</div>
                                                     <div className="text-xs text-neutral-500">{trait.category}</div>
@@ -156,8 +156,8 @@ export default function MintPage() {
                                 <div className="flex flex-wrap gap-3">
                                     {[
                                         { name: "Legendary", color: "bg-yellow-400" },
-                                        { name: "Epic", color: "bg-purple-400" },
-                                        { name: "Rare", color: "bg-cyan-400" },
+                                        { name: "Epic", color: "bg-primary-400" },
+                                        { name: "Rare", color: "bg-accent-400" },
                                         { name: "Uncommon", color: "bg-green-400" },
                                         { name: "Common", color: "bg-neutral-400" },
                                     ].map((rarity) => (

@@ -13,20 +13,20 @@ const sections = [
         ),
         content: (
             <div className="space-y-4">
-                <p>Getting started with Pengo is simple and secure. Connect your Web3 wallet to unlock the full potential of on-chain NFT customization.</p>
+                <p>Your Pengo journey starts with one click. Connect a modern wallet and step into a world where every pixel you add can live forever on-chain.</p>
                 <div className="glass-card p-6 space-y-4">
                     <h4 className="font-semibold text-white flex items-center gap-2">
                         <span className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center text-primary-400">1</span>
                         Supported Wallets
                     </h4>
-                    <p className="text-neutral-400 pl-10">We support MetaMask, WalletConnect, Coinbase Wallet, and other major Web3 wallets. Make sure you have one installed on your browser or device.</p>
+                    <p className="text-neutral-400 pl-10">MetaMask, WalletConnect, Coinbase Wallet, and more. Install a wallet you trust, keep a little gas ready, and you are set.</p>
                 </div>
                 <div className="glass-card p-6 space-y-4">
                     <h4 className="font-semibold text-white flex items-center gap-2">
                         <span className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center text-primary-400">2</span>
                         Network Setup
                     </h4>
-                    <p className="text-neutral-400 pl-10">Pengo operates on Monad Network. Your wallet will automatically prompt you to add the network when you connect for the first time.</p>
+                    <p className="text-neutral-400 pl-10">When you connect, switch to the network shown on the Mint page. Your wallet will prompt you if the chain is not added yet—approve once and you are in.</p>
                 </div>
             </div>
         )
@@ -41,14 +41,14 @@ const sections = [
         ),
         content: (
             <div className="space-y-6">
-                <p>Minting your Pengo NFT is your gateway to the world of customizable digital collectibles. Follow these steps to claim your unique penguin avatar.</p>
+                <p>Minting is your ticket in. Supply is capped at 20,000—every Pengo is a base identity you can style forever. Follow the steps and claim yours.</p>
                 <div className="space-y-4">
                     {[
-                        { step: "01", title: "Connect Your Wallet", desc: "Click the 'Connect Wallet' button in the navigation bar and approve the connection request." },
-                        { step: "02", title: "Prepare Your Funds", desc: "Ensure you have sufficient $MON tokens in your wallet to cover the minting fee. Gas fees are minimal on Monad." },
-                        { step: "03", title: "Navigate to Mint Page", desc: "Head to the minting section and browse available Pengo designs or choose random generation." },
-                        { step: "04", title: "Complete the Mint", desc: "Click 'Mint' and confirm the transaction in your wallet. The process takes just a few seconds." },
-                        { step: "05", title: "Start Customizing", desc: "Once minted, your Pengo appears in your wallet. Visit the Studio to add accessories and make it truly unique!" }
+                        { step: "01", title: "Connect Your Wallet", desc: "Hit Connect Wallet, approve the request, and make sure you are on the correct network." },
+                        { step: "02", title: "Prepare Your Funds", desc: "Keep enough native token for the mint price plus a small gas buffer. Check the Mint page for the live price." },
+                        { step: "03", title: "Navigate to Mint Page", desc: "Open Mint, pick your quantity, and review the total—transparent pricing, no surprise reveal gimmicks." },
+                        { step: "04", title: "Complete the Mint", desc: "Confirm Mint Pengo in your wallet. Seconds later, your fully on-chain identity is yours." },
+                        { step: "05", title: "Start Customizing", desc: "Then open Studio: draw accessories, equip marketplace pieces, and start building rarity only you control." }
                     ].map((item, index) => (
                         <div key={index} className="glass-card p-5 flex gap-4 group hover:bg-white/10 transition-all">
                             <span className="text-2xl font-bold gradient-text">{item.step}</span>
@@ -72,7 +72,7 @@ const sections = [
         ),
         content: (
             <div className="space-y-6">
-                <p>This is where the magic happens. Pengo is the first fully customizable on-chain NFT, and you have complete creative control.</p>
+                <p>This is the product. Fully on-chain customization means your edits are not a skin on a website—they rewrite how your NFT is rendered forever.</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="glass-card p-6 space-y-3">
@@ -82,7 +82,7 @@ const sections = [
                             </svg>
                         </div>
                         <h4 className="text-lg font-semibold text-white">Draw Your Own</h4>
-                        <p className="text-neutral-400 text-sm">Use our powerful Studio to draw custom accessories from scratch. Your creativity, your rules.</p>
+                        <p className="text-neutral-400 text-sm">Pixel-draw original accessories in Studio. Ship looks no generative pack ever planned.</p>
                     </div>
 
                     <div className="glass-card p-6 space-y-3">
@@ -92,13 +92,13 @@ const sections = [
                             </svg>
                         </div>
                         <h4 className="text-lg font-semibold text-white">Buy from Marketplace</h4>
-                        <p className="text-neutral-400 text-sm">Browse the Accessory Marketplace for unique items created by our community of artists.</p>
+                        <p className="text-neutral-400 text-sm">Browse the marketplace for community-made pieces—equip in one click, trade with zero marketplace fees.</p>
                     </div>
                 </div>
 
                 <div className="glass-card p-6 border-l-4 border-accent-500">
                     <h4 className="font-semibold text-white mb-2">💡 Pro Tip: Trait Accumulation</h4>
-                    <p className="text-neutral-400 text-sm">Accessories you purchase unlock special traits based on their value. The more you collect, the more unique traits your Pengo accumulates!</p>
+                    <p className="text-neutral-400 text-sm">Accessories can unlock special traits as value stacks. Build a net-worth story on-chain—and a look nobody can screenshot-steal as the source of truth.</p>
                 </div>
             </div>
         )
@@ -113,22 +113,22 @@ const sections = [
         ),
         content: (
             <div className="space-y-6">
-                <p>The Accessory Marketplace is a vibrant ecosystem where creativity meets commerce. Discover, trade, and collect unique NFT accessories crafted by talented artists worldwide.</p>
+                <p>A zero-fee accessory marketplace where creators get paid and collectors upgrade identity—peer-to-peer, transparent, fully on-chain.</p>
 
                 <div className="grid gap-4">
                     <div className="glass-card p-6">
                         <h4 className="text-lg font-semibold text-white mb-3">🎨 Discover Unique Creations</h4>
-                        <p className="text-neutral-400">Explore an extensive collection of accessories—from whimsical hats to intricate outfits. Each piece is a unique work of art crafted by our community creators.</p>
+                        <p className="text-neutral-400">Hunt rare fits and one-of-one drip from real artists. Every piece can change how your Pengo is rendered on-chain.</p>
                     </div>
 
                     <div className="glass-card p-6">
                         <h4 className="text-lg font-semibold text-white mb-3">💰 Trade with Confidence</h4>
-                        <p className="text-neutral-400">All transactions are secured on-chain with full transparency. Buy, sell, or trade accessories with other collectors in a trustless environment.</p>
+                        <p className="text-neutral-400">List, buy, and settle on-chain. No marketplace cut means more upside for the people who actually create and collect.</p>
                     </div>
 
                     <div className="glass-card p-6">
                         <h4 className="text-lg font-semibold text-white mb-3">🤝 Join the Creator Economy</h4>
-                        <p className="text-neutral-400">Are you an artist? Submit your designs to the marketplace and earn royalties every time your creation is traded. Turn your creativity into passive income.</p>
+                        <p className="text-neutral-400">Artists: mint culture into the economy. Sell accessories, earn from demand, and get discovered by every wallet that opens Studio.</p>
                     </div>
                 </div>
 
@@ -153,7 +153,7 @@ const sections = [
         ),
         content: (
             <div className="space-y-6">
-                <p>Pengo is more than just an NFT project—it's a thriving community of creators, collectors, and innovators. Join us and be part of something extraordinary.</p>
+                <p>Penguin Onchain is a scene: pixel artists, collectors, and builders shipping a new standard for digital identity. Come for the Pengo—stay for the people.</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <a href="https://discord.gg/penguinonchain" target="_blank" className="glass-card p-6 group hover:bg-white/10 transition-all block">
@@ -168,7 +168,7 @@ const sections = [
                                 <p className="text-neutral-400 text-sm">Join the conversation</p>
                             </div>
                         </div>
-                        <p className="text-neutral-400 text-sm">Connect with fellow Pengo enthusiasts, get support, and participate in exclusive events and giveaways.</p>
+                        <p className="text-neutral-400 text-sm">Ship ideas, get Studio help, catch drops, and meet the people writing the next chapter of on-chain art.</p>
                     </a>
 
                     <a href="https://x.com/onchainpengo" target="_blank" className="glass-card p-6 group hover:bg-white/10 transition-all block">
@@ -183,7 +183,7 @@ const sections = [
                                 <p className="text-neutral-400 text-sm">Follow for updates</p>
                             </div>
                         </div>
-                        <p className="text-neutral-400 text-sm">Stay updated with the latest news, announcements, sneak peeks, and community highlights.</p>
+                        <p className="text-neutral-400 text-sm">Launches, Studio teases, holder calls, and culture—follow so you never miss a mint window.</p>
                     </a>
                 </div>
             </div>
@@ -199,18 +199,18 @@ const sections = [
         ),
         content: (
             <div className="space-y-6">
-                <p>We're here to help! Whether you have questions about minting, customization, or anything else, our support resources are just a click away.</p>
+                <p>Stuck on mint, Studio, or network setup? We would rather you mint confidently than guess. Support is one click away.</p>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="glass-card p-6">
                         <h4 className="text-lg font-semibold text-white mb-3">📚 FAQ</h4>
-                        <p className="text-neutral-400 text-sm mb-4">Find answers to commonly asked questions about Pengo, minting, and the marketplace.</p>
+                        <p className="text-neutral-400 text-sm mb-4">Quick answers on minting, networks, Studio, and marketplace flows.</p>
                         <a href="#" className="text-primary-400 hover:text-primary-300 text-sm font-medium">View FAQ →</a>
                     </div>
 
                     <div className="glass-card p-6">
                         <h4 className="text-lg font-semibold text-white mb-3">💬 Support Team</h4>
-                        <p className="text-neutral-400 text-sm mb-4">Can't find what you're looking for? Our support team is ready to assist you.</p>
+                        <p className="text-neutral-400 text-sm mb-4">Still blocked? Ping support on Discord—real humans who ship this product.</p>
                         <a href="https://discord.gg/penguinonchain" target="_blank" className="text-primary-400 hover:text-primary-300 text-sm font-medium">Contact Support →</a>
                     </div>
                 </div>
@@ -229,8 +229,8 @@ const GettingStartedPage = () => {
             <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
             {/* Glow Effects */}
-            <div className="fixed top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="fixed bottom-0 right-0 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed bottom-0 right-0 w-80 h-80 bg-accent-500/15 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Header */}
             <header className="sticky top-0 z-50 glass-dark border-b border-white/5">
@@ -244,7 +244,7 @@ const GettingStartedPage = () => {
                             </Link>
                             <div>
                                 <h1 className="text-xl font-bold text-white">Getting Started</h1>
-                                <p className="text-sm text-neutral-400 hidden sm:block">Your guide to the Pengo ecosystem</p>
+                                <p className="text-sm text-neutral-400 hidden sm:block">Draw it. Own it. Live it forever — start here</p>
                             </div>
                         </div>
 

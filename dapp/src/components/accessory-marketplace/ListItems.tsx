@@ -87,7 +87,7 @@ export default function ListItems() {
                         href={`${networkContract?.explore}/tx/${hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-cyan-400 underline hover:text-cyan-300"
+                        className="text-accent-400 underline hover:text-primary-300"
                     >
                         {`${hash?.slice(0, 6)}...${hash?.slice(-4)}`}
                     </a>

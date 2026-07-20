@@ -37,17 +37,18 @@ const roobert = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Penguin Onchain",
-  description: "Penguin Onchain is more than just an NFT—it's a decentralized, interactive digital identity. Whether you're an artist, collector, or Web3 enthusiast, this project opens new possibilities for self-expression, community-driven rarity, and sustainable blockchain innovation.",
-  metadataBase: new URL("https://penguinonchain.top"), // Added metadataBase for resolving social open graph or twitter images
+  title: "Penguin Onchain | Draw it. Own it. Live it forever.",
+  description:
+    "Fully on-chain. Fully yours. Mint a Pengo, customize pixel art on-chain, trade accessories with zero fees, and hold a living digital identity with real ecosystem upside.",
+  metadataBase: new URL("https://penguinonchain.top"),
   openGraph: {
-    title: "Penguin Onchain",
-    description: "Penguin Onchain is a decentralized, interactive NFT identity.",
+    title: "Penguin Onchain — Fully on-chain. Fully yours.",
+    description:
+      "Draw it. Own it. Live it forever. Customizable on-chain Penguins, accessory marketplace, and community-powered value.",
     url: "https://penguinonchain.top",
     type: "website",
     images: [
       {
-        // url: "/OG-Image1000.png",
         url: "/OG-Studio.png",
         width: 1200,
         height: 630,
@@ -58,8 +59,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@onchainpengo",
-    title: "Penguin Onchain",
-    description: "A decentralized, interactive NFT identity.",
+    title: "Penguin Onchain — Fully on-chain. Fully yours.",
+    description: "Draw it. Own it. Live it forever. On-chain customizable Pengo NFTs.",
     images: ["/OG-Studio.png"],
   },
 };

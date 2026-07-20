@@ -72,7 +72,16 @@ export default function DynamicWalletProvider({
 }) {
   return (
     <WagmiProvider config={config}>
-      <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
+      <RainbowKitProvider
+        theme={darkTheme({
+          accentColor: "#acff00",
+          accentColorForeground: "#000000",
+          borderRadius: "medium",
+          overlayBlur: "small",
+        })}
+      >
+        {children}
+      </RainbowKitProvider>
     </WagmiProvider>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { Address } from "viem";
 import { toast } from "react-hot-toast";
 import PengoContract from "../../constants/PengoContract.json";
+import SelectField from "@/components/ui/SelectField";
 
 interface Accessory {
     bytePixel: string;
@@ -109,9 +110,9 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     };
 
     return (
-        <div className="glass rounded-xl overflow-hidden group hover:bg-white/10 transition-all duration-300">
+        <div className="glass rounded-xl overflow-visible group hover:bg-white/10 transition-all duration-300 relative z-0 hover:z-20 focus-within:z-20">
             {/* SVG Preview */}
-            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 flex items-center justify-center">
+            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 flex items-center justify-center overflow-hidden rounded-t-xl">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <svg
                     height={120}
@@ -164,26 +165,34 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
 
                 {/* Actions */}
                 {!isYour ? (
-                    <div className="space-y-2">
-                        <select
-                            className="w-full text-xs bg-white/5 border border-white/10 text-neutral-300 py-2 px-2 rounded-lg transition focus:border-primary-500 focus:outline-none hover:bg-white/10"
-                            onChange={(e) => setSelectedPengo(e.target.value)}
+                    <div className="space-y-2.5">
+                        <SelectField
+                            label="Apply to"
+                            placeholder={loading ? "Loading Pengos…" : "Select target Pengo"}
                             value={selectedPengo}
-                        >
-                            <option value="" className="bg-neutral-900">Select Target Pengo</option>
-                            {!loading && listOfAddress.map((id, index) => (
-                                <option key={index} value={`${id}`} className="bg-neutral-900">
-                                    Pengo #{id}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(e) => setSelectedPengo(e.target.value)}
+                            disabled={loading || listOfAddress.length === 0}
+                            options={
+                                !loading
+                                    ? listOfAddress.map((id) => ({
+                                          value: `${id}`,
+                                          label: `Pengo #${id}`,
+                                      }))
+                                    : []
+                            }
+                            hint={
+                                !loading && listOfAddress.length === 0
+                                    ? "Mint a Pengo first to equip this accessory"
+                                    : undefined
+                            }
+                        />
 
                         <button
                             onClick={handlePurchase}
                             disabled={!selectedPengo}
-                            className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${selectedPengo
+                            className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-all ${selectedPengo
                                     ? 'btn-primary'
-                                    : 'bg-white/5 text-neutral-500 cursor-not-allowed'
+                                    : 'bg-white/5 text-neutral-500 cursor-not-allowed border border-white/10'
                                 }`}
                         >
                             Buy Now

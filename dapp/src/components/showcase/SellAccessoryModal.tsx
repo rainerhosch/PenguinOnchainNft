@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { parseEther } from "ethers";
-import { Address, Abi } from "viem";
+import { Address, Abi, parseEther } from "viem";
 import {
     useAccount,
     useWriteContract,
@@ -75,7 +74,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
                             href={`${networkContract.explore}/tx/${hash}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#60ff00] underline"
+                            className="text-primary-500 underline"
                         >
                             {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
                         </a>
@@ -92,7 +91,7 @@ const SellAccessoryModal: React.FC<SellAccessoryModalProps> = ({
 
     return (
         <div className="fixed z-50 flex items-center justify-center bg-black/50 backdrop-blur-xl inset-0">
-            <div className="bg-purple-950/90 rounded-lg p-6 w-80 text-center">
+            <div className="bg-neutral-950/90 rounded-lg p-6 w-80 text-center">
                 <div className="flex flex-col gap-2  mb-4">
                     <h2 className="text-lg font-mono text-white">
                         Pengo #{nftId}

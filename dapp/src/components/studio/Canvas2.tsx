@@ -19,6 +19,7 @@ import {
     type BaseError,
 } from "wagmi";
 import PengoContract from "../../constants/PengoContract.json";
+import SelectField from "@/components/ui/SelectField";
 
 const CANVAS_SIZE = 300 * 2;
 const PIXEL_SIZE = 10 * 2;
@@ -128,8 +129,8 @@ export default function Canvas({ selectedColor }: CanvasProps) {
 
     useEffect(() => {
         updateSVGCode();
-        drawCanvas();
-    }, [rects]);
+        redrawScene();
+    }, [rects, showOverlay, allowedPixelPart]);
 
     useEffect(() => {
         const handleUndo = (e: KeyboardEvent) => {
@@ -226,48 +227,18 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         handleCanvasClick(e);
     };
 
+    // Draw-area overlay: toggle ONLY via user shortcut (Ctrl/Cmd+S) — never auto-hide on paint
     useEffect(() => {
-        const handleKeyViewOverlay = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.key === "s") {
-                e.preventDefault(); // Hindari save file default di browser
-                setShowOverlay((prev) => !prev); // Toggle overlay
+        const handleKeyViewOverlay = (e: globalThis.KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "s") {
+                e.preventDefault(); // block browser "Save page"
+                setShowOverlay((prev) => !prev);
             }
         };
 
-        window.addEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
-        return () => window.removeEventListener("keydown", handleKeyViewOverlay as unknown as EventListener);
+        window.addEventListener("keydown", handleKeyViewOverlay);
+        return () => window.removeEventListener("keydown", handleKeyViewOverlay);
     }, []);
-
-
-    useEffect(() => {
-        if (!canvasRef.current) return;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        // Clear the canvas before drawing the overlay
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawCanvas()
-
-        if (showOverlay && Array.isArray(allowedPixelPart) &&
-            allowedPixelPart.length === 2 &&
-            Array.isArray(allowedPixelPart[0]) &&
-            Array.isArray(allowedPixelPart[1])
-        ) {
-            const xCoords = allowedPixelPart[0].map((val) => Number(val));
-            const yCoords = allowedPixelPart[1].map((val) => Number(val));
-
-            ctx.fillStyle = "rgba(0, 255, 0, 0.3)"; // transnparent color
-
-            for (let i = 0; i < xCoords.length; i++) {
-                const x = xCoords[i] * PIXEL_SIZE;
-                const y = yCoords[i] * PIXEL_SIZE;
-
-                // Draw shadow area only if the overlay is activated
-                ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
-            }
-        }
-    }, [showOverlay, allowedPixelPart]);
 
 
     const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
@@ -329,12 +300,15 @@ export default function Canvas({ selectedColor }: CanvasProps) {
         setHistory([]);
     };
 
-    const drawCanvas = () => {
+    /** Grid + painted pixels + optional allowed-draw overlay (if showOverlay is on). */
+    const redrawScene = () => {
         if (!canvasRef.current) return;
         const ctx = canvasRef.current.getContext("2d");
         if (!ctx) return;
 
         ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+        // Grid
         ctx.strokeStyle = "rgba(200, 200, 200, 0.3)";
         for (let i = 0; i < CANVAS_SIZE; i += PIXEL_SIZE) {
             ctx.beginPath();
@@ -347,9 +321,26 @@ export default function Canvas({ selectedColor }: CanvasProps) {
             ctx.stroke();
         }
 
+        // Allowed draw area — stays visible while showOverlay is true (shortcut-controlled only)
+        if (
+            showOverlay &&
+            Array.isArray(allowedPixelPart) &&
+            allowedPixelPart.length === 2 &&
+            Array.isArray(allowedPixelPart[0]) &&
+            Array.isArray(allowedPixelPart[1])
+        ) {
+            const xCoords = (allowedPixelPart[0] as unknown[]).map((val) => Number(val));
+            const yCoords = (allowedPixelPart[1] as unknown[]).map((val) => Number(val));
+            ctx.fillStyle = "rgba(172, 255, 0, 0.28)";
+            for (let i = 0; i < xCoords.length; i++) {
+                ctx.fillRect(xCoords[i] * PIXEL_SIZE, yCoords[i] * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+
+        // User pixels on top of overlay so drawing never “hides” the guide incorrectly
         rects.forEach(({ x, y, color }) => {
             ctx.fillStyle = color;
-            ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE); // Adjusted to draw at the correct position
+            ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
         });
     };
 
@@ -509,7 +500,7 @@ export default function Canvas({ selectedColor }: CanvasProps) {
                             href={`${networkContract.explore}/tx/${hash}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#60ff00] underline"
+                            className="text-primary-500 underline"
                         >
                             {`${hash?.slice(0, 4)}...${hash?.slice(-10)}`}
                         </a>
@@ -545,67 +536,153 @@ export default function Canvas({ selectedColor }: CanvasProps) {
     }
 
     return (
-        <div className="flex sm:flex-row flex-col gap-4 items-center sm:items-start text-center px-2 mx-auto">
-            <div className="relative w-fit h-fit mx-auto my-4">
-                <canvas
-                    ref={canvasRef}
-                    width={CANVAS_SIZE}
-                    height={CANVAS_SIZE}
-                    className="border border-[rgba(219, 205, 205, 0.863)] cursor-crosshair w-full"
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseMove={handleMouseMove}
-                />
-            </div>
-            <div className="flex flex-col gap-2 w-full sm:w-[240px] my-4">
-                {/* Display the template SVG below the canvas as a sketch base */}
-                <div className="">
-                    <button onClick={handleReset} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Reset Canvas</button>
-
-                    <h3 className="text-md font-semibold">Sketch</h3>
-                    <div dangerouslySetInnerHTML={{ __html: svgCode }} />
-                    <form onSubmit={handleMintAcc} className="flex flex-col gap-2 justify-center">
-                        <div className="flex flex-col gap-2 items-center my-4">
-                            <input
-                                type="text"
-                                placeholder="Enter accessory name"
-                                className="text-xs border font-mono bg-black/60 text-white border-purple-500 p-1 rounded w-40"
-                                required
-                                onChange={(e) => setAccName(e.target.value)}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,300px)] lg:items-start">
+            {/* Canvas stage */}
+            <section className="studio-panel min-w-0">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 className="text-sm font-semibold text-white">Canvas</h3>
+                        <p className="text-[11px] text-neutral-500">
+                            30×30 pixel grid · paint with the active color
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/50 px-2 py-1 text-[11px] text-neutral-300"
+                            title="Active brush color"
+                        >
+                            <span
+                                className="h-3.5 w-3.5 rounded-full border border-white/30"
+                                style={{ backgroundColor: selectedColor }}
                             />
-                            <select
-                                className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
-                                onChange={(e) => setSelectedPengo(e.target.value)}
-                            >
-                                {!loading && listOfAddress.map((tokenId, index) => (
-                                    <option key={index} value={`${tokenId}`}>Pengo #{tokenId}</option>
-                                ))}
-                            </select>
-
-                            <select
-                                className='text-xs sm:text-sm bg-black/60 font-mono border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-white/30 border hover:bg-purple-500/80 w-40'
-                                onChange={(e) => {
-                                    setSelectedAccessory(e.target.value);
-                                    handleReset();
-                                }} // Store selected Accessory
-                            >
-                                {allowedAccesories.map((accessory, index) => (
-                                    <option key={index} value={accessory}>
-                                        {accessory}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex flex-col gap-2 items-center">
-                            {/* <button onClick={() => navigator.clipboard.writeText(svgToBytecode(accessoryCode))} className="text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40">Copy Accessory Code</button> */}
-                            <button
-                                type="submit"
-                                className='text-xs sm:text-sm bg-black/60 border-purple-500 text-white py-1 px-2 rounded transition duration-200 ease-in-out hover:border-transparent border hover:bg-black/40 w-40'
-                            >Mint Accessory</button>
-                        </div>
-                    </form>
+                            Brush
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => setShowOverlay((prev) => !prev)}
+                            className={[
+                                "rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-colors",
+                                showOverlay
+                                    ? "border-primary-500/60 bg-primary-500/15 text-primary-400"
+                                    : "border-white/10 bg-white/5 text-neutral-300 hover:border-primary-500/50 hover:text-primary-400",
+                            ].join(" ")}
+                            title="Toggle allowed draw area (Ctrl+S / Cmd+S)"
+                        >
+                            {showOverlay ? "Draw area: On" : "Draw area: Off"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                            className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[11px] font-medium text-neutral-300 transition-colors hover:border-primary-500/50 hover:text-primary-400"
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                <div className="studio-canvas-stage mx-auto w-full max-w-[640px]">
+                    <div className="relative mx-auto aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]">
+                        {/* subtle grid vibe behind canvas */}
+                        <div
+                            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+                            style={{
+                                backgroundImage:
+                                    "linear-gradient(rgba(172,255,0,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(172,255,0,0.35) 1px, transparent 1px)",
+                                backgroundSize: "20px 20px",
+                            }}
+                        />
+                        <canvas
+                            ref={canvasRef}
+                            width={CANVAS_SIZE}
+                            height={CANVAS_SIZE}
+                            className="relative z-[1] h-full w-full cursor-crosshair touch-none"
+                            onMouseDown={handleMouseDown}
+                            onMouseUp={handleMouseUp}
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseUp}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* Mint / publish panel */}
+            <aside className="studio-panel overflow-visible relative z-10 lg:sticky lg:top-24">
+                <div className="mb-4 flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-white">Mint accessory</h3>
+                    <span className="rounded-md bg-primary-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary-400">
+                        On-chain
+                    </span>
+                </div>
+
+                <div className="mb-4">
+                    <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+                        Live preview
+                    </p>
+                    <div className="flex min-h-[100px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/60 p-3">
+                        {svgCode ? (
+                            <div
+                                className="max-h-32 w-full [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-h-28 [&_svg]:w-auto"
+                                dangerouslySetInnerHTML={{ __html: svgCode }}
+                            />
+                        ) : (
+                            <p className="text-center text-xs text-neutral-600">Draw pixels to preview</p>
+                        )}
+                    </div>
+                </div>
+
+                <form onSubmit={handleMintAcc} className="flex flex-col gap-3">
+                    <div>
+                        <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                            Accessory name
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Neon Visor"
+                            className="input-field text-sm"
+                            required
+                            onChange={(e) => setAccName(e.target.value)}
+                        />
+                    </div>
+
+                    <SelectField
+                        label="Target Pengo"
+                        value={selectedPengo}
+                        onChange={(e) => setSelectedPengo(e.target.value)}
+                        options={
+                            !loading
+                                ? listOfAddress.map((tokenId) => ({
+                                      value: `${tokenId}`,
+                                      label: `Pengo #${tokenId}`,
+                                  }))
+                                : []
+                        }
+                        placeholder={loading ? "Loading…" : "Select Pengo"}
+                        hint={
+                            !loading && listOfAddress.length === 0
+                                ? "No Pengos in this wallet"
+                                : undefined
+                        }
+                    />
+
+                    <SelectField
+                        label="Accessory slot"
+                        value={selectedAcc}
+                        onChange={(e) => {
+                            setSelectedAccessory(e.target.value);
+                            handleReset();
+                        }}
+                        options={allowedAccesories.map((accessory) => ({
+                            value: accessory,
+                            label: accessory,
+                        }))}
+                        placeholder="Select slot"
+                    />
+
+                    <button type="submit" className="btn-primary mt-1 w-full py-2.5 text-sm">
+                        Mint Accessory
+                    </button>
+                </form>
+            </aside>
         </div>
     );
 }

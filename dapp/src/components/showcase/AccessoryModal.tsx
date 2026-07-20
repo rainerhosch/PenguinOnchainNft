@@ -33,7 +33,7 @@ const AccessoryModal: React.FC<AccessoryModalProps> = ({
 }) => {
     return (
         <div className="fixed z-50 flex items-center justify-center bg-black/50 backdrop-blur-xl inset-0">
-            <div className="flex flex-col gap-2 bg-purple-950 rounded-lg p-4 justify-center pointer-events-auto w-3/4 sm:w-1/4">
+            <div className="flex flex-col gap-2 bg-neutral-950 rounded-lg p-4 justify-center pointer-events-auto w-3/4 sm:w-1/4">
                 <h2 className="text-sm font-mono mb-2 text-center">Accessories</h2>
                 {accessories.map((accessory) => (
                     <button

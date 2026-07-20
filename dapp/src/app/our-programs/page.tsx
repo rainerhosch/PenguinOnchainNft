@@ -9,9 +9,9 @@ const OurProgramsPage = () => {
             <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
             {/* Glow Effects */}
-            <div className="fixed top-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="fixed bottom-1/3 left-0 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
-            <div className="fixed bottom-0 right-0 w-96 h-96 bg-pink-500/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed top-0 right-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed bottom-1/3 left-0 w-80 h-80 bg-accent-500/15 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed bottom-0 right-0 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Header */}
             <header className="sticky top-0 z-50 glass-dark border-b border-white/5">
@@ -24,7 +24,7 @@ const OurProgramsPage = () => {
                         </Link>
                         <div>
                             <h1 className="text-xl font-bold text-white">Our Programs</h1>
-                            <p className="text-sm text-neutral-400 hidden sm:block">Empowering creators, rewarding community</p>
+                            <p className="text-sm text-neutral-400 hidden sm:block">Fully on-chain · Fully yours — with rewards for builders</p>
                         </div>
                     </div>
                 </div>
@@ -33,15 +33,17 @@ const OurProgramsPage = () => {
             {/* Hero Section */}
             <section className="px-4 sm:px-6 py-16 sm:py-24">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-cyan-400 mb-6">
-                        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                        Now Open for Applications
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-accent-400 mb-6">
+                        <span className="w-2 h-2 bg-accent-400 rounded-full animate-pulse"></span>
+                        Applications open · Holders first
                     </div>
                     <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-                        Build the Future of <span className="gradient-text">Pengo</span> With Us
+                        Don&apos;t just hold a Pengo.{" "}
+                        <span className="gradient-text">Own the upside</span>
                     </h1>
                     <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto">
-                        At Pengo, we believe in the power of community. Our programs are designed to reward creativity, foster collaboration, and empower every member to shape our ecosystem.
+                        Penguin Onchain is a living identity and a real ecosystem. Minting funds power a transparent pool,
+                        creators earn from their art, and holders help decide what ships next—fully on-chain, fully yours.
                     </p>
                 </div>
             </section>
@@ -52,24 +54,28 @@ const OurProgramsPage = () => {
                     <div className="glass-card p-8 sm:p-12 relative overflow-hidden">
                         {/* Background decorations */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-cyan-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
                         <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                             {/* Content */}
                             <div>
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium mb-4">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 text-primary-400 text-sm font-medium mb-4">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                     </svg>
-                                    Value-Backed NFT
+                                    Value-backed collectible
                                 </div>
 
                                 <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                                    Pengo = <span className="text-green-400">Digital Shares</span>
+                                    Pengo is art with a{" "}
+                                    <span className="text-primary-400">built-in engine</span>
                                 </h2>
 
                                 <p className="text-lg text-neutral-300 mb-6">
-                                    Pengo isn't just digital art, it's like holding shares in a growing ecosystem. 70% of Funds from minting phase will be stored in to <strong className="text-white">Staking Pool</strong>, generating passive income for all holders. The team only takes 30% for art works and operational costs.
+                                    You&apos;re not buying a frozen image. You&apos;re joining a machine designed for long-term holders:
+                                    <strong className="text-white"> 70% of mint proceeds</strong> feed the{" "}
+                                    <strong className="text-white">Staking Pool</strong> that generates yield for the community.
+                                    The team keeps <strong className="text-white">30%</strong> for art, product, and ops—clear split, no mystery treasury.
                                 </p>
 
                                 <div className="space-y-4 mb-8">
@@ -78,27 +84,27 @@ const OurProgramsPage = () => {
                                             <span className="text-xl semibold text-green-400">40%</span>
                                         </div>
                                         <div>
-                                            <h4 className="font-semibold text-white mb-1">Distributed to Holders</h4>
-                                            <p className="text-sm text-neutral-400">40% of staking yields are distributed to NFT holders, claimable directly from the dApp.</p>
+                                            <h4 className="font-semibold text-white mb-1">Paid to holders</h4>
+                                            <p className="text-sm text-neutral-400">40% of yields flow to NFT holders—claim straight from the dApp when live.</p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                                            <span className="text-xl semibold text-cyan-400">40%</span>
+                                        <div className="w-12 h-12 rounded-xl bg-accent-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl semibold text-accent-400">40%</span>
                                         </div>
                                         <div>
-                                            <h4 className="font-semibold text-white mb-1">Reinvested in Pool</h4>
-                                            <p className="text-sm text-neutral-400">40% is compounded back into the staking pool, continuously increasing its size and future rewards.</p>
+                                            <h4 className="font-semibold text-white mb-1">Compounded in the pool</h4>
+                                            <p className="text-sm text-neutral-400">40% compounds back into the pool so future rewards and intrinsic backing can grow with the project.</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                                            <span className="text-xl semibold text-cyan-400">20%</span>
+                                        <div className="w-12 h-12 rounded-xl bg-accent-500/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl semibold text-accent-400">20%</span>
                                         </div>
                                         <div>
-                                            <h4 className="font-semibold text-white mb-1">Foundation Growth</h4>
-                                            <p className="text-sm text-neutral-400">20% of staking yields are distributed to the foundation, supporting the ecosystem's growth and development.</p>
+                                            <h4 className="font-semibold text-white mb-1">Ecosystem fuel</h4>
+                                            <p className="text-sm text-neutral-400">20% supports foundation growth—shipping Studio tools, campaigns, and long-term infrastructure.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -108,10 +114,11 @@ const OurProgramsPage = () => {
                                         <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         </svg>
-                                        <span className="font-medium text-white">Floor Price Growth</span>
+                                        <span className="font-medium text-white">Why this can support floor strength</span>
                                     </div>
                                     <p className="text-sm text-neutral-400">
-                                        As the staking pool grows, Pengo's intrinsic value increases proportionally, creating natural floor price appreciation tied to real yield, not speculation.
+                                        As the pool grows, more real value sits behind the collection—not hype alone.
+                                        That&apos;s the point of fully on-chain design: transparent rules you can verify.
                                     </p>
                                 </div>
                             </div>
@@ -129,8 +136,8 @@ const OurProgramsPage = () => {
                                 </div>
 
                                 <div className="glass p-6 rounded-2xl text-center">
-                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 flex items-center justify-center mx-auto mb-4">
-                                        <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-accent-500/20 to-accent-600/20 flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         </svg>
                                     </div>
@@ -179,14 +186,15 @@ const OurProgramsPage = () => {
                                 <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-500/20 text-primary-400 mb-4">For Artists</span>
                                 <h2 className="text-2xl font-bold text-white mb-4">Creator Program</h2>
                                 <p className="text-neutral-400 mb-6">
-                                    Join our exclusive Creator Program and turn your artistic vision into on-chain accessories. Collaborate with other talented artists, participate in themed workshops, and showcase your creations to the entire Pengo community.
+                                    Turn pixel craft into income. Ship accessories that live forever on-chain, get discovered by every Pengo holder,
+                                    and earn when the community wears your look.
                                 </p>
                                 <ul className="space-y-3 mb-6">
                                     {[
-                                        'Earn royalties on every sale of your designs',
-                                        'Access to exclusive creator tools and resources',
-                                        'Featured spotlight on our social channels',
-                                        'Early access to new platform features'
+                                        'Royalties when your designs sell and re-trade',
+                                        'Studio tools built for on-chain accessory pipelines',
+                                        'Social spotlights that put your work in front of collectors',
+                                        'Early access to features before the crowd'
                                     ].map((item, index) => (
                                         <li key={index} className="flex items-start gap-3 text-sm text-neutral-300">
                                             <svg className="w-5 h-5 text-accent-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,14 +222,15 @@ const OurProgramsPage = () => {
                                 <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-accent-500/20 text-accent-400 mb-4">Community Driven</span>
                                 <h2 className="text-2xl font-bold text-white mb-4">DAO Voting System</h2>
                                 <p className="text-neutral-400 mb-6">
-                                    Your voice matters! Our decentralized governance system empowers Pengo holders to directly influence the future of the platform. Vote on new accessory designs, propose features, and help shape community initiatives.
+                                    Fully yours means you help steer. Hold a Pengo, vote on what ships next—official accessory drops,
+                                    product priorities, and community initiatives recorded on-chain.
                                 </p>
                                 <ul className="space-y-3 mb-6">
                                     {[
-                                        '1 Pengo = 1 Vote on all proposals',
-                                        'Propose new features and improvements',
-                                        'Vote on official accessory collections',
-                                        'Transparent, on-chain governance'
+                                        '1 Pengo = 1 vote on live proposals',
+                                        'Propose features that actually reach the roadmap',
+                                        'Greenlight official accessory collections',
+                                        'Governance you can audit—not a private Discord poll'
                                     ].map((item, index) => (
                                         <li key={index} className="flex items-start gap-3 text-sm text-neutral-300">
                                             <svg className="w-5 h-5 text-accent-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,14 +258,15 @@ const OurProgramsPage = () => {
                                 <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-secondary-500/20 text-secondary-400 mb-4">For Advocates</span>
                                 <h2 className="text-2xl font-bold text-white mb-4">Ambassador Program</h2>
                                 <p className="text-neutral-400 mb-6">
-                                    Become the face of Pengo in your community! Ambassadors help spread the word, onboard new users, and represent our values across the Web3 space. Exclusive perks and recognition await.
+                                    Love the culture? Become the local face of Penguin Onchain. Onboard creators and collectors,
+                                    host energy in your region, and get rewarded for growing a movement—not just a mint.
                                 </p>
                                 <ul className="space-y-3 mb-6">
                                     {[
-                                        'Exclusive ambassador-only NFT rewards',
-                                        'Direct line to the Pengo team',
-                                        'Monthly community calls and AMAs',
-                                        'Recognition on our Ambassador Wall'
+                                        'Ambassador-only NFT rewards and flex drops',
+                                        'Direct line to the core team',
+                                        'Private calls, AMAs, and launch briefings',
+                                        'Public recognition on the Ambassador Wall'
                                     ].map((item, index) => (
                                         <li key={index} className="flex items-start gap-3 text-sm text-neutral-300">
                                             <svg className="w-5 h-5 text-secondary-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +291,7 @@ const OurProgramsPage = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-green-500/20 text-green-400 mb-4">For Everyone</span>
+                                <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-primary-500/20 text-primary-400 mb-4">For Everyone</span>
                                 <h2 className="text-2xl font-bold text-white mb-4">Referral Rewards</h2>
                                 <p className="text-neutral-400 mb-6">
                                     Share Pengo with friends and earn rewards! Our referral program gives you a percentage of every mint and marketplace transaction made by users you bring to the platform.
@@ -314,13 +324,17 @@ const OurProgramsPage = () => {
             <section className="px-4 sm:px-6 py-16 sm:py-24">
                 <div className="max-w-4xl mx-auto">
                     <div className="glass-card p-8 sm:p-12 relative overflow-hidden text-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-cyan-500/10 pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-accent-500/10 pointer-events-none" />
 
+                        <p className="text-sm font-medium text-primary-400 mb-3 relative tracking-wide uppercase">
+                            Fully on-chain · Fully yours
+                        </p>
                         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 relative">
-                            Ready to <span className="gradient-text">Get Started</span>?
+                            Pick your seat at the table
                         </h2>
                         <p className="text-neutral-400 mb-8 max-w-xl mx-auto relative">
-                            Whether you're an artist, a community builder, or simply passionate about Web3, there's a place for you in Pengo. Join us and help shape the future of on-chain NFTs.
+                            Artist, ambassador, or diamond-hand holder—there&apos;s a program built for how you show up.
+                            Mint if you haven&apos;t. Then claim your role and help write the next chapter of on-chain identity.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
                             <a href="https://discord.gg/penguinonchain" target="_blank" className="btn-primary text-base px-8 py-4">

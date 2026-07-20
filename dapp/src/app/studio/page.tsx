@@ -15,7 +15,7 @@ import {
 } from "wagmi";
 import PengoContract from "@/constants/PengoContract.json";
 
-function StudioPage(): JSX.Element {
+function StudioPage() {
     const [hideOptions, setHideOptions] = useState(false);
     const [hideDrawingCanvas, setHideDrawingCanvas] = useState(true);
 
@@ -63,9 +63,9 @@ function StudioPage(): JSX.Element {
             <div className="fixed inset-0 grid-pattern pointer-events-none" />
 
             {/* Glow Effects */}
-            <div className="fixed top-20 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-            <div className="fixed bottom-0 right-0 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
-            <div className="fixed top-1/2 right-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed top-20 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-[120px] pointer-events-none" />
+            <div className="fixed bottom-0 right-0 w-80 h-80 bg-accent-500/15 rounded-full blur-[100px] pointer-events-none" />
+            <div className="fixed top-1/2 right-1/4 w-64 h-64 bg-primary-600/10 rounded-full blur-[100px] pointer-events-none" />
 
             <AppNavbar />
 
@@ -189,16 +189,18 @@ function StudioPage(): JSX.Element {
 
                             {/* Canvas Editor */}
                             {hideOptions && (
-                                <div className="glass-card p-4 sm:p-6">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-secondary-500 to-primary-600 flex items-center justify-center">
-                                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
+                                            <svg className="h-5 w-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <h2 className="font-semibold text-white">Drawing Canvas</h2>
-                                            <p className="text-xs text-neutral-400">Create your custom accessory</p>
+                                            <h2 className="font-semibold text-white">Drawing workspace</h2>
+                                            <p className="text-xs text-neutral-400">
+                                                Colors left · canvas center · mint on the right
+                                            </p>
                                         </div>
                                     </div>
                                     <Editor />

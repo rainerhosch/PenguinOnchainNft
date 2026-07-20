@@ -116,17 +116,17 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                             width={200}
                             height={200}
                         />
-                        <h3 className="text-purple-950 text-sm font-mono my-1">{nft.name}</h3>
+                        <h3 className="text-primary-900 text-sm font-mono my-1">{nft.name}</h3>
                         {specialTrait.category != "" && <div className="flex flex-col gap-2 bg-white/10 rounded-md text-center py-2 px-2">
-                            <span className="text-xs font-mono text-purple-950/70">{specialTrait.category}</span>
-                            <span className="text-xs font-mono text-purple-950/70">Networth : {specialTrait.networth}</span>
+                            <span className="text-xs font-mono text-primary-900/70">{specialTrait.category}</span>
+                            <span className="text-xs font-mono text-primary-900/70">Networth : {specialTrait.networth}</span>
                         </div>}
                         {listOfAccessories.length > 0 ? (
-                            <button onClick={() => setShowModal(true)} className="text-xs font-mono border border-white py-1 px-2 bg-purple-900 rounded-sm hover:bg-black/30 my-2">
+                            <button onClick={() => setShowModal(true)} className="text-xs font-mono border border-white py-1 px-2 bg-neutral-900 rounded-sm hover:bg-black/30 my-2">
                                 View Trait
                             </button>
                         ) : (
-                            <p className="text-xs font-mono text-white/20 border border-white/60 py-1 px-2 rounded-sm bg-purple-950/50 my-2">No accessories</p>
+                            <p className="text-xs font-mono text-white/20 border border-white/60 py-1 px-2 rounded-sm bg-neutral-950/50 my-2">No accessories</p>
                         )}
                     </div>
                 ))

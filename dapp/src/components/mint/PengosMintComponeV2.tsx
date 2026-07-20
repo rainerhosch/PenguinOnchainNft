@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Abi, Address } from 'viem';
+import { Abi, Address, formatEther } from 'viem';
 import Image from "next/image";
 import image1 from "@/app/images/pengo-template.svg";
 import {
@@ -9,7 +9,6 @@ import {
     useWaitForTransactionReceipt,
     type BaseError,
 } from "wagmi";
-import { ethers } from "ethers";
 import { toast } from 'react-hot-toast';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import PengoContract from "../../constants/PengoContract.json";
@@ -85,7 +84,7 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
             abi: abi as Abi,
             functionName: "mintPengo",
             args: [BigInt(totalMint)],
-            value: BigInt(Number(price) * totalMint),
+            value: (price ?? BigInt(0)) * BigInt(totalMint),
         });
     }
 
@@ -113,7 +112,7 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
                         href={`${networkContract.explore}/tx/${hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-cyan-400 underline hover:text-cyan-300"
+                        className="text-accent-400 underline hover:text-primary-300"
                     >
                         {`${hash?.slice(0, 6)}...${hash?.slice(-8)}`}
                     </a>
@@ -150,7 +149,7 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
                 <div className="bg-white/5 rounded-xl p-4 text-center">
                     <p className="text-xs text-neutral-500 mb-1">Mint Price</p>
                     <p className="text-lg font-bold text-white">
-                        {price ? ethers.formatEther(BigInt(Number(price))) : '0'}
+                        {price != null ? formatEther(price) : '0'}
                         <span className="text-primary-400 ml-1">{currencySymbols}</span>
                     </p>
                 </div>
@@ -190,7 +189,7 @@ export default function PengosMintComponent({ onDataLoad }: PengosMintComponentP
                 <div className="text-center py-3 bg-white/5 rounded-xl">
                     <p className="text-sm text-neutral-400">Total Price</p>
                     <p className="text-xl font-bold text-white">
-                        {ethers.formatEther(BigInt(Number(price) || 0) * BigInt(totalMint))}
+                        {formatEther((price ?? BigInt(0)) * BigInt(totalMint))}
                         <span className="text-primary-400 ml-1">{currencySymbols}</span>
                     </p>
                 </div>
