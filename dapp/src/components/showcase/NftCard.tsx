@@ -87,6 +87,8 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 const base64Data = (tokenURI as string).split(",")[1];
                 const metadata = JSON.parse(atob(base64Data));
 
+                // console.log(metadata)
+
                 setNfts([
                     {
                         id: nftData,
@@ -105,7 +107,6 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
 
         fetchNftData();
     }, [nftData, tokenURI]);
-
     useEffect(() => {
         if (!isLoadingTokenURI && !isLoadingNftAcc) {
             setLoading(false);

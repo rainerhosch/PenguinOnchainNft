@@ -152,7 +152,7 @@ contract PenguinOnchain is
             // Default trait slot without iterating accessories
             specialTraits[tokenId] = SpecialTrait({
                 category: "lil pengo",
-                networth: "0 MON"
+                networth: "0 ETH"
             });
             emit MetadataUpdate(tokenId);
             unchecked {
