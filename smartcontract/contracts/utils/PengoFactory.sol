@@ -93,7 +93,7 @@ contract PengoFactory is IPengoFactory, Ownable {
         string memory rawPengo = string(
             abi.encodePacked(
                 '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">',
-                '<rect width="100%" height="100%" fill="#7556a8"/>'
+                '<rect width="100%" height="100%" fill="#acff00"/>'
             )
         );
 
