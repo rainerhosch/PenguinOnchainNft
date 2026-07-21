@@ -75,6 +75,11 @@ contract PenguinOnchain is
     mapping(address => uint256) public offerBalances;
     AccessoryForSale[] public accessoriesForSale;
 
+    // --- Share Power & $PENGO Token ---
+    mapping(uint256 => uint256) public sharePower;
+    uint256 public totalSharePower;
+    address public pengoToken;
+
     event AccessoryAdded(
         uint256 indexed tokenId,
         string trait_type,
@@ -697,6 +702,42 @@ contract PenguinOnchain is
     function setFactory(IPengoFactory _factoryAddress) external onlyOwner {
         if (address(_factoryAddress) == address(0)) revert ZeroAddress();
         factory = _factoryAddress;
+    }
+
+    function setPengoToken(address _pengoToken) external onlyOwner {
+        pengoToken = _pengoToken;
+    }
+
+    function addSharePower(uint256 tokenId, uint256 amount) external {
+        if (msg.sender != pengoToken) revert("Only PengoToken can add power");
+        if (!_exists(tokenId)) revert TokenDoesNotExist();
+        
+        sharePower[tokenId] += amount;
+        totalSharePower += amount;
+    }
+
+    function _beforeTokenTransfers(
+        address from,
+        address to,
+        uint256 startTokenId,
+        uint256 quantity
+    ) internal virtual override {
+        super._beforeTokenTransfers(from, to, startTokenId, quantity);
+        
+        // Only trigger on transfers (not mints or burns)
+        if (from != address(0) && to != address(0)) {
+            for (uint256 i = 0; i < quantity; i++) {
+                uint256 tokenId = startTokenId + i;
+                
+                // Deduct from total
+                totalSharePower -= sharePower[tokenId];
+                // Reset power
+                sharePower[tokenId] = 0;
+                
+                // Reset networth
+                specialTraits[tokenId].networth = "0";
+            }
+        }
     }
 
     function withdraw() public onlyOwner {

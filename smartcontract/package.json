@@ -64,6 +64,7 @@
     "@nomicfoundation/hardhat-ignition-viem": "^0.15.8",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
     "@nomicfoundation/hardhat-viem": "^2.0.6",
+    "@openzeppelin/contracts-upgradeable": "^4.7.2",
     "erc721a": "^4.2.2",
     "viem": "^2.22.1"
   }

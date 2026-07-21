@@ -78,4 +78,8 @@ interface IPenguinOnchain {
     function getNFTDetails(
         uint256 tokenId
     ) external view returns (Accessory[] memory, SpecialTrait memory);
+
+    function addSharePower(uint256 tokenId, uint256 amount) external;
+    function sharePower(uint256 tokenId) external view returns (uint256);
+    function totalSharePower() external view returns (uint256);
 }
