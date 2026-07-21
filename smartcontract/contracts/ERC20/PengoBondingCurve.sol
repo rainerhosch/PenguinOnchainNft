@@ -19,12 +19,12 @@ contract PengoBondingCurve is Ownable {
     IERC20 public pengoToken;
     IUniswapV2Router02 public uniswapRouter;
     
-    uint256 public constant TARGET_LIQUIDITY = 25 ether; 
+    uint256 public constant TARGET_LIQUIDITY = 10 ether; 
     uint256 public constant TOKENS_FOR_SALE = 800_000_000 * 1e18;
     uint256 public constant TOKENS_FOR_LIQUIDITY = 200_000_000 * 1e18;
     
-    uint256 public basePrice = 1250000000; // 1.25 Gwei in wei
-    uint256 public priceIncrement = 75; // 75 wei
+    uint256 public basePrice = 500000015; // ~0.5 Gwei in wei
+    uint256 public priceIncrement = 30; // 30 wei
     
     uint256 public tokensSold;
     bool public isMigrated;
@@ -32,6 +32,7 @@ contract PengoBondingCurve is Ownable {
     address public strategyVault;
 
     event TokensPurchased(address indexed buyer, uint256 amount, uint256 cost);
+    event TokensSold(address indexed seller, uint256 amount, uint256 returnEth, uint256 taxEth);
     event LiquidityMigrated(uint256 ethAmount, uint256 tokenAmount, uint256 lpTokens);
 
     constructor(address _pengoToken, address _uniswapRouter, address _strategyVault) {
@@ -49,6 +50,21 @@ contract PengoBondingCurve is Ownable {
         uint256 n = fullTokensToBuy;
         uint256 cost = (n * (2 * a + (n - 1) * priceIncrement)) / 2;
         return cost;
+    }
+
+    function getSellValue(uint256 amount) public view returns (uint256 returnEth, uint256 taxEth) {
+        require(amount % 1e18 == 0, "Amount must be in full tokens");
+        require(amount <= tokensSold, "Amount exceeds tokens sold");
+        
+        uint256 fullTokensToSell = amount / 1e18;
+        uint256 currentSold = (tokensSold - amount) / 1e18; // we calculate area from (tokensSold - amount) to tokensSold
+        
+        uint256 a = basePrice + (currentSold * priceIncrement);
+        uint256 n = fullTokensToSell;
+        uint256 totalEthValue = (n * (2 * a + (n - 1) * priceIncrement)) / 2;
+        
+        taxEth = (totalEthValue * 3) / 100; // 3% tax
+        returnEth = totalEthValue - taxEth;
     }
 
     function buy(uint256 amount) external payable {
@@ -69,6 +85,32 @@ contract PengoBondingCurve is Ownable {
         }
         
         // Check if target liquidity is reached
+        if (address(this).balance >= TARGET_LIQUIDITY) {
+            _migrateLiquidity();
+        }
+    }
+
+    function sell(uint256 amount) external {
+        require(!isMigrated, "Liquidity already migrated to DEX");
+        require(amount > 0, "Amount must be greater than zero");
+        
+        (uint256 returnEth, uint256 taxEth) = getSellValue(amount);
+        
+        // Ensure contract has enough ETH to pay the user
+        require(address(this).balance >= returnEth, "Contract has insufficient ETH");
+        
+        tokensSold -= amount;
+        
+        // Transfer tokens from user to contract (requires user to approve first)
+        require(pengoToken.transferFrom(msg.sender, address(this), amount), "Token transfer failed");
+        
+        // Send ETH back to user (net of tax)
+        payable(msg.sender).transfer(returnEth);
+        
+        emit TokensSold(msg.sender, amount, returnEth, taxEth);
+        
+        // Note: the taxEth is naturally kept in address(this).balance.
+        // We check if target liquidity is reached from tax!
         if (address(this).balance >= TARGET_LIQUIDITY) {
             _migrateLiquidity();
         }
