@@ -52,7 +52,17 @@ export default function BondingCurvePage() {
     });
     const targetLiquidity = targetLiquidityData ? Number(formatEther(targetLiquidityData as bigint)) : 25;
     
-    const progress = Math.min((ethRaised / (targetLiquidity > 0 ? targetLiquidity : 1)) * 100, 100).toFixed(2);
+    // Check if already migrated
+    const { data: isMigratedData } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: 'isMigrated',
+    });
+    const isMigrated = isMigratedData ? Boolean(isMigratedData) : false;
+
+    // If migrated, ethRaised is mathematically equal to targetLiquidity
+    const displayEthRaised = isMigrated ? targetLiquidity : ethRaised;
+    const progress = isMigrated ? "100.00" : Math.min((displayEthRaised / (targetLiquidity > 0 ? targetLiquidity : 1)) * 100, 100).toFixed(2);
 
     // Dynamic chart calculations based on progress
     const dotX = Number(progress);
@@ -242,7 +252,7 @@ export default function BondingCurvePage() {
                                 <h2 className="text-xl font-bold text-white mb-6">Migration Progress</h2>
 
                                 <div className="flex justify-between text-sm mb-2">
-                                    <span className="text-neutral-400">ETH Raised: {ethRaised.toFixed(4)} / {targetLiquidity} ETH</span>
+                                    <span className="text-neutral-400">ETH Raised: {displayEthRaised.toFixed(4)} / {targetLiquidity} ETH</span>
                                     <span className="text-primary-400 font-bold">{progress}%</span>
                                 </div>
                                 <div className="w-full bg-white/5 rounded-full h-6 border border-white/10 overflow-hidden relative">
@@ -255,30 +265,50 @@ export default function BondingCurvePage() {
                                 </div>
                             </div>
 
-                            <div className="glass-card p-6 h-80 flex flex-col">
-                                <h2 className="text-xl font-bold text-white mb-4">Price Chart (Bonding Curve)</h2>
-                                <div className="flex-1 min-h-0 w-full relative bg-white/5 rounded-lg border border-white/10 p-4 overflow-hidden">
-                                    <svg className="w-full h-full block" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                        <defs>
-                                            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2" />
-                                                <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-                                            </linearGradient>
-                                        </defs>
-                                        <line x1="0" y1="25" x2="100" y2="25" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                        <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                        <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                        <path d={`M ${curvePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="rgba(128, 255, 0, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
-                                        <path d={`M ${activePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="#80ff00ff" strokeWidth="2" />
-                                        {activePoints.length > 0 && (
-                                            <path d={`M 0 100 L 0 95 ${activePoints.map(p => `L ${p.x} ${p.y}`).join(' ')} L ${dotX} 100 Z`} fill="url(#chartGradient)" />
-                                        )}
-                                        <circle cx={dotX} cy={dotY} r="1" fill="#bbff00ff" className="animate-pulse" />
-                                    </svg>
-                                    <div className="absolute top-[30%] left-[80%] transform -translate-x-1/2 -translate-y-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
-                                        Current: {currentPrice > 0 ? currentPrice.toFixed(8) : "0.00000000"} ETH/PENGO
+                            <div className="glass-card p-6 h-[400px]">
+                                {isMigrated ? (
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2">
+                                            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-white">Migration Successful!</h3>
+                                        <p className="text-neutral-400">
+                                            The bonding curve has successfully raised {targetLiquidity} ETH. 
+                                            Liquidity has been migrated to Uniswap and trading is now live on the DEX!
+                                        </p>
+                                        <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white font-medium transition-colors border border-white/10 mt-2">
+                                            View Contract
+                                        </a>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="w-full h-full flex flex-col">
+                                        <h2 className="text-xl font-bold text-white mb-4">Price Chart (Bonding Curve)</h2>
+                                        <div className="flex-1 min-h-0 w-full relative bg-white/5 rounded-lg border border-white/10 p-4 overflow-hidden">
+                                            <svg className="w-full h-full block" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                                <defs>
+                                                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2" />
+                                                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <line x1="0" y1="25" x2="100" y2="25" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
+                                                <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
+                                                <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
+                                                <path d={`M ${curvePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="rgba(128, 255, 0, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
+                                                <path d={`M ${activePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="#80ff00ff" strokeWidth="2" />
+                                                {activePoints.length > 0 && (
+                                                    <path d={`M 0 100 L 0 95 ${activePoints.map(p => `L ${p.x} ${p.y}`).join(' ')} L ${dotX} 100 Z`} fill="url(#chartGradient)" />
+                                                )}
+                                                <circle cx={dotX} cy={dotY} r="1" fill="#bbff00ff" className="animate-pulse" />
+                                            </svg>
+                                            <div className="absolute top-[30%] left-[80%] transform -translate-x-1/2 -translate-y-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                                                Current: {currentPrice > 0 ? currentPrice.toFixed(8) : "0.00000000"} ETH/PENGO
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -288,13 +318,15 @@ export default function BondingCurvePage() {
                                 <div className="flex bg-neutral-800/80 p-1 rounded-xl mb-6">
                                     <button
                                         onClick={() => setTradeMode('buy')}
-                                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'buy' ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                                        disabled={isMigrated}
+                                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'buy' ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'} ${isMigrated ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         Buy
                                     </button>
                                     <button
                                         onClick={() => setTradeMode('sell')}
-                                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'sell' ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'}`}
+                                        disabled={isMigrated}
+                                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'sell' ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'} ${isMigrated ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         Sell (3% Tax)
                                     </button>
@@ -311,7 +343,8 @@ export default function BondingCurvePage() {
                                             value={inputValue}
                                             onChange={(e) => setInputValue(e.target.value.replace(/[^0-9.]/g, ''))}
                                             placeholder="0"
-                                            className="bg-transparent text-2xl text-white outline-none w-full font-mono"
+                                            disabled={isMigrated}
+                                            className="bg-transparent text-2xl text-white outline-none w-full font-mono disabled:opacity-50"
                                         />
                                         <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg border border-white/5">
                                             {isEthTop ? (
@@ -329,17 +362,19 @@ export default function BondingCurvePage() {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex gap-2 mt-4">
-                                        {[10, 25, 50, 100].map((pct) => (
-                                            <button
-                                                key={pct}
-                                                onClick={() => handlePercentage(pct)}
-                                                className="flex-1 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
-                                            >
-                                                {pct}%
-                                            </button>
-                                        ))}
-                                    </div>
+                                    {!isMigrated && (
+                                        <div className="flex gap-2 mt-4">
+                                            {[10, 25, 50, 100].map((pct) => (
+                                                <button
+                                                    key={pct}
+                                                    onClick={() => handlePercentage(pct)}
+                                                    className="flex-1 py-1.5 text-xs font-medium rounded-lg border border-white/10 text-neutral-400 hover:text-white hover:bg-white/10 transition-all"
+                                                >
+                                                    {pct}%
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex justify-center -my-2 relative z-10">
@@ -394,7 +429,14 @@ export default function BondingCurvePage() {
 
                                 {/* Action Button */}
                                 <div className="pt-4">
-                                    {!isConnected ? (
+                                    {isMigrated ? (
+                                        <button
+                                            disabled
+                                            className="w-full py-4 rounded-xl font-bold text-neutral-500 bg-neutral-800 border border-neutral-700 cursor-not-allowed transition-all"
+                                        >
+                                            Trading Live on DEX
+                                        </button>
+                                    ) : !isConnected ? (
                                         <button
                                             onClick={() => openConnectModal?.()}
                                             className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-primary-500 to-accent-500 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"

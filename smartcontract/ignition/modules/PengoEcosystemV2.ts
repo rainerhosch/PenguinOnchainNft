@@ -42,7 +42,8 @@ export default buildModule("PengoEcosystemV2", (m) => {
     const pengoStrategyProxy = m.contract("ERC1967Proxy", [pengoStrategyImpl, initData], { id: "PengoStrategyProxy" });
 
     // 5. Deploy Bonding Curve
-    const uniswapRouter = m.getParameter("uniswapRouter", "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D");
+    // Using a valid Uniswap V2 Clone router on Sepolia instead of official Mainnet router
+    const uniswapRouter = m.getParameter("uniswapRouter", "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008");
     const bondingCurve = m.contract("PengoBondingCurve", [
         pengoToken,
         uniswapRouter,

@@ -91,6 +91,15 @@ export default function AppNavbar() {
                                     $PENGO
                                 </Link>
                                 <Link
+                                    href="/swap"
+                                    className="px-4 py-2 text-neutral-300 hover:text-white transition-colors rounded-xl hover:bg-white/5 flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                    Swap
+                                </Link>
+                                <Link
                                     href="/governance"
                                     className="px-4 py-2 text-neutral-300 hover:text-white transition-colors rounded-xl hover:bg-white/5 flex items-center gap-2"
                                 >
@@ -219,6 +228,22 @@ export default function AppNavbar() {
                             <div>
                                 <div className="font-medium">Buy $PENGO</div>
                                 <div className="text-xs text-neutral-400">Bonding Curve</div>
+                            </div>
+                        </Link>
+
+                        <Link
+                            href="/swap"
+                            className="flex items-center gap-3 px-4 py-3 text-white rounded-xl hover:bg-white/5 transition-colors"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="font-medium">Swap</div>
+                                <div className="text-xs text-neutral-400">DEX Trading</div>
                             </div>
                         </Link>
 

@@ -1,12 +1,12 @@
 {
-  "PengoEcosystemV2#MockAAPL": "0x498cd93632E258A829444Ec7FbD40404D3991d8C",
-  "PengoEcosystemV2#MockGold": "0x58dFa5E9af4F8C1be476b2b4940F4440e5716897",
-  "PengoEcosystemV2#MockGoogle": "0x4F01cE4521185BC23e12e7cdf5762cF907e0B160",
-  "PengoEcosystemV2#MockNVIDIA": "0xF27A4829182A1040311855D238Dd3632fABcd384",
-  "PengoEcosystemV2#PengoFactory": "0x1c37d1d216ca2394406364a18f45c03702693034",
-  "PengoEcosystemV2#PengoStrategy": "0xE151Df9089Ce35024C083B75025192cA75B9D947",
-  "PengoEcosystemV2#PengoToken": "0x0e9CE6702dfbeC87A6888928F9C6A4916E3f818D",
-  "PengoEcosystemV2#PenguinOnchainTestnet": "0xA81396871fa92f07CB233DA614f57FE070f08eB9",
-  "PengoEcosystemV2#PengoStrategyProxy": "0xeC8d0684ce304b0Da7a6F8008F5c7f418202b2DC",
-  "PengoEcosystemV2#PengoBondingCurve": "0x63957c23102099B2335A937b076fc38fCC343f9C"
+  "PengoEcosystemV2#MockAAPL": "0x604D2b8e573696B6e02925C9A5a7E4F2eAe62569",
+  "PengoEcosystemV2#MockGold": "0x128F31222E0DDE9EC4C3956a1A8D1c76294eb743",
+  "PengoEcosystemV2#MockGoogle": "0xDe32800a94d4aBAAbA42cc5F9D839f8caC3813C0",
+  "PengoEcosystemV2#MockNVIDIA": "0x317356c2803E526826D4c453BE8Fd0fe7D848c76",
+  "PengoEcosystemV2#PengoFactory": "0x590A6A4061bA5a668b5FEf66a1AD29ab442e528f",
+  "PengoEcosystemV2#PengoStrategy": "0x2d729C9fcb1CD307276d9Bb3bf49CF26e44DC5Aa",
+  "PengoEcosystemV2#PengoToken": "0x66aE8918F72192a2B81557674743B4B7C76E6F3B",
+  "PengoEcosystemV2#PenguinOnchainTestnet": "0xf33B1693c3CF6d2fF443dBFB6D78c8062fA3BAEE",
+  "PengoEcosystemV2#PengoStrategyProxy": "0xeddc7614A6AC3a608ee0C6715443Ff9F11800b40",
+  "PengoEcosystemV2#PengoBondingCurve": "0xcFaC66a9a9C695f9d2509bc6d71Edb0c1fFE67ae"
 }
