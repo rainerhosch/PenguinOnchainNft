@@ -1,13 +1,15 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 export default buildModule("PenguinOnchainHotfix", (m) => {
-    // Load the existing factory that was already deployed
-    const pengoFactory = m.contractAt("PengoFactory", "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d");
+    // Factory address is parameterized — passed via ignition/parameters/<network>.json
+    // This prevents hardcoding per-network addresses and avoids address swap mistakes
+    const factoryAddr = m.getParameter("factoryAddress");
+    const pengoFactory = m.contractAt("PengoFactory", factoryAddr);
 
-    // Deploy the updated PenguinOnchain contract with the new mint price
+    // Deploy the updated PenguinOnchain contract
     const penguinOnchain = m.contract("PenguinOnchain");
 
-    // Link the two contracts together
+    // Re-link the two contracts together
     m.call(penguinOnchain, "setFactory", [pengoFactory]);
     m.call(pengoFactory, "setPengoContract", [penguinOnchain]);
 

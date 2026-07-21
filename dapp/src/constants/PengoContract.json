@@ -1,8 +1,8 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0x19803B50dea6B9991b5ED8be62225F5E0E43d8a0",
-    "factoryAddress": "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d",
+    "address": "0xA31F9be87c1b0a17fF369C2A18dDeF2346768cbc",
+    "factoryAddress": "0x9D2852cbE059962723f94B83C59fe84CBb222199",
     "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
     "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
     "constructorArgs": [],
@@ -18,8 +18,8 @@
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://sepolia.etherscan.io/api",
             "currency": "ETH",
-            "PengoAddress": "0x19803B50dea6B9991b5ED8be62225F5E0E43d8a0",
-            "factoryAddress": "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d",
+            "PengoAddress": "0xA31F9be87c1b0a17fF369C2A18dDeF2346768cbc",
+            "factoryAddress": "0x9D2852cbE059962723f94B83C59fe84CBb222199",
             "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
             "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
             "abi": [

@@ -20,9 +20,9 @@ async function main() {
 
   const deployedAddresses = JSON.parse(fs.readFileSync(addressesFile, "utf-8"));
   
-  // Support both standard module and hotfix module names
+  // Support standard module, testnet module, and hotfix module names
   const factoryAddress = deployedAddresses["PenguinOnchainModule#PengoFactory"] || deployedAddresses["PenguinOnchainHotfix#PengoFactory"];
-  const penguinAddress = deployedAddresses["PenguinOnchainModule#PenguinOnchain"] || deployedAddresses["PenguinOnchainHotfix#PenguinOnchain"];
+  const penguinAddress = deployedAddresses["PenguinOnchainModule#PenguinOnchain"] || deployedAddresses["PenguinOnchainModule#PenguinOnchainTestnet"] || deployedAddresses["PenguinOnchainHotfix#PenguinOnchain"];
 
   if (!factoryAddress || !penguinAddress) {
     console.error("Could not find required addresses in deployed_addresses.json");

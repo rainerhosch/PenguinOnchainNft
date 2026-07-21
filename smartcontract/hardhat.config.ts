@@ -8,9 +8,18 @@ import { execSync } from "child_process";
 task("deploy-sync", "Deploys via Ignition and syncs to DApp")
   .addOptionalParam("module", "The ignition module to deploy", "PenguinOnchain")
   .setAction(async (taskArgs, hre) => {
+    const fs = require("fs");
+    const path = require("path");
+
     // 1. Run ignition deploy via CLI
     console.log(`Starting deployment for module: ${taskArgs.module} on network: ${hre.network.name}`);
-    execSync(`npx hardhat ignition deploy ignition/modules/${taskArgs.module}.ts --network ${hre.network.name}`, { stdio: "inherit" });
+    
+    // Auto-load network-specific parameters if they exist
+    const paramsFile = path.join(__dirname, "ignition", "parameters", `${hre.network.name}.json`);
+    const paramsFlag = fs.existsSync(paramsFile) ? ` --parameters ${paramsFile}` : "";
+    if (paramsFlag) console.log(`Loading parameters from: ${paramsFile}`);
+    
+    execSync(`npx hardhat ignition deploy ignition/modules/${taskArgs.module}.ts --network ${hre.network.name}${paramsFlag}`, { stdio: "inherit" });
     
     // 2. Run sync script
     console.log("Deployment complete! Syncing DApp...");

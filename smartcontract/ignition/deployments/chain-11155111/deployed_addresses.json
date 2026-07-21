@@ -1,6 +1,4 @@
 {
-  "PenguinOnchainModule#PengoFactory": "0xF44DE6051efC6539FD66c93Ee5439737398bCd57",
-  "PenguinOnchainModule#PenguinOnchainTestnet": "0xc08E7F393604B3Fab0452ee1e51d40dc98C1a12d",
-  "PenguinOnchainHotfix#PengoFactory": "0xF44DE6051efC6539FD66c93Ee5439737398bCd57",
-  "PenguinOnchainHotfix#PenguinOnchain": "0x19803B50dea6B9991b5ED8be62225F5E0E43d8a0"
+  "PenguinOnchainModule#PengoFactory": "0x9D2852cbE059962723f94B83C59fe84CBb222199",
+  "PenguinOnchainModule#PenguinOnchainTestnet": "0xA31F9be87c1b0a17fF369C2A18dDeF2346768cbc"
 }
