@@ -19,19 +19,19 @@ const traits = [
 ];
 
 const rarityColors: { [key: string]: string } = {
-    legendary: "text-amber-400",
-    epic: "text-purple-400",
-    rare: "text-blue-400",
-    uncommon: "text-green-400",
-    common: "text-neutral-400"
+    legendary: "text-rose-500", // Zombie / Highest
+    epic: "text-fuchsia-400",
+    rare: "text-cyan-400",
+    uncommon: "text-emerald-400",
+    common: "text-slate-400"
 };
 
 const rarityBadgeColors: { [key: string]: string } = {
-    legendary: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    epic: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-    rare: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    uncommon: "bg-green-500/20 text-green-400 border-green-500/30",
-    common: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30"
+    legendary: "bg-rose-500/20 text-rose-500 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.3)]",
+    epic: "bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30",
+    rare: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    uncommon: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    common: "bg-slate-500/20 text-slate-400 border-slate-500/30"
 };
 
 // Format large numbers with commas
@@ -133,7 +133,7 @@ export default function MintPage() {
                                             className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-amber-400' : trait.rarity === 'epic' ? 'bg-purple-400' : trait.rarity === 'rare' ? 'bg-blue-400' : trait.rarity === 'uncommon' ? 'bg-green-400' : 'bg-neutral-400'}`} />
+                                                <div className={`w-2 h-2 rounded-full ${trait.rarity === 'legendary' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]' : trait.rarity === 'epic' ? 'bg-fuchsia-400' : trait.rarity === 'rare' ? 'bg-cyan-400' : trait.rarity === 'uncommon' ? 'bg-emerald-400' : 'bg-slate-400'}`} />
                                                 <div>
                                                     <div className={`font-medium ${rarityColors[trait.rarity]}`}>{trait.name}</div>
                                                     <div className="text-xs text-neutral-500">{trait.category}</div>

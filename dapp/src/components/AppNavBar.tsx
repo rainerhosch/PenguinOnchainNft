@@ -80,7 +80,24 @@ export default function AppNavbar() {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
-                                    Mint
+                                </Link>
+                                <Link
+                                    href="/bonding-curve"
+                                    className="px-4 py-2 text-neutral-300 hover:text-white transition-colors rounded-xl hover:bg-white/5 flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                    $PENGO
+                                </Link>
+                                <Link
+                                    href="/governance"
+                                    className="px-4 py-2 text-neutral-300 hover:text-white transition-colors rounded-xl hover:bg-white/5 flex items-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    DAO
                                 </Link>
                             </div>
 
@@ -178,16 +195,49 @@ export default function AppNavbar() {
                             className="flex items-center gap-3 px-4 py-3 text-white rounded-xl hover:bg-white/5 transition-colors"
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary-500 to-secondary-600 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                             </div>
                             <div>
-                                <div className="font-medium">Mint Pengo</div>
-                                <div className="text-xs text-neutral-400">Get your NFT</div>
+                                <div className="font-medium">Mint</div>
+                                <div className="text-xs text-neutral-400">Get your Pengo</div>
                             </div>
                         </Link>
+
+                        <Link
+                            href="/bonding-curve"
+                            className="flex items-center gap-3 px-4 py-3 text-white rounded-xl hover:bg-white/5 transition-colors"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="font-medium">Buy $PENGO</div>
+                                <div className="text-xs text-neutral-400">Bonding Curve</div>
+                            </div>
+                        </Link>
+
+                        <Link
+                            href="/governance"
+                            className="flex items-center gap-3 px-4 py-3 text-white rounded-xl hover:bg-white/5 transition-colors"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="font-medium">Governance</div>
+                                <div className="text-xs text-neutral-400">Vault & DAO</div>
+                            </div>
+                        </Link>
+
 
                         {/* Wallet Info */}
                         {status === 'connected' && address && (

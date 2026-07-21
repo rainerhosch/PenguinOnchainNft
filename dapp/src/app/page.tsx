@@ -40,12 +40,11 @@ export default function Home() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-neutral-400 mb-4 max-w-xl mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
-                  <span className="text-white font-medium">Penguin Onchain</span> is not a static JPEG.
-                  It&apos;s a living digital identity you design yourself—pixel art rendered on-chain,
-                  accessories you create and trade, and a stake in a community-owned economy.
+                  <span className="text-white font-medium">Penguin Onchain</span> is a living digital identity and a fully decentralized ecosystem.
+                  Mint NFTs, trade on the <span className="text-accent-400">$PENGO</span> token bonding curve, and use your NFT's Voting Power to govern real-world asset (RWA) investments in the Community Vault.
                 </p>
                 <p className="text-base text-neutral-500 mb-8 max-w-xl mx-auto lg:mx-0 animate-fade-in-up animation-delay-200">
-                  Mint your Pengo. Open the Studio. Make rarity that can&apos;t be faked or taken offline.
+                  Draw it. Trade it. Govern it. Earn yields based on your on-chain Net Worth.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-300">
@@ -118,9 +117,9 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
                 { value: "100%", label: "Art & metadata live on-chain—yours forever" },
-                { value: "20K", label: "Strict supply. Scarcity with purpose" },
-                { value: "0%", label: "Accessory marketplace trading fees" },
-                { value: "∞", label: "Ways to customize after you mint" },
+                { value: "25 ETH", label: "Target Liquidity on the $PENGO Bonding Curve" },
+                { value: "RWA", label: "Yields governed by DAO Voting Power" },
+                { value: "∞", label: "Ways to customize your on-chain identity" },
               ].map((stat, index) => (
                 <div key={index} className="text-center">
                   <div className="text-3xl sm:text-4xl font-bold gradient-text mb-2">
@@ -193,10 +192,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">More than art—skin in the game</h3>
+                <h3 className="text-xl font-bold text-white mb-3">Governed RWA Vault</h3>
                 <p className="text-neutral-400">
-                  Holders share in a transparent staking pool model. Your Pengo is a collectible
-                  and a seat at the table.
+                  Holders use their NFT Share Power to vote on tokenized Real-World Assets (AAPL, Google, Gold). Yields are distributed directly to your wallet based on your Net Worth.
                 </p>
                 <a href="/our-programs" className="btn-secondary inline-flex items-center gap-1 text-sm text-primary-400 hover:text-primary-300 mt-3 transition-colors">
                   See the economics

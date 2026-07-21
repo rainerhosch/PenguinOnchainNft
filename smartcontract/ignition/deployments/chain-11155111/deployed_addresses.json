@@ -1,4 +1,12 @@
 {
-  "PenguinOnchainModule#PengoFactory": "0x9D2852cbE059962723f94B83C59fe84CBb222199",
-  "PenguinOnchainModule#PenguinOnchainTestnet": "0xA31F9be87c1b0a17fF369C2A18dDeF2346768cbc"
+  "PengoEcosystemV2#MockAAPL": "0x1b641CB567576c427e885603f0d8f325CC854420",
+  "PengoEcosystemV2#MockGold": "0xab67c69fD6759954543B05fB4997595f7a44Ab9d",
+  "PengoEcosystemV2#MockGoogle": "0x830a4BAf96d2226b5D28FeAE4cbFBEDF540dA7ce",
+  "PengoEcosystemV2#MockNVIDIA": "0x2480d60E107fe7268FDe293bb40E6EF960185997",
+  "PengoEcosystemV2#PengoFactory": "0xB48FC1329e237b849a2fE79370A1e129e037cFA8",
+  "PengoEcosystemV2#PengoStrategy": "0x1cE38eea1b44087f44A9D71e68303E9FdE9d960C",
+  "PengoEcosystemV2#PengoToken": "0x40dB3d5B672db7a49ce8810cD0b774c659135766",
+  "PengoEcosystemV2#PenguinOnchainTestnet": "0x636C6c11573f2A96950C498ecb0eB0Bd682e2540",
+  "PengoEcosystemV2#PengoStrategyProxy": "0x008d7725043148E5aCC2d63Ead04DE7dFDCAee6C",
+  "PengoEcosystemV2#PengoBondingCurve": "0x333e8782AF206Ca7E9F5f18eC2656cc22b47096E"
 }

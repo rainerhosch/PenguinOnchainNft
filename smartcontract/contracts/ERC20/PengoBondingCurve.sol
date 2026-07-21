@@ -19,12 +19,12 @@ contract PengoBondingCurve is Ownable {
     IERC20 public pengoToken;
     IUniswapV2Router02 public uniswapRouter;
     
-    uint256 public constant TARGET_LIQUIDITY = 5 ether; 
+    uint256 public constant TARGET_LIQUIDITY = 25 ether; 
     uint256 public constant TOKENS_FOR_SALE = 800_000_000 * 1e18;
     uint256 public constant TOKENS_FOR_LIQUIDITY = 200_000_000 * 1e18;
     
-    uint256 public basePrice = 0.000000001 ether; // Price for the first token
-    uint256 public priceIncrement = 0.00000000000001 ether; // Price increase per token
+    uint256 public basePrice = 1250000000; // 1.25 Gwei in wei
+    uint256 public priceIncrement = 75; // 75 wei
     
     uint256 public tokensSold;
     bool public isMigrated;
