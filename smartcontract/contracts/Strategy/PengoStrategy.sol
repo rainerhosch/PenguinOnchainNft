@@ -30,7 +30,13 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     
     // Dividend tracker
     mapping(address => uint256) public totalDividendsPerPower; 
-    mapping(address => mapping(uint256 => uint256)) public claimedDividendsPerPower; // rwaToken => tokenId => uint256
+    mapping(address => mapping(uint256 => uint256)) private _deprecated_claimedDividends;
+    
+    // Staking Rewards Ext
+    address[] public rewardTokens;
+    mapping(address => bool) public isRewardToken;
+    mapping(address => mapping(uint256 => uint256)) public rewardDebt; // rwaToken => tokenId => uint256
+    mapping(address => mapping(uint256 => uint256)) public pendingDividends; // rwaToken => tokenId => uint256
     
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -109,19 +115,69 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         
         IERC20(rwaToken).transferFrom(msg.sender, address(this), amount);
         totalDividendsPerPower[rwaToken] += (amount * 1e18) / totalPower;
+        
+        if (!isRewardToken[rwaToken]) {
+            isRewardToken[rwaToken] = true;
+            rewardTokens.push(rwaToken);
+        }
     }
     
+    function getClaimableDividends(address rwaToken, uint256 tokenId) public view returns (uint256) {
+        uint256 power = nftContract.sharePower(tokenId);
+        uint256 _total = totalDividendsPerPower[rwaToken];
+        uint256 owed = (power * _total) / 1e18;
+        
+        uint256 _debt = rewardDebt[rwaToken][tokenId];
+        uint256 _pending = pendingDividends[rwaToken][tokenId];
+        
+        if (owed > _debt) {
+            _pending += (owed - _debt);
+        }
+        return _pending;
+    }
+
+    function updateRewardDebt(uint256 tokenId) external {
+        require(msg.sender == address(nftContract), "Only NFT contract can update debt");
+        uint256 power = nftContract.sharePower(tokenId);
+        
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            address rwa = rewardTokens[i];
+            uint256 _total = totalDividendsPerPower[rwa];
+            uint256 owed = (power * _total) / 1e18;
+            uint256 _debt = rewardDebt[rwa][tokenId];
+            
+            if (owed > _debt) {
+                pendingDividends[rwa][tokenId] += (owed - _debt);
+            }
+            rewardDebt[rwa][tokenId] = (power * _total) / 1e18;
+        }
+    }
+
+    function claimAllDividendsFor(uint256 tokenId, address receiver) external nonReentrant {
+        require(msg.sender == address(nftContract), "Only NFT contract can auto-sweep");
+        uint256 power = nftContract.sharePower(tokenId);
+        
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            address rwa = rewardTokens[i];
+            uint256 claimable = getClaimableDividends(rwa, tokenId);
+            
+            if (claimable > 0) {
+                pendingDividends[rwa][tokenId] = 0;
+                rewardDebt[rwa][tokenId] = (power * totalDividendsPerPower[rwa]) / 1e18;
+                IERC20(rwa).transfer(receiver, claimable);
+            }
+        }
+    }
+
     function claimDividends(address rwaToken, uint256 tokenId) external nonReentrant {
         require(IERC721(address(nftContract)).ownerOf(tokenId) == msg.sender, "Not token owner");
         
+        uint256 payout = getClaimableDividends(rwaToken, tokenId);
+        require(payout > 0, "No dividends owed");
+        
         uint256 power = nftContract.sharePower(tokenId);
-        require(power > 0, "No share power");
-        
-        uint256 owedPerPower = totalDividendsPerPower[rwaToken] - claimedDividendsPerPower[rwaToken][tokenId];
-        require(owedPerPower > 0, "No dividends owed");
-        
-        uint256 payout = (power * owedPerPower) / 1e18;
-        claimedDividendsPerPower[rwaToken][tokenId] = totalDividendsPerPower[rwaToken];
+        pendingDividends[rwaToken][tokenId] = 0;
+        rewardDebt[rwaToken][tokenId] = (power * totalDividendsPerPower[rwaToken]) / 1e18;
         
         IERC20(rwaToken).transfer(msg.sender, payout);
     }

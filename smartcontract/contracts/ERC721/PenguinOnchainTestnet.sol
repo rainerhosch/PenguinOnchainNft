@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/interfaces/IERC165.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
+import "../interfaces/IPengoStrategy.sol";
 import "../libraries/pengoConverter.sol";
 
 contract PenguinOnchainTestnet is
@@ -61,6 +62,8 @@ contract PenguinOnchainTestnet is
     IPengoFactory public factory;
     address public BENEFICARY_ADDRESS;
     address public ROYALTY_ADDRESS;
+    address public pengoToken;
+    IPengoStrategy public strategyContract;
 
     uint256 public nextAccessoryId = 1;
     mapping(uint256 => uint256) internal seeds;
@@ -78,7 +81,6 @@ contract PenguinOnchainTestnet is
     // --- Share Power & $PENGO Token ---
     mapping(uint256 => uint256) public sharePower;
     uint256 public totalSharePower;
-    address public pengoToken;
 
     event AccessoryAdded(
         uint256 indexed tokenId,
@@ -157,7 +159,7 @@ contract PenguinOnchainTestnet is
             // Default trait slot without iterating accessories
             specialTraits[tokenId] = SpecialTrait({
                 category: "lil pengo",
-                networth: "0 MON"
+                networth: "0 ETH"
             });
             emit MetadataUpdate(tokenId);
             unchecked {
@@ -708,9 +710,17 @@ contract PenguinOnchainTestnet is
         pengoToken = _pengoToken;
     }
 
+    function setStrategyContract(address _strategy) external onlyOwner {
+        strategyContract = IPengoStrategy(_strategy);
+    }
+
     function addSharePower(uint256 tokenId, uint256 amount) external {
         if (msg.sender != pengoToken) revert("Only PengoToken can add power");
         if (!_exists(tokenId)) revert TokenDoesNotExist();
+
+        if (address(strategyContract) != address(0)) {
+            strategyContract.updateRewardDebt(tokenId);
+        }
 
         sharePower[tokenId] += amount;
         totalSharePower += amount;
@@ -729,6 +739,10 @@ contract PenguinOnchainTestnet is
             for (uint256 i = 0; i < quantity; i++) {
                 uint256 tokenId = startTokenId + i;
 
+                if (address(strategyContract) != address(0)) {
+                    strategyContract.claimAllDividendsFor(tokenId, from);
+                }
+
                 // Deduct from total
                 totalSharePower -= sharePower[tokenId];
                 // Reset power
@@ -736,6 +750,14 @@ contract PenguinOnchainTestnet is
 
                 // Reset networth
                 specialTraits[tokenId].networth = "0";
+            }
+        } else if (to == address(0)) {
+            // Burn logic
+            for (uint256 i = 0; i < quantity; i++) {
+                uint256 tokenId = startTokenId + i;
+                if (address(strategyContract) != address(0)) {
+                    strategyContract.claimAllDividendsFor(tokenId, from);
+                }
             }
         }
     }

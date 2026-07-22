@@ -1,0 +1,392 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0xeddc7614A6AC3a608ee0C6715443Ff9F11800b40",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "52a9795240cc26a98fc60b32510a72373e724cc2d2a0e3339e36d567d35fb4e6": {
+      "address": "0x2d729C9fcb1CD307276d9Bb3bf49CF26e44DC5Aa",
+      "layout": {
+        "solcVersion": "0.8.27",
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\ERC1967\\ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "nftContract",
+            "type": "t_contract(IPenguinOnchain)5818",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:13"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "proposals",
+            "type": "t_mapping(t_uint256,t_struct(Proposal)5222_storage)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:24"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "proposalCount",
+            "type": "t_uint256",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:25"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "hasVoted",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:26"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "activeBuyList",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:28"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "inBuyList",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:29"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "totalDividendsPerPower",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:32"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "claimedDividendsPerPower",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:33"
+          }
+        ],
+        "types": {
+          "t_contract(IPenguinOnchain)5818": {
+            "label": "contract IPenguinOnchain"
+          },
+          "t_mapping(t_uint256,t_struct(Proposal)5222_storage)": {
+            "label": "mapping(uint256 => struct PengoStrategy.Proposal)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Proposal)5222_storage": {
+            "label": "struct PengoStrategy.Proposal",
+            "members": [
+              {
+                "label": "rwaToken",
+                "type": "t_address"
+              },
+              {
+                "label": "isAdd",
+                "type": "t_bool"
+              },
+              {
+                "label": "yesVotes",
+                "type": "t_uint256"
+              },
+              {
+                "label": "noVotes",
+                "type": "t_uint256"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "executed",
+                "type": "t_bool"
+              }
+            ]
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))": {
+            "label": "mapping(uint256 => mapping(uint256 => bool))"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        },
+        "namespaces": {}
+      },
+      "allAddresses": [
+        "0x2d729C9fcb1CD307276d9Bb3bf49CF26e44DC5Aa",
+        "0xEAFF1De090e32f1e1508878Bef531D2C381470F0"
+      ]
+    },
+    "40819bef7193f8a48516f7c8e9c8e41c351d970544e93366f2bd4b1269a61b02": {
+      "address": "0xEAFF1De090e32f1e1508878Bef531D2C381470F0",
+      "txHash": "0xa4a6b7d32e3236a0ed2006c5a33a9b56d7110f48c57e727788fee2dd94597a3b",
+      "layout": {
+        "solcVersion": "0.8.27",
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_uint8",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:67"
+          },
+          {
+            "contract": "ERC1967UpgradeUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\ERC1967\\ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "contract": "UUPSUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\UUPSUpgradeable.sol:107"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:36"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:22"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:94"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "nftContract",
+            "type": "t_contract(IPenguinOnchain)5818",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:13"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "proposals",
+            "type": "t_mapping(t_uint256,t_struct(Proposal)5222_storage)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:24"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "proposalCount",
+            "type": "t_uint256",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:25"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "hasVoted",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:26"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "activeBuyList",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:28"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "inBuyList",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:29"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "totalDividendsPerPower",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:32"
+          },
+          {
+            "contract": "PengoStrategy",
+            "label": "claimedDividendsPerPower",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "src": "contracts\\Strategy\\PengoStrategy.sol:33"
+          }
+        ],
+        "types": {
+          "t_contract(IPenguinOnchain)5818": {
+            "label": "contract IPenguinOnchain"
+          },
+          "t_mapping(t_uint256,t_struct(Proposal)5222_storage)": {
+            "label": "mapping(uint256 => struct PengoStrategy.Proposal)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Proposal)5222_storage": {
+            "label": "struct PengoStrategy.Proposal",
+            "members": [
+              {
+                "label": "rwaToken",
+                "type": "t_address"
+              },
+              {
+                "label": "isAdd",
+                "type": "t_bool"
+              },
+              {
+                "label": "yesVotes",
+                "type": "t_uint256"
+              },
+              {
+                "label": "noVotes",
+                "type": "t_uint256"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "executed",
+                "type": "t_bool"
+              }
+            ]
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_bool))": {
+            "label": "mapping(uint256 => mapping(uint256 => bool))"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          }
+        },
+        "namespaces": {}
+      }
+    }
+  }
+}

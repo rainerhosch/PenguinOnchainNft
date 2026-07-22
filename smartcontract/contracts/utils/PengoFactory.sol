@@ -50,6 +50,7 @@ import {DynamicBufferLib} from "solady/src/utils/DynamicBufferLib.sol";
 import "../libraries/pengoConverter.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
+import "../interfaces/IPengoStrategy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @notice On-chain SVG / metadata factory. Public structure preserved; assembly uses Solady buffers.
@@ -78,11 +79,16 @@ contract PengoFactory is IPengoFactory, Ownable {
     string internal constant BYTE_FEET      = "0d160101F5A6230e160101F5A62311160101F5A62312160101F5A623";
 
     IPenguinOnchain public pengoContract;
+    IPengoStrategy public strategyContract;
 
     event CoordinatesInitialized(string part, string byteData);
     event RemovedPart(string part);
 
     constructor() {}
+
+    function setStrategyContract(address _strategy) external onlyOwner {
+        strategyContract = IPengoStrategy(_strategy);
+    }
 
     function tokenURI(
         uint256 tokenId,
@@ -146,7 +152,31 @@ contract PengoFactory is IPengoFactory, Ownable {
         meta = meta.p(bytes('"},{"trait_type": "Life Goal", "value": "'));
         meta = meta.p(bytes(specialTraits.category));
         meta = meta.p(bytes('"},{"trait_type": "Net Worth", "value": "'));
-        meta = meta.p(bytes(specialTraits.networth));
+        
+        // Dynamic Net Worth Calculation
+        uint256 totalAccValue = 0;
+        for (uint256 j = 0; j < accLen; ) {
+            totalAccValue += accessories[j].lastPrice;
+            unchecked { ++j; }
+        }
+        
+        uint256 totalValueWei = totalAccValue;
+        if (address(strategyContract) != address(0)) {
+            for (uint k = 0; ; k++) {
+                try strategyContract.rewardTokens(k) returns (address rwa) {
+                    uint256 claimable = strategyContract.getClaimableDividends(rwa, tokenId);
+                    if (claimable > 0) {
+                        // Mock conversion: 1 RWA = 0.05 ETH
+                        totalValueWei += (claimable * 5e16) / 1e18;
+                    }
+                } catch {
+                    break;
+                }
+            }
+        }
+        
+        string memory combinedNetworth = string.concat(LibString.toString(totalValueWei / 1 ether), " ETH");
+        meta = meta.p(bytes(combinedNetworth));
         meta = meta.p(bytes('"}'));
         if (accLen > 0) {
             meta = meta.p(bytes(","));

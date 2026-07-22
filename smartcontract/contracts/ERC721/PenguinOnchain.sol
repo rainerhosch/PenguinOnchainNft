@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/interfaces/IERC165.sol";
 import "../interfaces/IPengoFactory.sol";
 import "../interfaces/IPenguinOnchain.sol";
+import "../interfaces/IPengoStrategy.sol";
 import "../libraries/pengoConverter.sol";
 
 contract PenguinOnchain is
@@ -79,6 +80,7 @@ contract PenguinOnchain is
     mapping(uint256 => uint256) public sharePower;
     uint256 public totalSharePower;
     address public pengoToken;
+    IPengoStrategy public strategyContract;
 
     event AccessoryAdded(
         uint256 indexed tokenId,
@@ -625,7 +627,7 @@ contract PenguinOnchain is
     }
 
     /*//////////////////////////////////////////////////////////////
-                                  VIEWS
+                                 VIEWS
     //////////////////////////////////////////////////////////////*/
     function getSeed(uint256 tokenId) public view returns (uint256) {
         if (!_exists(tokenId)) revert TokenDoesNotExist();
@@ -708,6 +710,10 @@ contract PenguinOnchain is
         pengoToken = _pengoToken;
     }
 
+    function setStrategyContract(address _strategy) external onlyOwner {
+        strategyContract = IPengoStrategy(_strategy);
+    }
+
     function addSharePower(uint256 tokenId, uint256 amount) external {
         if (msg.sender != pengoToken) revert("Only PengoToken can add power");
         if (!_exists(tokenId)) revert TokenDoesNotExist();
@@ -728,6 +734,10 @@ contract PenguinOnchain is
         if (from != address(0) && to != address(0)) {
             for (uint256 i = 0; i < quantity; i++) {
                 uint256 tokenId = startTokenId + i;
+
+                if (address(strategyContract) != address(0)) {
+                    strategyContract.claimAllDividendsFor(tokenId, from);
+                }
                 
                 // Deduct from total
                 totalSharePower -= sharePower[tokenId];
@@ -736,6 +746,14 @@ contract PenguinOnchain is
                 
                 // Reset networth
                 specialTraits[tokenId].networth = "0";
+            }
+        } else if (to == address(0)) {
+            // Burn logic
+            for (uint256 i = 0; i < quantity; i++) {
+                uint256 tokenId = startTokenId + i;
+                if (address(strategyContract) != address(0)) {
+                    strategyContract.claimAllDividendsFor(tokenId, from);
+                }
             }
         }
     }
