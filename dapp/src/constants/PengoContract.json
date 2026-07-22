@@ -1,8 +1,8 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0xf33B1693c3CF6d2fF443dBFB6D78c8062fA3BAEE",
-    "factoryAddress": "0x590A6A4061bA5a668b5FEf66a1AD29ab442e528f",
+    "address": "0x823827ea7a407B7D38cA410fF0aceEA58ca29600",
+    "factoryAddress": "0xb95837c3Cc699F20E897Ff1Bd716b3852e79a1e3",
     "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
     "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
     "constructorArgs": [],
@@ -19,8 +19,8 @@
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://sepolia.etherscan.io/api",
             "currency": "ETH",
-            "PengoAddress": "0xf33B1693c3CF6d2fF443dBFB6D78c8062fA3BAEE",
-            "factoryAddress": "0x590A6A4061bA5a668b5FEf66a1AD29ab442e528f",
+            "PengoAddress": "0x823827ea7a407B7D38cA410fF0aceEA58ca29600",
+            "factoryAddress": "0xb95837c3Cc699F20E897Ff1Bd716b3852e79a1e3",
             "pengoConverter": "0x9748C434Cf6E2956B48adb60f09Db0d95e274D6d",
             "daoAddress": "0x3E117060324E1B1e5692E0780Aab9be62468c58F",
             "abi": [
@@ -1237,6 +1237,35 @@
                             "type": "uint256"
                         }
                     ],
+                    "name": "getNetWorth",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryValueWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address[]",
+                            "name": "rwaAddresses",
+                            "type": "address[]"
+                        },
+                        {
+                            "internalType": "uint256[]",
+                            "name": "claimableAmounts",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
                     "name": "getSeed",
                     "outputs": [
                         {
@@ -1657,6 +1686,19 @@
                 {
                     "inputs": [
                         {
+                            "internalType": "address",
+                            "name": "_strategy",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setStrategyContract",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
                             "internalType": "uint256",
                             "name": "",
                             "type": "uint256"
@@ -1692,6 +1734,19 @@
                             "internalType": "string",
                             "name": "networth",
                             "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "strategyContract",
+                    "outputs": [
+                        {
+                            "internalType": "contract IPengoStrategy",
+                            "name": "",
+                            "type": "address"
                         }
                     ],
                     "stateMutability": "view",

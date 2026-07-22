@@ -50,6 +50,10 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         
         nftContract = IPenguinOnchain(_nftContract);
     }
+
+    function setNftContract(address _nftContract) external onlyOwner {
+        nftContract = IPenguinOnchain(_nftContract);
+    }
     
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
     
@@ -153,6 +157,17 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         }
     }
 
+    function syncRewardDebt(uint256 tokenId) external {
+        require(msg.sender == address(nftContract), "Only NFT contract can update debt");
+        uint256 power = nftContract.sharePower(tokenId);
+        
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            address rwa = rewardTokens[i];
+            uint256 _total = totalDividendsPerPower[rwa];
+            rewardDebt[rwa][tokenId] = (power * _total) / 1e18;
+        }
+    }
+
     function claimAllDividendsFor(uint256 tokenId, address receiver) external nonReentrant {
         require(msg.sender == address(nftContract), "Only NFT contract can auto-sweep");
         uint256 power = nftContract.sharePower(tokenId);
@@ -180,5 +195,19 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         rewardDebt[rwaToken][tokenId] = (power * totalDividendsPerPower[rwaToken]) / 1e18;
         
         IERC20(rwaToken).transfer(msg.sender, payout);
+    }
+    
+    function hotfixAddRewardToken(address rwa) external onlyOwner {
+        if (!isRewardToken[rwa]) {
+            isRewardToken[rwa] = true;
+            rewardTokens.push(rwa);
+        }
+    }
+
+    function hotfixAddToBuyList(address rwa) external onlyOwner {
+        if (!inBuyList[rwa]) {
+            inBuyList[rwa] = true;
+            activeBuyList.push(rwa);
+        }
     }
 }

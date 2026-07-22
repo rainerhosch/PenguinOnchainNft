@@ -53,6 +53,10 @@ import "../interfaces/IPenguinOnchain.sol";
 import "../interfaces/IPengoStrategy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+interface IERC20Symbol {
+    function symbol() external view returns (string memory);
+}
+
 /// @notice On-chain SVG / metadata factory. Public structure preserved; assembly uses Solady buffers.
 contract PengoFactory is IPengoFactory, Ownable {
     using DynamicBufferLib for DynamicBufferLib.DynamicBuffer;
@@ -151,33 +155,44 @@ contract PengoFactory is IPengoFactory, Ownable {
         meta = meta.p(bytes(topEyeColor.name));
         meta = meta.p(bytes('"},{"trait_type": "Life Goal", "value": "'));
         meta = meta.p(bytes(specialTraits.category));
-        meta = meta.p(bytes('"},{"trait_type": "Net Worth", "value": "'));
+        meta = meta.p(bytes('"},{"trait_type": "Net Worth (Accessories)", "value": "'));
         
-        // Dynamic Net Worth Calculation
+        // Dynamic Net Worth Calculation (Accessories Only)
         uint256 totalAccValue = 0;
         for (uint256 j = 0; j < accLen; ) {
             totalAccValue += accessories[j].lastPrice;
             unchecked { ++j; }
         }
         
-        uint256 totalValueWei = totalAccValue;
+        string memory combinedNetworth = string.concat(LibString.toString(totalAccValue / 1 ether), " ETH");
+        meta = meta.p(bytes(combinedNetworth));
+        meta = meta.p(bytes('"}'));
+
+        // Claimable RWA Dividends Raw Balances
         if (address(strategyContract) != address(0)) {
             for (uint k = 0; ; k++) {
                 try strategyContract.rewardTokens(k) returns (address rwa) {
                     uint256 claimable = strategyContract.getClaimableDividends(rwa, tokenId);
                     if (claimable > 0) {
-                        // Mock conversion: 1 RWA = 0.05 ETH
-                        totalValueWei += (claimable * 5e16) / 1e18;
+                        string memory symbol;
+                        try IERC20Symbol(rwa).symbol() returns (string memory s) {
+                            symbol = s;
+                        } catch {
+                            symbol = "Token";
+                        }
+                        
+                        string memory claimStr = LibString.toString(claimable / 1 ether);
+                        meta = meta.p(bytes(',{"trait_type": "Claimable '));
+                        meta = meta.p(bytes(symbol));
+                        meta = meta.p(bytes('", "value": "'));
+                        meta = meta.p(bytes(claimStr));
+                        meta = meta.p(bytes('"}'));
                     }
                 } catch {
                     break;
                 }
             }
         }
-        
-        string memory combinedNetworth = string.concat(LibString.toString(totalValueWei / 1 ether), " ETH");
-        meta = meta.p(bytes(combinedNetworth));
-        meta = meta.p(bytes('"}'));
         if (accLen > 0) {
             meta = meta.p(bytes(","));
             meta = meta.p(bytes(attrs.s()));

@@ -621,9 +621,54 @@ contract PenguinOnchain is
 
         specialTraits[tokenId] = SpecialTrait({
             category: cat,
-            networth: string.concat(totalValueInEther.toString(), " MON")
+            networth: "0 ETH" // This is now overridden dynamically in Factory, but kept for struct backwards compatibility
         });
-        emit MetadataUpdate(tokenId);
+    }
+
+    /**
+     * @dev Calculates the raw components of a Penguin NFT's net worth.
+     * Integrates accessory values and raw claimable RWA dividend amounts.
+     * This function is purely for view/read integrations (e.g. DeFi collateral).
+     * By returning raw token amounts, external protocols can use their own Oracles for pricing.
+     */
+    function getNetWorth(uint256 tokenId) public view returns (
+        uint256 accessoryValueWei,
+        address[] memory rwaAddresses,
+        uint256[] memory claimableAmounts
+    ) {
+        if (!_exists(tokenId)) revert TokenDoesNotExist();
+        
+        uint256 totalAccValue = 0;
+        uint256[] storage ids = accessoryIds[tokenId];
+        uint256 len = ids.length;
+        for (uint256 i = 0; i < len; ) {
+            totalAccValue += accessories[tokenId][ids[i]].lastPrice;
+            unchecked { ++i; }
+        }
+
+        accessoryValueWei = totalAccValue;
+        
+        if (address(strategyContract) != address(0)) {
+            // Count reward tokens
+            uint256 rwaCount = 0;
+            for (uint k = 0; ; k++) {
+                try strategyContract.rewardTokens(k) returns (address) {
+                    rwaCount++;
+                } catch {
+                    break;
+                }
+            }
+
+            rwaAddresses = new address[](rwaCount);
+            claimableAmounts = new uint256[](rwaCount);
+
+            for (uint k = 0; k < rwaCount; k++) {
+                try strategyContract.rewardTokens(k) returns (address rwa) {
+                    rwaAddresses[k] = rwa;
+                    claimableAmounts[k] = strategyContract.getClaimableDividends(rwa, tokenId);
+                } catch {}
+            }
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -716,10 +761,16 @@ contract PenguinOnchain is
 
     function addSharePower(uint256 tokenId, uint256 amount) external {
         if (msg.sender != pengoToken) revert("Only PengoToken can add power");
-        if (!_exists(tokenId)) revert TokenDoesNotExist();
-        
+        if (address(strategyContract) != address(0)) {
+            strategyContract.updateRewardDebt(tokenId);
+        }
+
         sharePower[tokenId] += amount;
         totalSharePower += amount;
+
+        if (address(strategyContract) != address(0)) {
+            strategyContract.syncRewardDebt(tokenId);
+        }
     }
 
     function _beforeTokenTransfers(
