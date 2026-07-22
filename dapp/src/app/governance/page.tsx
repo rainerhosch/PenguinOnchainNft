@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import AppNavbar from "../../components/AppNavBar";
 import { useReadContract, useWriteContract, useAccount, useWaitForTransactionReceipt, useReadContracts } from 'wagmi';
-import { parseEther, formatEther, type Abi } from 'viem';
+import { parseEther, formatEther, type Abi, erc20Abi } from 'viem';
 import { toast, Toaster } from 'react-hot-toast';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 
@@ -61,24 +61,36 @@ export default function GovernancePage() {
         query: { enabled: proposalCount > 0 && !!selectedNftToBurn }
     });
 
-    const knownRWAs = [
-        { address: "0x604D2b8e573696B6e02925C9A5a7E4F2eAe62569" as `0x${string}`, symbol: "mAAPL" },
-        { address: "0x128F31222E0DDE9EC4C3956a1A8D1c76294eb743" as `0x${string}`, symbol: "mGOLD" },
-        { address: "0x6C91901C9509f6E35F38E22252a13b5D22b069df" as `0x${string}`, symbol: "mGOOGL" },
-        { address: "0xa2717a61d1558E5E57cE8f58bB267793d5B5F37a" as `0x${string}`, symbol: "mNVDA" }
-    ];
+    // Fetch RWA Symbols dynamically for proposals
+    const uniqueProposalRWAs = Array.from(new Set(
+        (proposalsData || []).map(p => p.result ? (p.result as any[])[0] as `0x${string}` : null).filter(Boolean)
+    ));
+
+    const { data: proposalRWASymbols } = useReadContracts({
+        contracts: uniqueProposalRWAs.map(address => ({
+            address: address as `0x${string}`,
+            abi: erc20Abi,
+            functionName: 'symbol'
+        })),
+        query: { enabled: uniqueProposalRWAs.length > 0 }
+    });
+
+    const getRWASymbol = (address: string) => {
+        const index = uniqueProposalRWAs.findIndex(a => a?.toLowerCase() === address.toLowerCase());
+        if (index !== -1 && proposalRWASymbols && proposalRWASymbols[index]?.result) {
+            return proposalRWASymbols[index].result as string;
+        }
+        return `${address.substring(0, 6)}...${address.substring(38)}`;
+    };
 
     const activeProposals = proposalsData ? proposalsData.map((data, index) => {
         if (!data.result) return null;
         const [rwaToken, isAdd, yesVotes, noVotes, endTime, executed] = data.result as [string, boolean, bigint, bigint, bigint, boolean];
         const status = executed ? "Executed" : (Number(endTime) * 1000 < Date.now() ? "Pending Execution" : "Active");
         
-        const foundRWA = knownRWAs.find(r => r.address.toLowerCase() === rwaToken.toLowerCase());
-        const displayRWA = foundRWA ? foundRWA.symbol : `${rwaToken.substring(0, 6)}...${rwaToken.substring(38)}`;
-        
         return {
             id: proposalIds[index],
-            targetRWA: displayRWA,
+            targetRWA: getRWASymbol(rwaToken),
             description: `${isAdd ? "Add to" : "Remove from"} Buy List`,
             yesVotes: Number(formatEther(yesVotes)),
             noVotes: Number(formatEther(noVotes)),
@@ -90,6 +102,13 @@ export default function GovernancePage() {
         };
     }).filter(p => p !== null) : [];
     // console.log(activeProposals)
+
+    const knownRWAs = [
+        { address: "0x604D2b8e573696B6e02925C9A5a7E4F2eAe62569" as `0x${string}`, symbol: "mAAPL" },
+        { address: "0x128F31222E0DDE9EC4C3956a1A8D1c76294eb743" as `0x${string}`, symbol: "mGOLD" },
+        { address: "0x6C91901C9509f6E35F38E22252a13b5D22b069df" as `0x${string}`, symbol: "mGOOGL" },
+        { address: "0xa2717a61d1558E5E57cE8f58bB267793d5B5F37a" as `0x${string}`, symbol: "mNVDA" }
+    ];
 
 
 
