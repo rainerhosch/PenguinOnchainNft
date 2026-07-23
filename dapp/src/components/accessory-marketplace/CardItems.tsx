@@ -34,6 +34,7 @@ interface CardItemProps {
     onPurchase: (accessoryId: number, fromTokenId: number, toTokenId: string, price: bigint) => void;
     accessoryId: number;
     tokenId: string;
+    isProcessing?: boolean;
 }
 
 const parseBytePixel = (bytePixel: string) => {
@@ -55,7 +56,7 @@ const parseBytePixel = (bytePixel: string) => {
 };
 
 
-export default function CardItem({ accessoryData, onPurchase, accessoryId, tokenId }: CardItemProps) {
+export default function CardItem({ accessoryData, onPurchase, accessoryId, tokenId, isProcessing = false }: CardItemProps) {
     const { address, chain } = useAccount();
     const pixels = parseBytePixel(accessoryData.bytePixel);
     const [isYour, setIsYour] = useState(false);
@@ -82,6 +83,35 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     });
 
     const listOfAccessories: Accessory[] = (nftAccData as [Accessory[], SpecialTrait])?.[0] || [];
+
+    // Check if the selected Pengo already has an accessory in this slot
+    const isSlotFilled = listOfAccessories.some(acc => acc.trait_type === accessoryData.trait_type);
+
+    const { data: tokenURIData } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: "tokenURI",
+        args: [selectedPengo],
+        query: { enabled: !!selectedPengo }
+    });
+
+    const [pengoImage, setPengoImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (tokenURIData) {
+            try {
+                const base64Data = (tokenURIData as string).split(",")[1];
+                const metadata = JSON.parse(atob(base64Data));
+                if (metadata.image) {
+                    setPengoImage(metadata.image);
+                }
+            } catch (e) {
+                console.error("Failed to parse tokenURI for preview", e);
+            }
+        } else {
+            setPengoImage(null);
+        }
+    }, [tokenURIData, selectedPengo]);
 
     useEffect(() => {
         if (accessoryData.owner === address) {
@@ -112,27 +142,37 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
     return (
         <div className="glass rounded-xl overflow-visible group hover:bg-white/10 transition-all duration-300 relative z-0 hover:z-20 focus-within:z-20">
             {/* SVG Preview */}
-            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 flex items-center justify-center overflow-hidden rounded-t-xl">
+            <div className="relative bg-gradient-to-br from-neutral-900 to-neutral-800 p-4 flex items-center justify-center overflow-hidden rounded-t-xl transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <svg
-                    height={120}
-                    width={120}
-                    shapeRendering="crispEdges"
-                    viewBox="0 0 30 30"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="drop-shadow-lg"
-                >
-                    {pixels.map((pixel, index) => (
-                        <rect
-                            key={index}
-                            x={pixel.x}
-                            y={pixel.y}
-                            width={pixel.w}
-                            height={pixel.h}
-                            fill={pixel.color}
+
+                <div className="relative w-[120px] h-[120px] transition-transform duration-300 group-hover:scale-110">
+                    {pengoImage && (
+                        <img
+                            src={pengoImage}
+                            alt="Pengo Preview"
+                            className="absolute inset-0 w-full h-full drop-shadow-lg rounded-xl"
                         />
-                    ))}
-                </svg>
+                    )}
+                    <svg
+                        height={100}
+                        width={100}
+                        shapeRendering="crispEdges"
+                        viewBox="0 0 30 30"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="absolute inset-0 w-full h-full drop-shadow-lg"
+                    >
+                        {pixels.map((pixel, index) => (
+                            <rect
+                                key={index}
+                                x={pixel.x}
+                                y={pixel.y}
+                                width={pixel.w}
+                                height={pixel.h}
+                                fill={pixel.color}
+                            />
+                        ))}
+                    </svg>
+                </div>
 
                 {/* Trait Type Badge */}
                 <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-medium bg-primary-500/80 text-white rounded-md">
@@ -190,13 +230,27 @@ export default function CardItem({ accessoryData, onPurchase, accessoryId, token
 
                         <button
                             onClick={handlePurchase}
-                            disabled={!selectedPengo}
-                            className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-all ${selectedPengo
-                                ? 'btn-primary'
-                                : 'bg-white/5 text-neutral-500 cursor-not-allowed border border-white/10'
+                            disabled={!selectedPengo || isProcessing || isSlotFilled}
+                            className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-all ${isProcessing
+                                ? 'bg-primary-500/50 text-white cursor-not-allowed flex justify-center items-center gap-2'
+                                : !selectedPengo || isSlotFilled
+                                    ? 'bg-white/5 text-neutral-500 cursor-not-allowed border border-white/10'
+                                    : 'btn-primary'
                                 }`}
                         >
-                            Buy Now
+                            {isProcessing ? (
+                                <>
+                                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Processing...
+                                </>
+                            ) : isSlotFilled ? (
+                                "Slot Filled"
+                            ) : (
+                                "Buy Now"
+                            )}
                         </button>
                     </div>
                 ) : (

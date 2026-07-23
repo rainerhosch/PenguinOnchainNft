@@ -36,6 +36,7 @@ export default function ListItems() {
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [visibleCount, setVisibleCount] = useState(12);
     const [accessoryFS, setAccessoryFS] = useState<AccessoryForSale[]>([]);
+    const [processingId, setProcessingId] = useState<number | null>(null);
 
     const networkContract = chain?.id !== undefined
         ? PengoContract.networkDeployment.find(network => Number(network.chainId) === chain.id)
@@ -43,16 +44,16 @@ export default function ListItems() {
     const abi = networkContract?.abi;
     const contractAddress = networkContract?.PengoAddress as Address;
 
-    const { data: AccessoriesForSale } = useReadContract({
+    const { data: AccessoriesForSale, refetch: refetchAccessories } = useReadContract({
         address: contractAddress,
         abi,
         functionName: "getAllAccessoriesForSale",
     });
 
-    const { data: hash, error, writeContract } = useWriteContract();
+    const { data: hash, error, writeContract, isPending } = useWriteContract();
     const {
         isSuccess: isConfirmed,
-        isLoading
+        isLoading: isConfirming
     } = useWaitForTransactionReceipt({ hash });
 
     useEffect(() => {
@@ -63,39 +64,26 @@ export default function ListItems() {
     }, [AccessoriesForSale]);
 
     useEffect(() => {
-        if (isPurchasing && isLoading) {
-            toast.loading("Processing transaction...", { id: "txn-loading" });
-        } else {
-            toast.dismiss("txn-loading");
-        }
-    }, [isLoading, isPurchasing]);
-
-    useEffect(() => {
-        if (error) {
-            toast.error(`Error: ${(error as BaseError).shortMessage || error.message}`, { id: `purchase-error` });
-            setIsPurchasing(false);
-        }
-    }, [error]);
-
-    useEffect(() => {
-        if (isConfirmed) {
-            toast.success(`Transaction confirmed!`, { id: `purchase-success` });
+        const toastId = "purchase-tx";
+        if (isPending) {
+            toast.loading("Please confirm purchase in your wallet...", { id: toastId });
+        } else if (isConfirming) {
+            toast.loading("Transaction submitted. Waiting for confirmation...", { id: toastId });
+        } else if (isConfirmed) {
             toast.success(
-                <p className="text-sm">
-                    Transaction Hash:<br />
-                    <a
-                        href={`${networkContract?.explore}/tx/${hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent-400 underline hover:text-primary-300"
-                    >
-                        {`${hash?.slice(0, 6)}...${hash?.slice(-4)}`}
-                    </a>
-                </p>
+                <div>
+                    Purchase successful!<br />
+                    <a href={`${networkContract?.explore}/tx/${hash}`} target="_blank" rel="noopener noreferrer" className="underline text-emerald-400 font-bold">View on Explorer</a>
+                </div>, 
+                { id: toastId }
             );
-            setIsPurchasing(false);
+            refetchAccessories();
+            setProcessingId(null);
+        } else if (error) {
+            toast.error(`Transaction failed: ${(error as BaseError).shortMessage || error.message.substring(0, 50)}...`, { id: toastId });
+            setProcessingId(null);
         }
-    }, [hash, isConfirmed, networkContract?.explore]);
+    }, [isPending, isConfirming, isConfirmed, error, hash, networkContract?.explore, refetchAccessories]);
 
     const handlePurchase = (accessoryId: number, fromTokenId: number, toTokenId: string, price: bigint) => {
         if (!toTokenId || isNaN(Number(toTokenId))) {
@@ -103,7 +91,8 @@ export default function ListItems() {
             return;
         }
 
-        setIsPurchasing(true);
+        setProcessingId(accessoryId);
+
         writeContract({
             address: contractAddress,
             abi: abi as Abi,
@@ -191,6 +180,7 @@ export default function ListItems() {
                         accessoryId={Number(accessory.accessoryId)}
                         tokenId={accessory.tokenId.toString()}
                         onPurchase={handlePurchase}
+                        isProcessing={processingId === Number(accessory.accessoryId) && (isPending || isConfirming)}
                     />
                 ))}
             </div>

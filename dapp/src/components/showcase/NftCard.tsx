@@ -37,7 +37,7 @@ type SpecialTrait = {
 const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
     const { chain } = useAccount();
     const [nfts, setNfts] = useState<
-        { id: number; name: string; image: string; traits: unknown }[]
+        { id: number; name: string; image: string; traits: any[]; networth: string }[]
     >([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -87,14 +87,18 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                 const base64Data = (tokenURI as string).split(",")[1];
                 const metadata = JSON.parse(atob(base64Data));
 
-                // console.log(metadata)
+                console.log(metadata)
+
+                const networthAttr = metadata.attributes?.find((attr: any) => attr.trait_type === "Net Worth (Accessories)");
+                const dynamicNetworth = networthAttr ? networthAttr.value : "";
 
                 setNfts([
                     {
                         id: nftData,
                         name: metadata.name,
                         image: metadata.image,
-                        traits: metadata.traits,
+                        traits: metadata.attributes,
+                        networth: dynamicNetworth
                     },
                 ]);
             } catch (error) {
@@ -168,7 +172,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
                                         Net worth
                                     </p>
                                     <p className="truncate text-[11px] font-medium text-primary-400">
-                                        {specialTrait.networth || "—"}
+                                        {nft.networth || "—"}
                                     </p>
                                 </div>
                             </div>
@@ -194,7 +198,7 @@ const NftCard: React.FC<NftCardProps> = ({ nftData }) => {
             {showModal && (
                 <AccessoryModal
                     accessories={listOfAccessories}
-                    specialTrait={specialTrait}
+                    metadataAttributes={nfts[0]?.traits}
                     pengoName={nfts[0]?.name}
                     nftId={nftData}
                     currencySymbol={currencySymbol}

@@ -17,7 +17,7 @@ async function main() {
   const mGooglAddress = deployedAddresses["PengoEcosystemV2#MockGoogle"];
   const mNVidiaAddress = deployedAddresses["PengoEcosystemV2#MockNVIDIA"];
   // You can change this to mNVDA or UNI-V2
-  const targetRwaAddress = mGooglAddress;
+  const targetRwaAddress = mAAPLAddress;
 
   if (!strategyAddress || !targetRwaAddress) {
     throw new Error("Missing addresses in deployment file");

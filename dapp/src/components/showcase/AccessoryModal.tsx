@@ -24,6 +24,7 @@ interface AccessoryModalProps {
   pengoName?: string;
   nftId?: number;
   currencySymbol?: string;
+  metadataAttributes?: { trait_type: string; value: string }[];
   setSelectedAccessory: (accessory: Accessory) => void;
   setShowModal: (show: boolean) => void;
   setShowSellAccessoryModal: (show: boolean) => void;
@@ -35,6 +36,7 @@ const AccessoryModal: React.FC<AccessoryModalProps> = ({
   pengoName,
   nftId,
   currencySymbol = "ETH",
+  metadataAttributes = [],
   setSelectedAccessory,
   setShowModal,
   setShowSellAccessoryModal,
@@ -93,21 +95,22 @@ const AccessoryModal: React.FC<AccessoryModalProps> = ({
           </button>
         </div>
 
-        {/* Special traits */}
-        {specialTrait && (specialTrait.category || specialTrait.networth) && (
+        {/* Dynamic & Special traits */}
+        {metadataAttributes && metadataAttributes.length > 0 && (
           <div className="mx-5 mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-white/10 bg-black/40 px-3 py-2.5">
-              <p className="text-[10px] uppercase tracking-wider text-neutral-500">Life goal</p>
-              <p className="truncate text-sm font-medium text-white">
-                {specialTrait.category || "—"}
-              </p>
-            </div>
-            <div className="rounded-xl border border-primary-500/20 bg-primary-500/10 px-3 py-2.5">
-              <p className="text-[10px] uppercase tracking-wider text-primary-400/80">Net worth</p>
-              <p className="truncate text-sm font-medium text-primary-400">
-                {specialTrait.networth || "—"}
-              </p>
-            </div>
+            {metadataAttributes.map((attr, idx) => (
+              <div
+                key={idx}
+                className={`rounded-xl border px-3 py-1 ${attr.trait_type.startsWith('Claimable') || attr.trait_type === 'Net Worth (Accessories)' ? 'border-primary-500/20 bg-primary-500/10 text-primary-400' : 'border-white/10 bg-black/40 text-white'}`}
+              >
+                <p className={`text-[8px] uppercase tracking-wider ${attr.trait_type.startsWith('Claimable') || attr.trait_type === 'Net Worth (Accessories)' ? 'text-primary-400/80' : 'text-neutral-500'}`}>
+                  {attr.trait_type}
+                </p>
+                <p className="truncate text-[11px] font-medium">
+                  {attr.value || "—"}
+                </p>
+              </div>
+            ))}
           </div>
         )}
 
