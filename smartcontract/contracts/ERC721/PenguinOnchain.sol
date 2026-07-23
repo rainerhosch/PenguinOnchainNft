@@ -54,9 +54,9 @@ contract PenguinOnchain is
     /*//////////////////////////////////////////////////////////////
                                CONSTANTS
     //////////////////////////////////////////////////////////////*/
-    uint256 public constant MAX_SUPPLY = 20000;
+    uint256 public constant MAX_SUPPLY = 10000;
     uint256 public constant MINT_PRICE = 0.01 ether;
-    uint256 public constant MAX_MINT_PER_WALLET = 100;
+    uint256 public constant MAX_MINT_PER_WALLET = 10;
     uint256 public constant ROYALTY_PERCENT = 5;
 
     IPengoFactory public factory;
@@ -631,23 +631,31 @@ contract PenguinOnchain is
      * This function is purely for view/read integrations (e.g. DeFi collateral).
      * By returning raw token amounts, external protocols can use their own Oracles for pricing.
      */
-    function getNetWorth(uint256 tokenId) public view returns (
-        uint256 accessoryValueWei,
-        address[] memory rwaAddresses,
-        uint256[] memory claimableAmounts
-    ) {
+    function getNetWorth(
+        uint256 tokenId
+    )
+        public
+        view
+        returns (
+            uint256 accessoryValueWei,
+            address[] memory rwaAddresses,
+            uint256[] memory claimableAmounts
+        )
+    {
         if (!_exists(tokenId)) revert TokenDoesNotExist();
-        
+
         uint256 totalAccValue = 0;
         uint256[] storage ids = accessoryIds[tokenId];
         uint256 len = ids.length;
         for (uint256 i = 0; i < len; ) {
             totalAccValue += accessories[tokenId][ids[i]].lastPrice;
-            unchecked { ++i; }
+            unchecked {
+                ++i;
+            }
         }
 
         accessoryValueWei = totalAccValue;
-        
+
         if (address(strategyContract) != address(0)) {
             // Count reward tokens
             uint256 rwaCount = 0;
@@ -665,7 +673,8 @@ contract PenguinOnchain is
             for (uint k = 0; k < rwaCount; k++) {
                 try strategyContract.rewardTokens(k) returns (address rwa) {
                     rwaAddresses[k] = rwa;
-                    claimableAmounts[k] = strategyContract.getClaimableDividends(rwa, tokenId);
+                    claimableAmounts[k] = strategyContract
+                        .getClaimableDividends(rwa, tokenId);
                 } catch {}
             }
         }
@@ -780,7 +789,7 @@ contract PenguinOnchain is
         uint256 quantity
     ) internal virtual override {
         super._beforeTokenTransfers(from, to, startTokenId, quantity);
-        
+
         // Only trigger on transfers (not mints or burns)
         if (from != address(0) && to != address(0)) {
             for (uint256 i = 0; i < quantity; i++) {
@@ -789,12 +798,12 @@ contract PenguinOnchain is
                 if (address(strategyContract) != address(0)) {
                     strategyContract.claimAllDividendsFor(tokenId, from);
                 }
-                
+
                 // Deduct from total
                 totalSharePower -= sharePower[tokenId];
                 // Reset power
                 sharePower[tokenId] = 0;
-                
+
                 // Reset networth
                 specialTraits[tokenId].networth = "0";
             }
