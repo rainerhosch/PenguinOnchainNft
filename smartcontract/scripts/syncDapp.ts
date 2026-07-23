@@ -23,6 +23,9 @@ async function main() {
   // Support standard module, testnet module, and hotfix module names
   const factoryAddress = deployedAddresses["PenguinOnchainModule#PengoFactory"] || deployedAddresses["PenguinOnchainHotfix#PengoFactory"] || deployedAddresses["PengoEcosystemV2#PengoFactory"];
   const penguinAddress = deployedAddresses["PenguinOnchainModule#PenguinOnchain"] || deployedAddresses["PenguinOnchainModule#PenguinOnchainTestnet"] || deployedAddresses["PenguinOnchainHotfix#PenguinOnchain"] || deployedAddresses["PengoEcosystemV2#PenguinOnchainTestnet"];
+  const daoAddress = deployedAddresses["PengoEcosystemV2#PengoStrategyProxy"];
+  const pengoConverter = deployedAddresses["PengoEcosystemV2#PengoBondingCurve"];
+  const pengoToken = deployedAddresses["PengoEcosystemV2#PengoToken"];
 
   if (!factoryAddress || !penguinAddress) {
     console.error("Could not find required addresses in deployed_addresses.json");
@@ -45,6 +48,9 @@ async function main() {
   // Update root addresses
   contractJson.address = penguinAddress;
   contractJson.factoryAddress = factoryAddress;
+  if (daoAddress) contractJson.daoAddress = daoAddress;
+  if (pengoConverter) contractJson.pengoConverter = pengoConverter;
+  if (pengoToken) contractJson.pengoTokenAddress = pengoToken;
 
   // Find or create the correct network deployment entry
   if (!contractJson.networkDeployment) {
@@ -62,6 +68,9 @@ async function main() {
       explore: networkName === 'robinhood' ? "https://robinhoodchain.blockscout.com/" : "https://sepolia.etherscan.io/",
       PengoAddress: penguinAddress,
       factoryAddress: factoryAddress,
+      daoAddress: daoAddress || "",
+      pengoConverter: pengoConverter || "",
+      pengoTokenAddress: pengoToken || "",
       abi: penguinArtifact.abi
     });
   } else {
@@ -69,6 +78,9 @@ async function main() {
     contractJson.networkDeployment[networkEntryIndex].name = networkName === 'robinhood' ? 'Robinhood Chain' : networkName;
     contractJson.networkDeployment[networkEntryIndex].PengoAddress = penguinAddress;
     contractJson.networkDeployment[networkEntryIndex].factoryAddress = factoryAddress;
+    if (daoAddress) contractJson.networkDeployment[networkEntryIndex].daoAddress = daoAddress;
+    if (pengoConverter) contractJson.networkDeployment[networkEntryIndex].pengoConverter = pengoConverter;
+    if (pengoToken) contractJson.networkDeployment[networkEntryIndex].pengoTokenAddress = pengoToken;
     contractJson.networkDeployment[networkEntryIndex].abi = penguinArtifact.abi;
   }
 

@@ -1212,6 +1212,35 @@
         "type": "uint256"
       }
     ],
+    "name": "getNetWorth",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "accessoryValueWei",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "rwaAddresses",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "claimableAmounts",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
     "name": "getSeed",
     "outputs": [
       {
@@ -1632,6 +1661,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_strategy",
+        "type": "address"
+      }
+    ],
+    "name": "setStrategyContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -1667,6 +1709,19 @@
         "internalType": "string",
         "name": "networth",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strategyContract",
+    "outputs": [
+      {
+        "internalType": "contract IPengoStrategy",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
