@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "lp-integration": {
+      "source": "Uniswap/uniswap-ai",
+      "sourceType": "github",
+      "skillPath": "packages/plugins/uniswap-trading/skills/lp-integration/SKILL.md",
+      "computedHash": "825f73e64b6a0e072da6757cf0d91ce1ac3e5c02767b12bdfde3698bc5b0d580"
+    }
+  }
+}

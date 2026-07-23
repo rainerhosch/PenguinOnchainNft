@@ -1,6 +1,6 @@
 {
-    "PengoEcosystem": {
+    "PengoEcosystemV2": {
         "nftAddress": "0xA31F9be87c1b0a17fF369C2A18dDeF2346768cbc",
-        "uniswapRouter": "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008"
+        "uniswapRouter": "0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3"
     }
 }

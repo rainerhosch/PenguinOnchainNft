@@ -1,10 +1,10 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
-    "factoryAddress": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E",
-    "pengoConverter": "0x5c65A66806326b1857F7366C19350644F1725A91",
-    "daoAddress": "0x09577c7D42e1b3D26Aecb0183EE7b37068044E60",
+    "address": "0x79E13a459f78FBBA379C7dcd3F33c0F9de577Bf7",
+    "factoryAddress": "0x7c68a434b2C81Ce05F4Dc8c152B92cf16a76Be8E",
+    "pengoConverter": "0xA8ef0A3C9B2B43ebD33457BE80ee82E7AE55825D",
+    "daoAddress": "0x6922798AB9F8741714fcfe6E1686521F459f7c1A",
     "constructorArgs": [],
     "txHash": "0xcd772371fb7c72173d0f2f2cfdf1cf5b0b1a04e47f8dfbfedab3a2378fb35550",
     "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -19,10 +19,10 @@
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://sepolia.etherscan.io/api",
             "currency": "ETH",
-            "PengoAddress": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
-            "factoryAddress": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E",
-            "pengoConverter": "0x5c65A66806326b1857F7366C19350644F1725A91",
-            "daoAddress": "0x09577c7D42e1b3D26Aecb0183EE7b37068044E60",
+            "PengoAddress": "0x79E13a459f78FBBA379C7dcd3F33c0F9de577Bf7",
+            "factoryAddress": "0x7c68a434b2C81Ce05F4Dc8c152B92cf16a76Be8E",
+            "pengoConverter": "0xA8ef0A3C9B2B43ebD33457BE80ee82E7AE55825D",
+            "daoAddress": "0x6922798AB9F8741714fcfe6E1686521F459f7c1A",
             "abi": [
                 {
                     "inputs": [],
@@ -2276,7 +2276,7 @@
                     "type": "function"
                 }
             ],
-            "pengoTokenAddress": "0x89F1044f0d45b7e798F05e2f4A8372920d956e16"
+            "pengoTokenAddress": "0xb864bac5C2E006E2c5B35ae8931EDEba65b3dEb8"
         },
         {
             "name": "Robinhood Chain",
@@ -6335,5 +6335,5 @@
             ]
         }
     ],
-    "pengoTokenAddress": "0x89F1044f0d45b7e798F05e2f4A8372920d956e16"
+    "pengoTokenAddress": "0xb864bac5C2E006E2c5B35ae8931EDEba65b3dEb8"
 }

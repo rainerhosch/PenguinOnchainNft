@@ -45,8 +45,8 @@ export default buildModule("PengoEcosystemMainnet", (m) => {
     m.call(penguinOnchain, "setStrategyContract", [pengoStrategyProxy]);
 
     // 5. Deploy Bonding Curve
-    // Using a valid Uniswap V2 Clone router on Sepolia instead of official Mainnet router
-    const uniswapRouter = m.getParameter("uniswapRouter", "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008");
+    // Using official Uniswap V2 Router02 for Robinhood Chain
+    const uniswapRouter = m.getParameter("uniswapRouter", "0x89e5db8b5aa49aa85ac63f691524311aeb649eba");
     const targetLiquidity = m.getParameter("targetLiquidity", 10n * 10n ** 18n); // 10 ETH for Mainnet
     
     const bondingCurve = m.contract("PengoBondingCurve", [

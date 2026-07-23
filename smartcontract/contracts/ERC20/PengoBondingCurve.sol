@@ -23,8 +23,8 @@ contract PengoBondingCurve is Ownable {
     uint256 public constant TOKENS_FOR_SALE = 800_000_000 * 1e18;
     uint256 public constant TOKENS_FOR_LIQUIDITY = 200_000_000 * 1e18;
     
-    uint256 public basePrice = 500000015; // ~0.5 Gwei in wei
-    uint256 public priceIncrement = 30; // 30 wei
+    uint256 public immutable basePrice;
+    uint256 public immutable priceIncrement;
     
     uint256 public tokensSold;
     bool public isMigrated;
@@ -40,6 +40,19 @@ contract PengoBondingCurve is Ownable {
         uniswapRouter = IUniswapV2Router02(_uniswapRouter);
         strategyVault = _strategyVault;
         TARGET_LIQUIDITY = _targetLiquidity;
+
+        // Automatically configure the bonding curve slope based on TARGET_LIQUIDITY
+        // We want 800M tokens to cost exactly TARGET_LIQUIDITY
+        uint256 n = TOKENS_FOR_SALE / 1e18; // 800,000,000
+        uint256 avgPrice = _targetLiquidity / n;
+        basePrice = avgPrice / 25; // Base price is 1/25th of the average price
+        
+        // Solve for priceIncrement: n * (n - 1) * priceIncrement = 2 * TARGET - 2 * n * basePrice
+        uint256 targetx2 = _targetLiquidity * 2;
+        uint256 basex2xn = basePrice * 2 * n;
+        require(targetx2 > basex2xn, "Invalid target liquidity for curve");
+        
+        priceIncrement = (targetx2 - basex2xn) / (n * (n - 1));
     }
 
     function getCost(uint256 amount) public view returns (uint256 totalCost, uint256 taxEth) {
@@ -127,12 +140,12 @@ contract PengoBondingCurve is Ownable {
         
         require(tokenBalance >= TOKENS_FOR_LIQUIDITY, "Not enough tokens for LP");
         
-        pengoToken.approve(address(uniswapRouter), tokenBalance);
+        pengoToken.approve(address(uniswapRouter), TOKENS_FOR_LIQUIDITY);
         
         // Add liquidity to Uniswap. LP tokens are sent directly to the Strategy Vault!
         (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethBalance}(
             address(pengoToken),
-            tokenBalance,
+            TOKENS_FOR_LIQUIDITY, // Only pair exactly the designated amount, ensuring perfect price jump
             0, // accept any amount of token
             0, // accept any amount of ETH
             strategyVault,
@@ -140,5 +153,12 @@ contract PengoBondingCurve is Ownable {
         );
         
         emit LiquidityMigrated(amountETH, amountToken, liquidity);
+
+        // Burn any remaining tokens (due to tax or early curve completion)
+        uint256 remainingTokens = pengoToken.balanceOf(address(this));
+        if (remainingTokens > 0) {
+            // Transfer to the standard dead address to permanently remove them from circulation
+            pengoToken.transfer(0x000000000000000000000000000000000000dEaD, remainingTokens);
+        }
     }
 }
