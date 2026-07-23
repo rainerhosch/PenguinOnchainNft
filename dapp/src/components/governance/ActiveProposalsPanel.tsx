@@ -28,14 +28,14 @@ export default function ActiveProposalsPanel({
     executingId
 }: ActiveProposalsPanelProps) {
     return (
-        <div className="glass-card p-6 min-h-[500px]">
-            <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-                <h2 className="text-2xl font-bold text-white">
+        <div className="glass-card p-4 sm:p-5 md:p-6 min-h-[500px]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 border-b border-white/10 pb-4 gap-4 sm:gap-0">
+                <h2 className="text-xl md:text-2xl font-bold text-white">
                     Active Proposals <span className="text-primary-400 ml-2 text-lg">({proposalCount})</span>
                 </h2>
                 <button
                     onClick={() => setIsProposalModalOpen(true)}
-                    className="bg-white/5 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 px-4 py-2 rounded-xl text-sm font-bold transition-all"
+                    className="w-full sm:w-auto bg-white/5 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 px-4 py-2 rounded-xl text-sm font-bold transition-all"
                 >
                     + New Proposal
                 </button>

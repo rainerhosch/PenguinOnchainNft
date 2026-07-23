@@ -478,9 +478,9 @@ export default function GovernancePage() {
                         </p>
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                         {/* Dashboard Left Column */}
-                        <div className="lg:col-span-1 space-y-8">
+                        <div className="lg:col-span-1 space-y-4 sm:space-y-6 lg:space-y-8">
                             <ProfilePanel
                                 pengoBalance={pengoBalance}
                                 rawPengoBalance={rawPengoBalance}
@@ -502,7 +502,7 @@ export default function GovernancePage() {
                         </div>
 
                         {/* Right Column: Proposals & Vault */}
-                        <div className="lg:col-span-2 space-y-8">
+                        <div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
                             <ClaimableDividendsPanel
                                 dividends={dividends}
                                 handleClaim={handleClaim}

@@ -31,18 +31,18 @@ export default function ProfilePanel({
     isConfirmedBurn
 }: ProfilePanelProps) {
     return (
-        <div className="glass-card p-6 border border-primary-500/30 relative overflow-hidden">
+        <div className="glass-card p-4 sm:p-5 md:p-6 border border-primary-500/30 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl"></div>
-            <h2 className="text-xl font-bold text-white mb-6 relative z-10">Your Profile</h2>
+            <h2 className="text-lg font-bold text-white mb-6 relative z-10">Your Profile</h2>
 
             <div className="space-y-4">
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10 flex justify-between items-center">
-                    <span className="text-neutral-400">Total $PENGO</span>
-                    <span className="text-xl font-bold text-white">{pengoBalance}</span>
+                <div className="bg-white/5 rounded-xl p-2 border border-white/10 flex justify-between items-center">
+                    <span className="text-neutral-400">Balance</span>
+                    <span className="text-sm font-bold text-white">{pengoBalance} $PENGO</span>
                 </div>
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10 flex justify-between items-center">
+                <div className="bg-white/5 rounded-xl p-2 border border-white/10 flex justify-between items-center">
                     <span className="text-neutral-400">Total Share Power</span>
-                    <span className="text-xl font-bold text-primary-400 flex items-center gap-2">
+                    <span className="text-sm font-bold text-primary-400 flex items-center gap-2">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
