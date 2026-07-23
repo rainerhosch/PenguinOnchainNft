@@ -73,7 +73,7 @@ describe("Pengo Ecosystem & Vault Strategy", function () {
     await pengoToken.connect(user1).burnForPower(tokenId, ethers.parseEther("100"));
 
     // Propose
-    await strategy.propose(await mockAAPL.getAddress(), true);
+    await strategy.connect(user1).propose(await mockAAPL.getAddress(), true, tokenId);
 
     // Vote
     await strategy.connect(user1).vote(1, tokenId, true);
@@ -87,7 +87,7 @@ describe("Pengo Ecosystem & Vault Strategy", function () {
     const tokenId = (await nft.totalSupply()) - 1n;
     await pengoToken.connect(user1).burnForPower(tokenId, ethers.parseEther("100"));
 
-    await strategy.propose(await mockAAPL.getAddress(), true);
+    await strategy.connect(user1).propose(await mockAAPL.getAddress(), true, tokenId);
     await strategy.connect(user1).vote(1, tokenId, true);
 
     // Fast forward time by 4 days
