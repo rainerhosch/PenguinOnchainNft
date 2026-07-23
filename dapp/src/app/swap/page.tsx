@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import AppNavbar from "../../components/AppNavBar";
 import { useReadContract, useWriteContract, useAccount, useWaitForTransactionReceipt, useBalance } from 'wagmi';
-import { parseEther, formatEther } from 'viem';
+import { parseEther, formatEther, maxUint256 } from 'viem';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import UniswapRouterAbi from '../../constants/UniswapRouterAbi.json';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEthPrice } from '../../hooks/useEthPrice';
 
 // WETH used by the V2 Clone Router on Sepolia
-const WETH_ADDRESS = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";
-const ROUTER_ADDRESS = "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008" as `0x${string}`;
+const WETH_ADDRESS = "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14";
+const ROUTER_ADDRESS = "0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3" as `0x${string}`;
 const PENGO_ADDRESS = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
 const BONDING_CURVE_ADDRESS = PengoEcosystem.addresses.sepolia.PengoBondingCurve as `0x${string}`;
 
@@ -129,7 +129,7 @@ export default function SwapPage() {
             address: PENGO_ADDRESS,
             abi: PengoEcosystem.abis.PengoToken,
             functionName: 'approve',
-            args: [ROUTER_ADDRESS, inputAmountParsed],
+            args: [ROUTER_ADDRESS, maxUint256],
         });
     };
 
@@ -198,7 +198,11 @@ export default function SwapPage() {
                         </p>
                     </div>
 
-                    {!isMigrated && isMigrated !== undefined ? (
+                    {isMigrated === undefined ? (
+                        <div className="flex justify-center mt-10">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                        </div>
+                    ) : isMigrated === false ? (
                         <div className="bg-dark-800/80 backdrop-blur-xl rounded-[2rem] p-8 text-center border border-white/10 shadow-2xl mt-4">
                             <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,7 +299,7 @@ export default function SwapPage() {
                             <div className="flex justify-between items-center gap-4">
                                 <input
                                     type="text"
-                                    value={outputValueFormatted ? Number(outputValueFormatted).toFixed(isEthTop ? 2 : 6) : ""}
+                                    value={outputValueFormatted ? (isEthTop ? Number(outputValueFormatted).toFixed(2) : outputValueFormatted) : ""}
                                     readOnly
                                     placeholder="0"
                                     className="bg-transparent text-4xl text-white outline-none w-full font-medium placeholder:text-neutral-600 opacity-80"

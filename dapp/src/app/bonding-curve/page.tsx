@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import AppNavbar from "../../components/AppNavBar";
-import { useReadContract, useWriteContract, useAccount, useBalance, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther, formatEther } from 'viem';
+import { useReadContract, useWriteContract, useAccount, useBalance, useWaitForTransactionReceipt, useWatchContractEvent } from 'wagmi';
+import { parseEther, formatEther, maxUint256 } from 'viem';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceDot } from 'recharts';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import { useEthPrice } from '../../hooks/useEthPrice';
@@ -14,9 +15,10 @@ const abi = PengoEcosystem.abis.PengoBondingCurve;
 // Generate full curve points (x from 0 to 100)
 const curvePoints = Array.from({ length: 101 }, (_, i) => {
     const x = i;
-    // Parabolic curve: starts at y=95, ends at y=10
-    const y = 95 - (0.5 * x + 0.0035 * x * x);
-    return { x, y };
+    // Parabolic curve approximation for UI: starts low, grows exponentially
+    // We can use a simpler power function to represent the bonding curve
+    const y = Math.pow(x / 10, 2);
+    return { progress: x, priceIndex: y };
 });
 
 export default function BondingCurvePage() {
@@ -26,6 +28,11 @@ export default function BondingCurvePage() {
     const [isClient, setIsClient] = useState(false);
     const { address, isConnected } = useAccount();
     const { openConnectModal } = useConnectModal();
+
+    // Slippage States
+    const [slippageMode, setSlippageMode] = useState<"auto" | number>("auto");
+    const [showSettings, setShowSettings] = useState(false);
+    const [customSlippage, setCustomSlippage] = useState("");
 
     useEffect(() => {
         setIsClient(true);
@@ -37,12 +44,14 @@ export default function BondingCurvePage() {
         abi,
         functionName: 'getCost',
         args: [parseEther("1")],
+        query: { refetchInterval: 3000 }
     });
     const currentPrice = currentPriceData && Array.isArray(currentPriceData) ? Number(formatEther((currentPriceData as any)[0])) : 0;
 
     // 2. Fetch contract balance (ETH Raised) and Target Liquidity
     const { data: contractBalanceData, refetch: refetchContractBalance } = useBalance({
         address: contractAddress,
+        query: { refetchInterval: 3000 }
     });
     const ethRaised = contractBalanceData ? Number(formatEther(contractBalanceData.value)) : 0;
     
@@ -50,16 +59,27 @@ export default function BondingCurvePage() {
         address: contractAddress,
         abi,
         functionName: 'TARGET_LIQUIDITY',
+        query: { refetchInterval: 60000 }
     });
     const targetLiquidity = targetLiquidityData ? Number(formatEther(targetLiquidityData as bigint)) : 25;
     
     // Check if already migrated
-    const { data: isMigratedData } = useReadContract({
+    const { data: isMigratedData, refetch: refetchIsMigrated } = useReadContract({
         address: contractAddress,
         abi,
         functionName: 'isMigrated',
+        query: { refetchInterval: 3000 }
     });
     const isMigrated = isMigratedData ? Boolean(isMigratedData) : false;
+
+    // Fetch Curve Parameters for Math Estimation
+    const { data: basePriceData } = useReadContract({ address: contractAddress, abi, functionName: 'basePrice', query: { refetchInterval: 60000 } });
+    const { data: priceIncData } = useReadContract({ address: contractAddress, abi, functionName: 'priceIncrement', query: { refetchInterval: 60000 } });
+    const { data: tokensSoldData, refetch: refetchTokensSold } = useReadContract({ address: contractAddress, abi, functionName: 'tokensSold', query: { refetchInterval: 3000 } });
+    
+    const basePriceNum = basePriceData ? Number(formatEther(basePriceData as bigint)) : 0;
+    const priceIncNum = priceIncData ? Number(formatEther(priceIncData as bigint)) : 0;
+    const soldNum = tokensSoldData ? Number(formatEther(tokensSoldData as bigint)) : 0;
 
     // If migrated, ethRaised is mathematically equal to targetLiquidity
     const displayEthRaised = isMigrated ? targetLiquidity : ethRaised;
@@ -67,11 +87,12 @@ export default function BondingCurvePage() {
 
     // Dynamic chart calculations based on progress
     const dotX = Number(progress);
-    const dotY = 95 - (0.5 * dotX + 0.0035 * dotX * dotX);
-    const activePoints = curvePoints.filter(p => p.x <= dotX);
-    if (activePoints.length === 0 || activePoints[activePoints.length - 1].x < dotX) {
-        activePoints.push({ x: dotX, y: dotY });
-    }
+    
+    // Create actual active chart data
+    const chartData = curvePoints.map(point => ({
+        ...point,
+        activeArea: point.progress <= dotX ? point.priceIndex : null
+    }));
 
     // 3. Read User Token Balance
     const { data: userTokenBalanceData, refetch: refetchUserTokenBalance } = useReadContract({
@@ -93,28 +114,59 @@ export default function BondingCurvePage() {
     const ethValueUsd = ethPrice && userEthBalance ? `(~$${(Number(userEthBalance) * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})` : "";
 
     // 5. Fetch EXACT Cost for Buy
-    const estimatedPengoAmount = isEthTop && currentPrice > 0 
-        ? Math.floor(Number(inputValue) / currentPrice)
-        : (inputValue ? Number(inputValue) : 0);
+    let estimatedPengoAmount = 0;
+    if (isEthTop && inputValue && !isNaN(Number(inputValue))) {
+        const ethAmount = Number(inputValue);
+        if (ethAmount > 0 && priceIncNum > 0) {
+            if (tradeMode === 'buy') {
+                const costEth = ethAmount / 1.01; // deduct 1% tax
+                const A = priceIncNum;
+                const B = 2 * (basePriceNum + soldNum * priceIncNum) - priceIncNum;
+                const C = -2 * costEth;
+                const discriminant = B * B - 4 * A * C;
+                if (discriminant >= 0) {
+                    estimatedPengoAmount = Math.floor((-B + Math.sqrt(discriminant)) / (2 * A));
+                }
+            } else {
+                // Sell mode: User wants to receive `ethAmount` ETH. We must calculate how many PENGO they need to sell.
+                const receiveEth = ethAmount / 0.99; // add 1% tax back to get gross eth value
+                const A = priceIncNum;
+                const B = priceIncNum - 2 * basePriceNum - 2 * soldNum * priceIncNum;
+                const C = 2 * receiveEth;
+                const discriminant = B * B - 4 * A * C;
+                if (discriminant >= 0) {
+                    estimatedPengoAmount = Math.floor((-B - Math.sqrt(discriminant)) / (2 * A));
+                }
+            }
+        }
+    } else {
+        estimatedPengoAmount = inputValue ? Number(inputValue) : 0;
+    }
+
+    // Clamp estimation to not exceed available tokens for sale (800M max)
+    const tokensRemaining = 800_000_000 - soldNum;
+    if (estimatedPengoAmount > tokensRemaining && tradeMode === 'buy') {
+        estimatedPengoAmount = tokensRemaining;
+    }
 
     const safeAmount = !isNaN(estimatedPengoAmount) && estimatedPengoAmount > 0 ? Math.floor(estimatedPengoAmount) : 0;
-    const { data: exactCostData } = useReadContract({
+    const { data: exactCostData, refetch: refetchExactCost } = useReadContract({
         address: contractAddress,
         abi,
         functionName: 'getCost',
         args: safeAmount > 0 ? [parseEther(safeAmount.toString())] : undefined,
-        query: { enabled: safeAmount > 0 && tradeMode === 'buy' }
+        query: { enabled: safeAmount > 0 && tradeMode === 'buy', refetchInterval: 3000 }
     });
     const exactCostEth = exactCostData && Array.isArray(exactCostData) ? formatEther((exactCostData as any)[0]) : "0";
     const exactCostTaxEth = exactCostData && Array.isArray(exactCostData) ? formatEther((exactCostData as any)[1]) : "0";
     
     // 6. Fetch EXACT Value for Sell (returns [returnEth, taxEth])
-    const { data: exactSellData } = useReadContract({
+    const { data: exactSellData, refetch: refetchExactSell } = useReadContract({
         address: contractAddress,
         abi,
         functionName: 'getSellValue',
         args: safeAmount > 0 ? [parseEther(safeAmount.toString())] : undefined,
-        query: { enabled: safeAmount > 0 && tradeMode === 'sell' }
+        query: { enabled: safeAmount > 0 && tradeMode === 'sell', refetchInterval: 3000 }
     });
     
     const sellReturnEth = exactSellData && Array.isArray(exactSellData) ? formatEther((exactSellData as any)[0]) : "0";
@@ -143,15 +195,43 @@ export default function BondingCurvePage() {
     const { data: hash, writeContract, isPending } = useWriteContract();
     const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
+    // 9. WebSockets Event Listeners for Instant UI Updates (Pump.fun style)
+    const onTradeEvent = () => {
+        refetchPrice();
+        refetchContractBalance();
+        refetchTokensSold();
+        refetchIsMigrated();
+        refetchExactCost();
+        refetchExactSell();
+    };
+
+    useWatchContractEvent({
+        address: contractAddress,
+        abi,
+        eventName: 'TokensPurchased',
+        onLogs: onTradeEvent,
+    });
+
+    useWatchContractEvent({
+        address: contractAddress,
+        abi,
+        eventName: 'TokensSold',
+        onLogs: onTradeEvent,
+    });
+
     useEffect(() => {
         if (isConfirmed) {
             refetchPrice();
             refetchContractBalance();
             refetchUserTokenBalance();
             refetchUserEthBalance();
+            refetchTokensSold();
+            refetchIsMigrated();
+            refetchExactCost();
+            refetchExactSell();
             setInputValue(""); // Reset input on success
         }
-    }, [isConfirmed, refetchPrice, refetchContractBalance, refetchUserTokenBalance, refetchUserEthBalance]);
+    }, [isConfirmed, refetchPrice, refetchContractBalance, refetchUserTokenBalance, refetchUserEthBalance, refetchTokensSold, refetchIsMigrated, refetchExactCost, refetchExactSell]);
 
     const handlePercentage = (percent: number) => {
         if (!isEthTop) {
@@ -170,15 +250,33 @@ export default function BondingCurvePage() {
         }
     };
 
+    // Calculate effective slippage
+    let effectiveSlippage = 1;
+    if (slippageMode === 'auto') {
+        const prog = Number(progress);
+        if (prog < 50) effectiveSlippage = 1;
+        else if (prog < 80) effectiveSlippage = 2.5;
+        else if (prog < 95) effectiveSlippage = 5;
+        else effectiveSlippage = 10;
+    } else {
+        effectiveSlippage = slippageMode;
+    }
+
     const handleBuy = () => {
         if (tradeMode !== 'buy' || !inputValue || isNaN(Number(inputValue)) || currentPrice <= 0 || safeAmount < 1) return;
         if (exactCostEth === "0") return;
+        
+        // Smart Slippage Logic
+        // The contract will automatically refund any excess ETH!
+        const slippageMultiplier = 1 + (effectiveSlippage / 100);
+        const slippageValueEth = (Number(exactCostEth) * slippageMultiplier).toFixed(18);
+
         writeContract({
             address: contractAddress,
             abi,
             functionName: 'buy',
             args: [parseEther(safeAmount.toString())],
-            value: parseEther(exactCostEth),
+            value: parseEther(slippageValueEth),
         });
     };
 
@@ -188,7 +286,7 @@ export default function BondingCurvePage() {
             address: tokenAddress,
             abi: PengoEcosystem.abis.PengoToken,
             functionName: 'approve',
-            args: [contractAddress, parseEther(safeAmount.toString())],
+            args: [contractAddress, maxUint256],
         });
     };
 
@@ -309,26 +407,75 @@ export default function BondingCurvePage() {
                                 ) : (
                                     <div className="w-full h-full flex flex-col">
                                         <h2 className="text-xl font-bold text-white mb-4">Price Chart (Bonding Curve)</h2>
-                                        <div className="flex-1 min-h-0 w-full relative bg-white/5 rounded-lg border border-white/10 p-4 overflow-hidden">
-                                            <svg className="w-full h-full block" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                                <defs>
-                                                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2" />
-                                                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-                                                    </linearGradient>
-                                                </defs>
-                                                <line x1="0" y1="25" x2="100" y2="25" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                                <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                                <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                                                <path d={`M ${curvePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="rgba(128, 255, 0, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
-                                                <path d={`M ${activePoints.map(p => `${p.x} ${p.y}`).join(' L ')}`} fill="none" stroke="#80ff00ff" strokeWidth="2" />
-                                                {activePoints.length > 0 && (
-                                                    <path d={`M 0 100 L 0 95 ${activePoints.map(p => `L ${p.x} ${p.y}`).join(' ')} L ${dotX} 100 Z`} fill="url(#chartGradient)" />
-                                                )}
-                                                <circle cx={dotX} cy={dotY} r="1" fill="#bbff00ff" className="animate-pulse" />
-                                            </svg>
-                                            <div className="absolute top-[30%] left-[80%] transform -translate-x-1/2 -translate-y-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
-                                                Current: {currentPrice > 0 ? currentPrice.toFixed(8) : "0.00000000"} ETH/PENGO
+                                        <div className="flex-1 min-h-0 w-full relative bg-white/5 rounded-lg border border-white/10 p-4 overflow-hidden flex flex-col">
+                                            <div className="text-xs text-neutral-400 mb-2 flex justify-between">
+                                                <span>Live Trading Activity</span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="relative flex h-2 w-2">
+                                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                                    </span>
+                                                    WSS Connected
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 w-full relative">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                                        <defs>
+                                                            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <XAxis 
+                                                            dataKey="progress" 
+                                                            stroke="rgba(255,255,255,0.1)" 
+                                                            tick={{fill: 'rgba(255,255,255,0.4)', fontSize: 10}}
+                                                            tickFormatter={(val) => `${val}%`}
+                                                        />
+                                                        <YAxis 
+                                                            stroke="rgba(255,255,255,0.1)" 
+                                                            tick={{fill: 'rgba(255,255,255,0.4)', fontSize: 10}}
+                                                            domain={[0, 'dataMax']}
+                                                            hide={true}
+                                                        />
+                                                        <Tooltip 
+                                                            contentStyle={{ backgroundColor: 'rgba(23, 23, 23, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                                            itemStyle={{ color: '#10b981' }}
+                                                            formatter={(value: any) => [``, 'Curve Profile']}
+                                                            labelFormatter={(label) => `Progress: ${label}%`}
+                                                        />
+                                                        <Area 
+                                                            type="monotone" 
+                                                            dataKey="priceIndex" 
+                                                            stroke="rgba(255,255,255,0.1)" 
+                                                            fill="none" 
+                                                            strokeDasharray="4 4"
+                                                            activeDot={false}
+                                                        />
+                                                        <Area 
+                                                            type="monotone" 
+                                                            dataKey="activeArea" 
+                                                            stroke="#10b981" 
+                                                            strokeWidth={2}
+                                                            fillOpacity={1} 
+                                                            fill="url(#colorPrice)" 
+                                                        />
+                                                        {dotX > 0 && (
+                                                            <ReferenceDot 
+                                                                x={dotX} 
+                                                                y={Math.pow(dotX / 10, 2)} 
+                                                                r={4} 
+                                                                fill="#10b981" 
+                                                                stroke="#ffffff" 
+                                                                strokeWidth={2} 
+                                                            />
+                                                        )}
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                            <div className="absolute top-[30%] left-[80%] transform -translate-x-1/2 -translate-y-full bg-white/10 backdrop-blur-md border border-emerald-500/30 text-white text-xs py-1 px-3 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.2)] whitespace-nowrap">
+                                                Current: {currentPrice > 0 ? currentPrice.toFixed(8) : "0.00000000"} ETH
                                             </div>
                                         </div>
                                     </div>
@@ -337,7 +484,56 @@ export default function BondingCurvePage() {
                         </div>
 
                         <div className="glass-card p-6 sticky top-24">
-                            <h2 className="text-xl font-bold text-white mb-6">Trade $PENGO</h2>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold text-white">Trade $PENGO</h2>
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setShowSettings(!showSettings)}
+                                        className={`p-2 rounded-lg border transition-colors ${showSettings ? 'bg-white/10 border-white/20 text-white' : 'bg-white/5 hover:bg-white/10 border-white/10 text-neutral-400 hover:text-white'}`}
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                    {showSettings && (
+                                        <div className="absolute right-0 top-full mt-2 w-64 bg-neutral-900 border border-white/10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] p-4 z-50 animate-fade-in-up">
+                                            <div className="text-sm font-medium text-white mb-3 flex justify-between items-center">
+                                                Slippage Tolerance
+                                                <button onClick={() => setShowSettings(false)} className="text-neutral-500 hover:text-white">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                </button>
+                                            </div>
+                                            <div className="grid grid-cols-4 gap-2 mb-3">
+                                                <button onClick={() => {setSlippageMode('auto'); setCustomSlippage("");}} className={`py-1.5 text-xs font-medium rounded-lg border transition-all ${slippageMode === 'auto' ? 'bg-primary-500/20 border-primary-500 text-primary-400' : 'border-white/10 text-neutral-400 hover:bg-white/5'}`}>Auto</button>
+                                                <button onClick={() => {setSlippageMode(1); setCustomSlippage("");}} className={`py-1.5 text-xs font-medium rounded-lg border transition-all ${slippageMode === 1 ? 'bg-primary-500/20 border-primary-500 text-primary-400' : 'border-white/10 text-neutral-400 hover:bg-white/5'}`}>1%</button>
+                                                <button onClick={() => {setSlippageMode(5); setCustomSlippage("");}} className={`py-1.5 text-xs font-medium rounded-lg border transition-all ${slippageMode === 5 ? 'bg-primary-500/20 border-primary-500 text-primary-400' : 'border-white/10 text-neutral-400 hover:bg-white/5'}`}>5%</button>
+                                                <button onClick={() => {setSlippageMode(10); setCustomSlippage("");}} className={`py-1.5 text-xs font-medium rounded-lg border transition-all ${slippageMode === 10 ? 'bg-primary-500/20 border-primary-500 text-primary-400' : 'border-white/10 text-neutral-400 hover:bg-white/5'}`}>10%</button>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Custom" 
+                                                    value={customSlippage}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value.replace(/[^0-9.]/g, '');
+                                                        setCustomSlippage(val);
+                                                        if (val && !isNaN(Number(val))) setSlippageMode(Number(val));
+                                                        else if (val === "") setSlippageMode('auto');
+                                                    }}
+                                                    className={`w-full bg-black/30 border rounded-lg px-3 py-1.5 text-sm text-white outline-none transition-colors ${typeof slippageMode === 'number' && slippageMode !== 1 && slippageMode !== 5 && slippageMode !== 10 ? 'border-primary-500' : 'border-white/10 focus:border-white/30'}`}
+                                                />
+                                                <span className="text-neutral-400 text-sm">%</span>
+                                            </div>
+                                            {slippageMode === 'auto' && (
+                                                <div className="mt-3 text-[10px] text-emerald-400/80 leading-tight">
+                                                    Smart Slippage active: Automatically adjusting to {effectiveSlippage}% based on curve progress ({progress}%).
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                             <div className="space-y-4">
                                 <div className="flex bg-neutral-800/80 p-1 rounded-xl mb-6">
                                     <button
@@ -511,7 +707,7 @@ export default function BondingCurvePage() {
                                 </div>
 
                                 <div className="text-xs text-neutral-500 text-center mt-4">
-                                    Price updates on every trade. Max slippage 1%.
+                                    Price updates on every trade. Max slippage {slippageMode === 'auto' ? `Auto (${effectiveSlippage}%)` : `${effectiveSlippage}%`}.
                                 </div>
                             </div>
                         </div>
