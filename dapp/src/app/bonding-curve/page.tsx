@@ -121,6 +121,9 @@ export default function BondingCurvePage() {
 
     const estimatedEthCost = tradeMode === 'buy' ? exactCostEth : sellReturnEth;
 
+    const currentEthAmount = isEthTop ? Number(inputValue || 0) : Number(estimatedEthCost || 0);
+    const currentEthUsd = ethPrice && currentEthAmount > 0 ? `~$${(currentEthAmount * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "";
+
     // 7. Check Token Allowance for Sell
     const tokenAddress = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
     const { data: tokenAllowanceData } = useReadContract({
@@ -366,6 +369,9 @@ export default function BondingCurvePage() {
                                             )}
                                         </div>
                                     </div>
+                                    {isEthTop && currentEthUsd && (
+                                        <div className="text-xs text-neutral-500 mt-2 ml-1">{currentEthUsd}</div>
+                                    )}
                                     {!isMigrated && (
                                         <div className="flex gap-2 mt-4">
                                             {[10, 25, 50, 100].map((pct) => (
@@ -423,6 +429,9 @@ export default function BondingCurvePage() {
                                             )}
                                         </div>
                                     </div>
+                                    {!isEthTop && currentEthUsd && (
+                                        <div className="text-xs text-neutral-500 mt-2 ml-1">{currentEthUsd}</div>
+                                    )}
                                     {!isEthTop && tradeMode === 'sell' && sellTaxEth !== "0" && (
                                         <div className="mt-2 text-xs text-red-400/80 flex justify-between">
                                             <span>3% Tax Deducted:</span>

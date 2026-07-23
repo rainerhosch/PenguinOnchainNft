@@ -69,6 +69,9 @@ export default function SwapPage() {
     const expectedOutput = amountsOutData && Array.isArray(amountsOutData) ? (amountsOutData as any)[1] : BigInt(0);
     const outputValueFormatted = expectedOutput > BigInt(0) ? formatEther(expectedOutput) : "";
     
+    const swapEthAmount = isEthTop ? Number(inputValue || 0) : Number(outputValueFormatted || 0);
+    const swapEthUsd = ethPrice && swapEthAmount > 0 ? `~$${(swapEthAmount * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "";
+    
     // Calculate amountOutMin with 1% slippage
     const amountOutMin = expectedOutput > BigInt(0) ? (expectedOutput * BigInt(99)) / BigInt(100) : BigInt(0);
 
@@ -250,6 +253,9 @@ export default function SwapPage() {
                                     )}
                                 </div>
                             </div>
+                            {isEthTop && swapEthUsd && (
+                                <div className="text-xs text-neutral-500 mt-2 ml-1">{swapEthUsd}</div>
+                            )}
                             <div className="flex gap-2 mt-4">
                                 {[25, 50, 75, 100].map((pct) => (
                                     <button
@@ -310,6 +316,9 @@ export default function SwapPage() {
                                     )}
                                 </div>
                             </div>
+                            {!isEthTop && swapEthUsd && (
+                                <div className="text-xs text-neutral-500 mt-2 ml-1">{swapEthUsd}</div>
+                            )}
                         </div>
 
                         {/* Action Button */}
