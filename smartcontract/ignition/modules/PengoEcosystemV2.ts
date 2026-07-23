@@ -44,10 +44,13 @@ export default buildModule("PengoEcosystemV2", (m) => {
     // 5. Deploy Bonding Curve
     // Using a valid Uniswap V2 Clone router on Sepolia instead of official Mainnet router
     const uniswapRouter = m.getParameter("uniswapRouter", "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008");
+    const targetLiquidity = m.getParameter("targetLiquidity", 1n * 10n ** 18n); // Default to 1 ETH for testnet flexibility
+    
     const bondingCurve = m.contract("PengoBondingCurve", [
         pengoToken,
         uniswapRouter,
-        pengoStrategyProxy
+        pengoStrategyProxy,
+        targetLiquidity
     ]);
 
     // 6. Setup Initial Configs (Transfer PENGO to Bonding Curve)

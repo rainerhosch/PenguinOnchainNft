@@ -1,15 +1,15 @@
 {
   "addresses": {
     "sepolia": {
-      "PengoToken": "0x99b3b9710e61301004Be21ff07dD7ecBb139b861",
-      "PengoStrategyProxy": "0xC48e2B41f8AaDe7d3081d34FC6C20e9487EDE2A5",
-      "PengoBondingCurve": "0xDb43874eEEB1cF1414a80b384C26674011020860",
-      "MockAAPL": "0x32AA5182207323C60691B8AA0eB8cc61ed48B7e5",
-      "MockGold": "0x13c01Abcef85d3829BB38a86431e9C6fde7412c3",
-      "MockGoogle": "0xD49728d09190005a832881065e0Df1B491e71e23",
-      "MockNVIDIA": "0xe95CE4C7A351285D2A8D1A445290c1ECDaEA1562",
-      "PenguinOnchain": "0xADDe79C20ee78759D6902d368CEEdCA5f5e9D3CF",
-      "PengoFactory": "0xDd38b0B9CFCADEFBdA58d01461B3a2fB1a92B455"
+      "PengoToken": "0x89F1044f0d45b7e798F05e2f4A8372920d956e16",
+      "PengoStrategyProxy": "0x09577c7D42e1b3D26Aecb0183EE7b37068044E60",
+      "PengoBondingCurve": "0x5c65A66806326b1857F7366C19350644F1725A91",
+      "MockAAPL": "0xb80e7062D6CA80671413d8f069A07AA223a8f785",
+      "MockGold": "0x2e81f51aC82C63FF1b42BBbB1959C70EFB8A9c88",
+      "MockGoogle": "0x4bbAC688F6aDA118721EeEbFc16b7E215b5B1681",
+      "MockNVIDIA": "0xBea85A3C7aa2e11391111E9af8EC485e133c223E",
+      "PenguinOnchain": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
+      "PengoFactory": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E"
     }
   },
   "abis": {
@@ -1048,6 +1048,11 @@
             "internalType": "address",
             "name": "_strategyVault",
             "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_targetLiquidity",
+            "type": "uint256"
           }
         ],
         "stateMutability": "nonpayable",
@@ -1116,6 +1121,12 @@
             "indexed": false,
             "internalType": "uint256",
             "name": "cost",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "taxEth",
             "type": "uint256"
           }
         ],
@@ -1230,7 +1241,12 @@
         "outputs": [
           {
             "internalType": "uint256",
-            "name": "",
+            "name": "totalCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "taxEth",
             "type": "uint256"
           }
         ],

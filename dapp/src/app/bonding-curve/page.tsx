@@ -38,7 +38,7 @@ export default function BondingCurvePage() {
         functionName: 'getCost',
         args: [parseEther("1")],
     });
-    const currentPrice = currentPriceData ? Number(formatEther(currentPriceData as bigint)) : 0;
+    const currentPrice = currentPriceData && Array.isArray(currentPriceData) ? Number(formatEther((currentPriceData as any)[0])) : 0;
 
     // 2. Fetch contract balance (ETH Raised) and Target Liquidity
     const { data: contractBalanceData, refetch: refetchContractBalance } = useBalance({
@@ -105,7 +105,8 @@ export default function BondingCurvePage() {
         args: safeAmount > 0 ? [parseEther(safeAmount.toString())] : undefined,
         query: { enabled: safeAmount > 0 && tradeMode === 'buy' }
     });
-    const exactCostEth = exactCostData ? formatEther(exactCostData as bigint) : "0";
+    const exactCostEth = exactCostData && Array.isArray(exactCostData) ? formatEther((exactCostData as any)[0]) : "0";
+    const exactCostTaxEth = exactCostData && Array.isArray(exactCostData) ? formatEther((exactCostData as any)[1]) : "0";
     
     // 6. Fetch EXACT Value for Sell (returns [returnEth, taxEth])
     const { data: exactSellData } = useReadContract({
@@ -123,6 +124,9 @@ export default function BondingCurvePage() {
 
     const currentEthAmount = isEthTop ? Number(inputValue || 0) : Number(estimatedEthCost || 0);
     const currentEthUsd = ethPrice && currentEthAmount > 0 ? `~$${(currentEthAmount * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "";
+
+    const marketCapEth = currentPrice * 1_000_000_000;
+    const marketCapUsd = ethPrice ? marketCapEth * ethPrice : null;
 
     // 7. Check Token Allowance for Sell
     const tokenAddress = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
@@ -244,7 +248,7 @@ export default function BondingCurvePage() {
                             $PENGO <span className="gradient-text">Bonding Curve</span>
                         </h1>
                         <p className="text-neutral-400 max-w-xl mx-auto">
-                            Buy or Sell $PENGO tokens early on the bonding curve. Once the bonding curve hits 10 ETH (partly driven by a 3% sell tax!), liquidity is automatically seeded to Uniswap!
+                            Buy or Sell $PENGO tokens early on the bonding curve. Once the bonding curve hits 10 ETH (partly driven by a 1% buy/sell tax!), liquidity is automatically seeded to Uniswap!
                         </p>
                     </div>
 
@@ -268,6 +272,19 @@ export default function BondingCurvePage() {
                                         style={{ width: `${progress}%` }}
                                     >
                                         <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/30 blur-[2px]" />
+                                    </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-4 mt-6">
+                                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                                        <div className="text-sm text-neutral-400 mb-1">Current Price</div>
+                                        <div className="font-medium text-white">{currentPrice > 0 ? currentPrice.toFixed(8) : "0.00000000"} ETH</div>
+                                        {ethPrice && <div className="text-xs text-neutral-500 mt-1">~${(currentPrice * ethPrice).toFixed(6)}</div>}
+                                    </div>
+                                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                                        <div className="text-sm text-neutral-400 mb-1">Est. Market Cap</div>
+                                        <div className="font-medium text-white">{marketCapEth.toLocaleString()} ETH</div>
+                                        {marketCapUsd && <div className="text-xs text-neutral-500 mt-1">~${marketCapUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>}
                                     </div>
                                 </div>
                             </div>
@@ -328,14 +345,14 @@ export default function BondingCurvePage() {
                                         disabled={isMigrated}
                                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'buy' ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'} ${isMigrated ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
-                                        Buy
+                                        Buy (1% Tax)
                                     </button>
                                     <button
                                         onClick={() => setTradeMode('sell')}
                                         disabled={isMigrated}
                                         className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${tradeMode === 'sell' ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg' : 'text-neutral-400 hover:text-white'} ${isMigrated ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
-                                        Sell (3% Tax)
+                                        Sell (1% Tax)
                                     </button>
                                 </div>
 
@@ -434,8 +451,14 @@ export default function BondingCurvePage() {
                                     )}
                                     {!isEthTop && tradeMode === 'sell' && sellTaxEth !== "0" && (
                                         <div className="mt-2 text-xs text-red-400/80 flex justify-between">
-                                            <span>3% Tax Deducted:</span>
+                                            <span>1% Tax Deducted:</span>
                                             <span>-{Number(sellTaxEth).toFixed(6)} ETH</span>
+                                        </div>
+                                    )}
+                                    {isEthTop && tradeMode === 'buy' && exactCostTaxEth !== "0" && (
+                                        <div className="mt-2 text-xs text-emerald-400/80 flex justify-between">
+                                            <span>1% Tax Included:</span>
+                                            <span>+{Number(exactCostTaxEth).toFixed(6)} ETH</span>
                                         </div>
                                     )}
                                 </div>

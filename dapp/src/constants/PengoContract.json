@@ -1,8 +1,8 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0xADDe79C20ee78759D6902d368CEEdCA5f5e9D3CF",
-    "factoryAddress": "0xDd38b0B9CFCADEFBdA58d01461B3a2fB1a92B455",
+    "address": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
+    "factoryAddress": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E",
     "pengoConverter": "0xDb43874eEEB1cF1414a80b384C26674011020860",
     "daoAddress": "0xC48e2B41f8AaDe7d3081d34FC6C20e9487EDE2A5",
     "constructorArgs": [],
