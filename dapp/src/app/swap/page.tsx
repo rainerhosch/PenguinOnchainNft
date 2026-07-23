@@ -12,6 +12,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 const WETH_ADDRESS = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";
 const ROUTER_ADDRESS = "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008" as `0x${string}`;
 const PENGO_ADDRESS = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
+const BONDING_CURVE_ADDRESS = PengoEcosystem.addresses.sepolia.PengoBondingCurve as `0x${string}`;
 
 export default function SwapPage() {
     const [inputValue, setInputValue] = useState("");
@@ -40,6 +41,14 @@ export default function SwapPage() {
         address,
     });
     const userEthBalance = userEthBalanceData ? Number(formatEther(userEthBalanceData.value)).toFixed(4) : "0.0000";
+
+    // Read Bonding Curve Migration Status
+    const { data: isMigratedData } = useReadContract({
+        address: BONDING_CURVE_ADDRESS,
+        abi: PengoEcosystem.abis.PengoBondingCurve,
+        functionName: 'isMigrated',
+    });
+    const isMigrated = isMigratedData as boolean;
 
     // 2. Fetch Quotes (getAmountsOut)
     const inputAmountParsed = inputValue && !isNaN(Number(inputValue)) && Number(inputValue) > 0 ? parseEther(inputValue.toString()) : BigInt(0);
@@ -182,7 +191,23 @@ export default function SwapPage() {
                         </p>
                     </div>
 
-                    <div className="bg-dark-800/80 backdrop-blur-xl rounded-[2rem] p-4 relative border border-white/10 shadow-2xl">
+                    {!isMigrated && isMigrated !== undefined ? (
+                        <div className="bg-dark-800/80 backdrop-blur-xl rounded-[2rem] p-8 text-center border border-white/10 shadow-2xl mt-4">
+                            <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-white mb-2">DEX Trading Locked</h2>
+                            <p className="text-neutral-400 text-sm mb-6">
+                                PENGO is currently in its initial launch phase. It must complete the Bonding Curve before public DEX trading opens.
+                            </p>
+                            <Link href="/bonding-curve" className="inline-block px-6 py-3 bg-primary-500 hover:bg-primary-400 text-primary-950 font-bold rounded-xl transition-all">
+                                Go to Bonding Curve
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="bg-dark-800/80 backdrop-blur-xl rounded-[2rem] p-4 relative border border-white/10 shadow-2xl">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-4 px-2">
                             <span className="text-white font-medium">Swap</span>
@@ -313,6 +338,7 @@ export default function SwapPage() {
                             )}
                         </div>
                     </div>
+                    )}
                 </div>
             </main>
         </div>
