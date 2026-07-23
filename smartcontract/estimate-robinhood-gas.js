@@ -1,77 +1,94 @@
+const { ethers } = require("ethers");
 const fs = require('fs');
-const https = require('https');
-
-const alchemyUrl = 'https://robinhood-mainnet.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB';
-const deployer = '0xed6cf54e56d96af22bfb4d1e65fee9bcd311b5d9';
-
-const factoryArtifact = require('./artifacts/contracts/utils/PengoFactory.sol/PengoFactory.json');
-const penguinArtifact = require('./artifacts/contracts/ERC721/PenguinOnchain.sol/PenguinOnchain.json');
-
-async function rpcCall(method, params) {
-    return new Promise((resolve, reject) => {
-        const data = JSON.stringify({
-            jsonrpc: "2.0",
-            id: 1,
-            method: method,
-            params: params
-        });
-
-        const req = https.request(alchemyUrl, {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'content-type': 'application/json',
-                'content-length': Buffer.byteLength(data)
-            }
-        }, (res) => {
-            let body = '';
-            res.on('data', chunk => body += chunk);
-            res.on('end', () => resolve(JSON.parse(body)));
-        });
-
-        req.on('error', reject);
-        req.write(data);
-        req.end();
-    });
-}
 
 async function main() {
     console.log("Fetching current gas price on Robinhood Mainnet...");
-    const gasPriceRes = await rpcCall('eth_gasPrice', []);
-    const gasPriceWei = BigInt(gasPriceRes.result);
+    
+    // We can use a custom provider if we want to query Robinhood specifically
+    const provider = new ethers.JsonRpcProvider('https://robinhood-mainnet.g.alchemy.com/v2/08vne2jndkLeMxbs8GdFi6jtZrDfgBmB');
+    
+    let feeData;
+    try {
+        feeData = await provider.getFeeData();
+    } catch (e) {
+        console.log("Failed to connect to Robinhood RPC. Falling back to public ETH node for gas price just for testing, or aborting.");
+        console.error(e.message);
+        return;
+    }
+    
+    const gasPriceWei = feeData.gasPrice || 2000000000n; // fallback to 2 gwei if empty
     console.log(`Gas Price: ${Number(gasPriceWei) / 1e9} gwei (${gasPriceWei} wei)`);
 
+    const deployerAddress = '0xed6cf54e56d96af22bfb4d1e65fee9bcd311b5d9';
+
+    // Helper to get bytecode from artifacts
+    const getBytecode = (path) => {
+        try {
+            const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+            return data.bytecode;
+        } catch(e) {
+            console.error("Could not read artifact at", path);
+            return null;
+        }
+    };
+
+    // 1. Estimate PengoFactory
     console.log("\nEstimating PengoFactory deployment...");
-    const factoryData = factoryArtifact.bytecode;
-    const factoryRes = await rpcCall('eth_estimateGas', [{
-        from: deployer,
-        data: factoryData
-    }]);
-    
-    if (factoryRes.error) {
-        console.error("Error estimating PengoFactory:", factoryRes.error);
-    } else {
-        const factoryGas = BigInt(factoryRes.result);
-        const costWei = factoryGas * gasPriceWei;
-        console.log(`PengoFactory Gas Limit: ${factoryGas.toString(10)}`);
-        console.log(`PengoFactory Cost: ${Number(costWei) / 1e18} ETH`);
+    const factoryBytecode = getBytecode('./artifacts/contracts/utils/PengoFactory.sol/PengoFactory.json');
+    if (factoryBytecode) {
+        try {
+            const factoryGas = await provider.estimateGas({
+                from: deployerAddress,
+                data: factoryBytecode
+            });
+            const costWei = factoryGas * gasPriceWei;
+            console.log(`PengoFactory Gas Limit: ${factoryGas.toString()}`);
+            console.log(`PengoFactory Cost: ${Number(costWei) / 1e18} ETH`);
+        } catch (e) {
+            console.error("Error estimating PengoFactory:", e.message);
+        }
     }
 
+    // 2. Estimate PenguinOnchain
     console.log("\nEstimating PenguinOnchain deployment...");
-    const penguinData = penguinArtifact.bytecode;
-    const penguinRes = await rpcCall('eth_estimateGas', [{
-        from: deployer,
-        data: penguinData
-    }]);
-    
-    if (penguinRes.error) {
-        console.error("Error estimating PenguinOnchain:", penguinRes.error);
-    } else {
-        const penguinGas = BigInt(penguinRes.result);
-        const costWei = penguinGas * gasPriceWei;
-        console.log(`PenguinOnchain Gas Limit: ${penguinGas.toString(10)}`);
-        console.log(`PenguinOnchain Cost: ${Number(costWei) / 1e18} ETH`);
+    const penguinBytecode = getBytecode('./artifacts/contracts/ERC721/PenguinOnchain.sol/PenguinOnchain.json');
+    if (penguinBytecode) {
+        try {
+            const penguinGas = await provider.estimateGas({
+                from: deployerAddress,
+                data: penguinBytecode
+            });
+            const costWei = penguinGas * gasPriceWei;
+            console.log(`PenguinOnchain Gas Limit: ${penguinGas.toString()}`);
+            console.log(`PenguinOnchain Cost: ${Number(costWei) / 1e18} ETH`);
+        } catch (e) {
+            console.error("Error estimating PenguinOnchain:", e.message);
+        }
     }
+
+    // 3. Estimate PengoStrategy Implementation
+    console.log("\nEstimating PengoStrategy (Implementation) deployment...");
+    const strategyBytecode = getBytecode('./artifacts/contracts/Strategy/PengoStrategy.sol/PengoStrategy.json');
+    if (strategyBytecode) {
+        try {
+            const strategyGas = await provider.estimateGas({
+                from: deployerAddress,
+                data: strategyBytecode
+            });
+            const costWei = strategyGas * gasPriceWei;
+            console.log(`PengoStrategy Gas Limit: ${strategyGas.toString()}`);
+            console.log(`PengoStrategy Cost: ${Number(costWei) / 1e18} ETH`);
+        } catch (e) {
+            console.error("Error estimating PengoStrategy:", e.message);
+        }
+    }
+
+    // 4. Estimate ERC1967Proxy
+    console.log("\nEstimating ERC1967Proxy deployment...");
+    const proxyGas = 400000n; // Hardcoded fallback because it requires constructor arguments
+    const proxyCostWei = proxyGas * gasPriceWei;
+    console.log(`ERC1967Proxy Gas Limit: ~${proxyGas.toString()} (Hardcoded estimate)`);
+    console.log(`ERC1967Proxy Cost: ~${Number(proxyCostWei) / 1e18} ETH`);
 }
 
 main().catch(console.error);

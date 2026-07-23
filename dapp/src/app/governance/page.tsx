@@ -15,6 +15,12 @@ const nftAddress = PengoEcosystem.addresses.sepolia.PenguinOnchain as `0x${strin
 import PenguinOnchainAbiRaw from '../../constants/PenguinOnchainAbi.json';
 const PenguinOnchainAbi = PenguinOnchainAbiRaw as Abi;
 
+import ProfilePanel from '../../components/governance/ProfilePanel';
+import ActiveBuyListPanel from '../../components/governance/ActiveBuyListPanel';
+import EcosystemTreasuryPanel from '../../components/governance/EcosystemTreasuryPanel';
+import ClaimableDividendsPanel from '../../components/governance/ClaimableDividendsPanel';
+import ActiveProposalsPanel from '../../components/governance/ActiveProposalsPanel';
+
 export default function GovernancePage() {
     const [burnAmount, setBurnAmount] = useState("");
     const { address } = useAccount();
@@ -83,11 +89,20 @@ export default function GovernancePage() {
         return `${address.substring(0, 6)}...${address.substring(38)}`;
     };
 
+    const { data: totalSharePowerData } = useReadContract({
+        address: nftAddress,
+        abi: PenguinOnchainAbi,
+        functionName: 'totalSharePower',
+    });
+    const absoluteMajority = totalSharePowerData ? (totalSharePowerData as bigint) / BigInt(2) + BigInt(1) : BigInt(0);
+
     const activeProposals = proposalsData ? proposalsData.map((data, index) => {
         if (!data.result) return null;
         const [rwaToken, isAdd, yesVotes, noVotes, endTime, executed] = data.result as [string, boolean, bigint, bigint, bigint, boolean];
-        const status = executed ? "Executed" : (Number(endTime) * 1000 < Date.now() ? "Pending Execution" : "Active");
-        
+
+        const hasAbsoluteMajority = absoluteMajority > BigInt(0) && yesVotes >= absoluteMajority;
+        const status = executed ? "Executed" : (Number(endTime) * 1000 < Date.now() ? "Pending Execution" : (hasAbsoluteMajority ? "Pending Execution (Fast-Track)" : "Active"));
+
         return {
             id: proposalIds[index],
             targetRWA: getRWASymbol(rwaToken),
@@ -103,14 +118,74 @@ export default function GovernancePage() {
     }).filter(p => p !== null) : [];
     // console.log(activeProposals)
 
-    const knownRWAs = [
-        { address: "0x604D2b8e573696B6e02925C9A5a7E4F2eAe62569" as `0x${string}`, symbol: "mAAPL" },
-        { address: "0x128F31222E0DDE9EC4C3956a1A8D1c76294eb743" as `0x${string}`, symbol: "mGOLD" },
-        { address: "0x6C91901C9509f6E35F38E22252a13b5D22b069df" as `0x${string}`, symbol: "mGOOGL" },
-        { address: "0xa2717a61d1558E5E57cE8f58bB267793d5B5F37a" as `0x${string}`, symbol: "mNVDA" }
-    ];
+    // Fetch dynamic RWA list from strategy
+    const { data: rewardTokensData } = useReadContract({
+        address: strategyAddress,
+        abi: strategyAbi,
+        functionName: 'getRewardTokens',
+    });
 
+    const dynamicRWAAddresses = (rewardTokensData as `0x${string}`[]) || [];
 
+    const { data: dynamicRWASymbolsData } = useReadContracts({
+        contracts: dynamicRWAAddresses.map(address => ({
+            address,
+            abi: erc20Abi,
+            functionName: 'symbol'
+        })),
+        query: { enabled: dynamicRWAAddresses.length > 0 }
+    });
+
+    const knownRWAs = dynamicRWAAddresses.map((address, index) => {
+        const symbolResult = dynamicRWASymbolsData && dynamicRWASymbolsData[index]?.result;
+        const symbol = symbolResult
+            ? (symbolResult as string)
+            : `${address.substring(0, 6)}...${address.substring(38)}`;
+        return { address, symbol, isValid: !!symbolResult };
+    }).filter(rwa => rwa.isValid);
+
+    const { data: strategyBalancesData } = useReadContracts({
+        contracts: knownRWAs.map(rwa => ({
+            address: rwa.address,
+            abi: erc20Abi,
+            functionName: 'balanceOf',
+            args: [strategyAddress]
+        }))
+    });
+
+    const ecosystemAssets = knownRWAs.map((rwa, index) => {
+        const bal = strategyBalancesData && strategyBalancesData[index]?.result ? (strategyBalancesData[index].result as bigint) : BigInt(0);
+        return {
+            tokenName: rwa.symbol,
+            amount: Number(formatEther(bal)).toLocaleString(undefined, { maximumFractionDigits: 2 })
+        };
+    });
+    // console.log(knownRWAs)
+
+    // Fetch Active Buy List
+    const { data: activeBuyListData } = useReadContract({
+        address: strategyAddress,
+        abi: strategyAbi,
+        functionName: 'getActiveBuyList',
+    });
+    const activeBuyListAddresses = (activeBuyListData as `0x${string}`[]) || [];
+
+    const { data: activeBuyListSymbolsData } = useReadContracts({
+        contracts: activeBuyListAddresses.map(address => ({
+            address,
+            abi: erc20Abi,
+            functionName: 'symbol'
+        })),
+        query: { enabled: activeBuyListAddresses.length > 0 }
+    });
+
+    const activeBuyList = activeBuyListAddresses.map((address, index) => {
+        const symbolResult = activeBuyListSymbolsData && activeBuyListSymbolsData[index]?.result;
+        const symbol = symbolResult
+            ? (symbolResult as string)
+            : `${address.substring(0, 6)}...${address.substring(38)}`;
+        return { address, symbol, isValid: !!symbolResult };
+    }).filter(rwa => rwa.isValid);
 
     const { data: totalDividendsData, refetch: refetchTotalDividends } = useReadContracts({
         contracts: knownRWAs.map(rwa => ({
@@ -128,7 +203,8 @@ export default function GovernancePage() {
             abi: strategyAbi,
             functionName: 'getClaimableDividends',
             args: [rwa.address, selectedNftToBurn ? BigInt(selectedNftToBurn) : BigInt(0)]
-        }))
+        })),
+        query: { enabled: !!selectedNftToBurn }
     });
 
 
@@ -179,7 +255,7 @@ export default function GovernancePage() {
     });
 
     const dividends = knownRWAs.map((rwa, index) => {
-        const payout = claimableDividendsData && claimableDividendsData[index]?.result ? (claimableDividendsData[index].result as bigint) : BigInt(0);
+        const payout = claimableDividendsData && claimableDividendsData[index]?.result && selectedNftToBurn ? (claimableDividendsData[index].result as bigint) : BigInt(0);
 
         return {
             rwa: rwa.symbol,
@@ -298,6 +374,83 @@ export default function GovernancePage() {
         });
     };
 
+    const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+    const [newProposalRwa, setNewProposalRwa] = useState("");
+    const [newProposalIsAdd, setNewProposalIsAdd] = useState(true);
+
+    const { data: proposeHash, writeContract: writePropose, isPending: isProposing } = useWriteContract();
+    const { isLoading: isConfirmingPropose, isSuccess: isConfirmedPropose } = useWaitForTransactionReceipt({ hash: proposeHash });
+
+    const { data: executeHash, writeContract: writeExecute, isPending: isExecuting } = useWriteContract();
+    const { isLoading: isConfirmingExecute, isSuccess: isConfirmedExecute } = useWaitForTransactionReceipt({ hash: executeHash });
+    const [executingId, setExecutingId] = useState<number | null>(null);
+
+    const isValidRwaAddress = newProposalRwa.length === 42 && newProposalRwa.startsWith('0x');
+
+    const { data: previewSymbolData } = useReadContract({
+        address: isValidRwaAddress ? (newProposalRwa as `0x${string}`) : undefined,
+        abi: erc20Abi,
+        functionName: 'symbol',
+        query: { enabled: isValidRwaAddress }
+    });
+
+    const { data: previewNameData } = useReadContract({
+        address: isValidRwaAddress ? (newProposalRwa as `0x${string}`) : undefined,
+        abi: erc20Abi,
+        functionName: 'name',
+        query: { enabled: isValidRwaAddress }
+    });
+
+    useEffect(() => {
+        if (isConfirmedPropose) {
+            toast.success("Proposal created successfully!");
+            setIsProposalModalOpen(false);
+            setNewProposalRwa("");
+            refetchProposals();
+        }
+    }, [isConfirmedPropose]);
+
+    useEffect(() => {
+        if (isConfirmedExecute) {
+            toast.success("Proposal executed successfully!");
+            refetchProposals();
+        }
+    }, [isConfirmedExecute]);
+
+    const handlePropose = () => {
+        if (!newProposalRwa) {
+            toast.error("Please enter an RWA token address.");
+            return;
+        }
+        if (!selectedNftToBurn) {
+            toast.error("Please select an NFT from 'Your Profile' to create a proposal.");
+            return;
+        }
+
+        const selectedNftObj = userNFTs.find(nft => nft.id === selectedNftToBurn);
+        if (selectedNftObj && selectedNftObj.rawPower === BigInt(0)) {
+            toast.error("Your selected NFT does not have any Share Power to create a proposal.");
+            return;
+        }
+
+        writePropose({
+            address: strategyAddress,
+            abi: strategyAbi,
+            functionName: 'propose',
+            args: [newProposalRwa as `0x${string}`, newProposalIsAdd, BigInt(selectedNftToBurn)]
+        });
+    };
+
+    const handleExecute = (proposalId: number) => {
+        setExecutingId(proposalId);
+        writeExecute({
+            address: strategyAddress,
+            abi: strategyAbi,
+            functionName: 'executeProposal',
+            args: [BigInt(proposalId)]
+        });
+    };
+
     return (
         <div className="min-h-screen bg-gradient-mesh">
             <Toaster position="top-center" />
@@ -308,7 +461,7 @@ export default function GovernancePage() {
             <AppNavbar />
 
             <main className="relative pt-24 pb-16 px-4 sm:px-6">
-                <div className="max-w-6xl mx-auto">
+                <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="text-center mb-12">
                         <Link href="/" className="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition-colors mb-6">
@@ -317,217 +470,135 @@ export default function GovernancePage() {
                             </svg>
                             Back to Home
                         </Link>
-                        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                            DAO <span className="gradient-text">Governance & Vault</span>
+                        <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-emerald-400 mb-4">
+                            PenguinOnchain DAO Governance
                         </h1>
-                        <p className="text-neutral-400 max-w-xl mx-auto">
-                            Burn $PENGO to boost your NFT's Share Power. Use your power to vote on RWA investments and claim dividends.
+                        <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+                            Shape the future of the ecosystem. Burn $PENGO to boost your NFT's Share Power, then use your power to vote on RWA investments and claim dividends.
                         </p>
                     </div>
 
                     <div className="grid lg:grid-cols-3 gap-8">
-                        {/* Profile & Boost Panel */}
-                        <div className="lg:col-span-1 space-y-6">
-                            <div className="glass-card p-6">
-                                <h2 className="text-xl font-bold text-white mb-6">Your Profile</h2>
+                        {/* Dashboard Left Column */}
+                        <div className="lg:col-span-1 space-y-8">
+                            <ProfilePanel
+                                pengoBalance={pengoBalance}
+                                rawPengoBalance={rawPengoBalance}
+                                totalPower={totalPower}
+                                userNFTs={userNFTs}
+                                selectedNftToBurn={selectedNftToBurn}
+                                setSelectedNftToBurn={setSelectedNftToBurn}
+                                burnAmount={burnAmount}
+                                setBurnAmount={setBurnAmount}
+                                handleBurn={handleBurn}
+                                isBurning={isBurning}
+                                isConfirmingBurn={isConfirmingBurn}
+                                isConfirmedBurn={isConfirmedBurn}
+                            />
 
-                                <div className="space-y-4">
-                                    <div className="bg-white/5 rounded-xl p-4 border border-white/10 flex justify-between items-center">
-                                        <span className="text-neutral-400">Total $PENGO</span>
-                                        <span className="text-xl font-bold text-white">{pengoBalance}</span>
-                                    </div>
-                                    <div className="bg-white/5 rounded-xl p-4 border border-white/10 flex justify-between items-center">
-                                        <span className="text-neutral-400">Total Share Power</span>
-                                        <span className="text-xl font-bold text-primary-400 flex items-center gap-2">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                            </svg>
-                                            {totalPower}
-                                        </span>
-                                    </div>
-                                </div>
+                            <ActiveBuyListPanel activeBuyList={activeBuyList} />
 
-                                <h3 className="text-lg font-bold text-white mt-8 mb-4">Burn to Boost</h3>
-                                <div className="space-y-4">
-                                    <div className="flex gap-4 overflow-x-auto pb-4 pt-2 snap-x custom-scrollbar">
-                                        {userNFTs.length === 0 ? (
-                                            <div className="text-sm text-neutral-500 w-full text-center py-4 border border-white/10 border-dashed rounded-xl">No NFTs found. Please mint one first.</div>
-                                        ) : (
-                                            userNFTs.map(nft => (
-                                                <button
-                                                    key={nft.id}
-                                                    onClick={() => setSelectedNftToBurn(nft.id)}
-                                                    className={`flex-shrink-0 w-32 snap-center rounded-2xl border p-2 transition-all ${selectedNftToBurn === nft.id ? 'bg-primary-500/20 border-primary-500 ring-2 ring-primary-500/50' : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'}`}
-                                                >
-                                                    <div className="aspect-square rounded-xl bg-black/0 mb-2 overflow-hidden flex items-center justify-center relative">
-                                                        <img src={nft.image} alt={nft.name} className="w-24 h-24 object-contain rounded-lg" />
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <div className="font-bold text-white text-xs truncate">{nft.name}</div>
-                                                        <div className="text-xs text-primary-400 font-medium mt-1 flex items-center justify-center gap-1">
-                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                            </svg>
-                                                            {nft.power}
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            ))
-                                        )}
-                                    </div>
-
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            value={burnAmount}
-                                            onChange={(e) => setBurnAmount(e.target.value)}
-                                            placeholder="Amount of PENGO to burn"
-                                            className="w-full bg-white/5 border border-white/10 text-white rounded-xl p-3 outline-none focus:border-primary-500"
-                                        />
-                                        <button
-                                            className="absolute right-2 top-2 text-xs bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded transition-colors"
-                                            onClick={() => setBurnAmount(formatEther(rawPengoBalance))}
-                                        >
-                                            MAX
-                                        </button>
-                                    </div>
-
-                                    <button
-                                        onClick={handleBurn}
-                                        disabled={isBurning || isConfirmingBurn || !burnAmount}
-                                        className="w-full py-3 bg-red-500/20 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:hover:bg-red-500/20 disabled:hover:text-red-500 rounded-xl font-bold transition-all"
-                                    >
-                                        {isBurning ? "Confirming..." : isConfirmingBurn ? "Burning..." : "🔥 Burn $PENGO"}
-                                    </button>
-
-                                    {isConfirmedBurn && (
-                                        <div className="text-emerald-400 text-sm text-center font-medium">Burn successful!</div>
-                                    )}
-                                </div>
-                            </div>
+                            <EcosystemTreasuryPanel ecosystemAssets={ecosystemAssets} />
                         </div>
 
-                        {/* Proposals & Vault */}
+                        {/* Right Column: Proposals & Vault */}
                         <div className="lg:col-span-2 space-y-8">
-                            {/* Vault Dividends */}
-                            <div className="glass-card p-6">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                        <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Claimable Dividends
-                                    </h2>
-                                    <button className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg font-bold transition-colors">
-                                        Claim All
-                                    </button>
-                                </div>
+                            <ClaimableDividendsPanel
+                                dividends={dividends}
+                                handleClaim={handleClaim}
+                                isClaiming={isClaiming}
+                                isConfirmingClaim={isConfirmingClaim}
+                            />
 
-                                <div className="space-y-3">
-                                    {dividends.map((div, i) => (
-                                        <div key={i} className={`flex justify-between items-center p-4 bg-white/5 rounded-xl border ${div.canClaim ? 'border-primary-500/50' : 'border-white/10'}`}>
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-700 to-neutral-800 flex items-center justify-center border border-white/10">
-                                                    <span className="text-xs font-bold text-white">{div.rwa.charAt(1)}</span>
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-white">{div.rwa}</div>
-                                                    <div className={`text-sm ${div.canClaim ? 'text-emerald-400' : 'text-neutral-500'}`}>{div.value}</div>
-                                                </div>
-                                            </div>
-                                            <div className="text-right flex flex-col items-end gap-1">
-                                                <div className="font-bold text-white text-lg">{div.amount}</div>
-                                                <button
-                                                    onClick={() => handleClaim(div.address)}
-                                                    disabled={!div.canClaim || isClaiming || isConfirmingClaim}
-                                                    className="text-sm px-3 py-1 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:bg-neutral-600"
-                                                >
-                                                    {isClaiming ? "Confirming..." : isConfirmingClaim ? "Claiming..." : "Claim"}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Governance Proposals */}
-                            <div className="glass-card p-6">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-white">Active Proposals (Total: {proposalCount})</h2>
-                                    <button className="text-primary-400 hover:text-primary-300 text-sm font-medium">
-                                        + New Proposal
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {activeProposals.length === 0 && (
-                                        <div className="text-center py-8 text-neutral-400 border border-white/10 border-dashed rounded-xl">
-                                            No active proposals at the moment.
-                                        </div>
-                                    )}
-                                    {activeProposals.map(prop => (
-                                        <div key={prop.id} className="p-5 bg-white/5 rounded-xl border border-white/10 hover:border-white/20 transition-colors">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <span className="text-xs font-bold px-2 py-1 bg-white/10 rounded text-neutral-300">#{prop.id}</span>
-                                                        <h3 className="font-bold text-white text-lg">{prop.targetRWA}</h3>
-                                                    </div>
-                                                    <p className="text-sm text-neutral-400">{prop.description}</p>
-                                                </div>
-                                                <span className={`text-xs px-3 py-1 rounded-full border ${prop.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-neutral-500/20 text-neutral-400 border-neutral-500/30'}`}>
-                                                    {prop.status}
-                                                </span>
-                                            </div>
-
-                                            {/* Vote Progress */}
-                                            <div className="mb-4">
-                                                <div className="flex justify-between text-xs mb-1">
-                                                    <span className="text-emerald-400">Yes: {prop.yesVotes.toLocaleString()}</span>
-                                                    <span className="text-red-400">No: {prop.noVotes.toLocaleString()}</span>
-                                                </div>
-                                                <div className="w-full h-2 bg-red-500/20 rounded-full overflow-hidden flex">
-                                                    <div
-                                                        className="h-full bg-emerald-500"
-                                                        style={{ width: `${(prop.yesVotes + prop.noVotes) > 0 ? (prop.yesVotes / (prop.yesVotes + prop.noVotes)) * 100 : 50}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            {prop.status === 'Active' && (
-                                                prop.hasVoted ? (
-                                                    <div className="w-full">
-                                                        <button disabled className="w-full py-2 bg-white/5 text-white/50 border border-white/10 rounded-lg cursor-not-allowed">
-                                                            ✓ Voted
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex gap-3">
-                                                        <button
-                                                            onClick={() => handleVote(prop.id, true)}
-                                                            disabled={isVoting || isConfirmingVote}
-                                                            className="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg transition-colors disabled:opacity-50"
-                                                        >
-                                                            {isVoting && votingOnId === prop.id ? "..." : "Vote Yes"}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleVote(prop.id, false)}
-                                                            disabled={isVoting || isConfirmingVote}
-                                                            className="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg transition-colors disabled:opacity-50"
-                                                        >
-                                                            {isVoting && votingOnId === prop.id ? "..." : "Vote No"}
-                                                        </button>
-                                                    </div>
-                                                )
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <ActiveProposalsPanel
+                                proposalCount={proposalCount}
+                                activeProposals={activeProposals}
+                                setIsProposalModalOpen={setIsProposalModalOpen}
+                                handleVote={handleVote}
+                                isVoting={isVoting}
+                                isConfirmingVote={isConfirmingVote}
+                                votingOnId={votingOnId}
+                                handleExecute={handleExecute}
+                                isExecuting={isExecuting}
+                                isConfirmingExecute={isConfirmingExecute}
+                                executingId={executingId}
+                            />
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* New Proposal Modal */}
+            {isProposalModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="glass-card p-6 w-full max-w-md relative">
+                        <button
+                            onClick={() => setIsProposalModalOpen(false)}
+                            className="absolute top-4 right-4 text-neutral-400 hover:text-white"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <h2 className="text-xl font-bold text-white mb-6">Create New Proposal</h2>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-400 mb-2">RWA Token Address</label>
+                                <input
+                                    type="text"
+                                    value={newProposalRwa}
+                                    onChange={(e) => setNewProposalRwa(e.target.value)}
+                                    placeholder="0x..."
+                                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl p-3 outline-none focus:border-primary-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-400 mb-2">Action</label>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setNewProposalIsAdd(true)}
+                                        className={`flex-1 py-2 rounded-lg border ${newProposalIsAdd ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-white/5 text-neutral-400 border-white/10 hover:bg-white/10'}`}
+                                    >
+                                        Add to Buy List
+                                    </button>
+                                    <button
+                                        onClick={() => setNewProposalIsAdd(false)}
+                                        className={`flex-1 py-2 rounded-lg border ${!newProposalIsAdd ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-white/5 text-neutral-400 border-white/10 hover:bg-white/10'}`}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+
+                            {isValidRwaAddress && (
+                                <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
+                                    <div className="text-xs text-neutral-400 mb-1">On-Chain Preview</div>
+                                    {previewSymbolData ? (
+                                        <>
+                                            <div className="font-bold text-white">{previewNameData as string} ({previewSymbolData as string})</div>
+                                            <a href={`https://sepolia.etherscan.io/token/${newProposalRwa}`} target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300 text-xs mt-2 inline-flex items-center gap-1">
+                                                View on Etherscan
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                            </a>
+                                        </>
+                                    ) : (
+                                        <div className="text-sm text-neutral-500">Fetching token data... (if it fails, this might not be an ERC20 token)</div>
+                                    )}
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handlePropose}
+                                disabled={isProposing || isConfirmingPropose || !newProposalRwa || (isValidRwaAddress && !previewSymbolData)}
+                                className="w-full mt-4 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:bg-neutral-600"
+                            >
+                                {isProposing ? "Confirming..." : isConfirmingPropose ? "Proposing..." : "Submit Proposal"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

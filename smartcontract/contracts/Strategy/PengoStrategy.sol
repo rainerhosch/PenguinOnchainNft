@@ -58,7 +58,11 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
     
     // --- Governance ---
-    function propose(address rwaToken, bool isAdd) external {
+    function propose(address rwaToken, bool isAdd, uint256 tokenId) external {
+        require(IERC721(address(nftContract)).ownerOf(tokenId) == msg.sender, "Not token owner");
+        uint256 power = nftContract.sharePower(tokenId);
+        require(power > 0, "No share power");
+
         proposalCount++;
         proposals[proposalCount] = Proposal({
             rwaToken: rwaToken,
@@ -89,7 +93,10 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     
     function executeProposal(uint256 proposalId) external {
         Proposal storage p = proposals[proposalId];
-        require(block.timestamp >= p.endTime, "Voting not ended");
+        uint256 totalPower = nftContract.totalSharePower();
+        uint256 absoluteMajority = (totalPower / 2) + 1;
+
+        require(block.timestamp >= p.endTime || p.yesVotes >= absoluteMajority, "Voting not ended and no absolute majority");
         require(!p.executed, "Already executed");
         
         p.executed = true;
@@ -209,5 +216,13 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
             inBuyList[rwa] = true;
             activeBuyList.push(rwa);
         }
+    }
+
+    function getRewardTokens() external view returns (address[] memory) {
+        return rewardTokens;
+    }
+
+    function getActiveBuyList() external view returns (address[] memory) {
+        return activeBuyList;
     }
 }

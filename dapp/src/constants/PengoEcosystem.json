@@ -562,6 +562,19 @@
         "type": "function"
       },
       {
+        "inputs": [],
+        "name": "getActiveBuyList",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "",
+            "type": "address[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
         "inputs": [
           {
             "internalType": "address",
@@ -580,6 +593,19 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getRewardTokens",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "",
+            "type": "address[]"
           }
         ],
         "stateMutability": "view",
@@ -607,6 +633,32 @@
           }
         ],
         "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "rwa",
+            "type": "address"
+          }
+        ],
+        "name": "hotfixAddRewardToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "rwa",
+            "type": "address"
+          }
+        ],
+        "name": "hotfixAddToBuyList",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -778,6 +830,11 @@
             "internalType": "bool",
             "name": "isAdd",
             "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
           }
         ],
         "name": "propose",
