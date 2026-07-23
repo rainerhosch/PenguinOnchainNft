@@ -1,9 +1,9 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-export default buildModule("PengoEcosystemV2", (m) => {
+export default buildModule("PengoEcosystemMainnet", (m) => {
     // 1. Deploy NFT Contracts
     const pengoFactory = m.contract("PengoFactory");
-    const penguinOnchain = m.contract("PenguinOnchainTestnet");
+    const penguinOnchain = m.contract("PenguinOnchain");
     
     // Setup NFT Contracts
     m.call(penguinOnchain, "setFactory", [pengoFactory]);
@@ -24,11 +24,8 @@ export default buildModule("PengoEcosystemV2", (m) => {
     m.call(pengoFactory, "initializeCoordinates", [part_name3, part_data3], { id: "initializeCoordinatesFootWear" });
     m.call(pengoFactory, "initializeCoordinates", [part_name4, part_data4], { id: "initializeCoordinatesEyeWear" });
 
-    // 2. Deploy Mock RWA tokens for Sepolia
-    const mockAAPL = m.contract("MockRWA", ["Mock Apple", "mAAPL"], { id: "MockAAPL" });
-    const mockNVIDIA = m.contract("MockRWA", ["Mock NVIDIA", "mNVDA"], { id: "MockNVIDIA" });
-    const mockGold = m.contract("MockRWA", ["Mock Gold", "mGOLD"], { id: "MockGold" });
-    const mockGoogle = m.contract("MockRWA", ["Mock Google", "mGOOGL"], { id: "MockGoogle" });
+    // 2. Mainnet doesn't deploy Mock RWAs
+    // (In Mainnet, you will add real RWA tokens via governance proposals)
 
     // 3. Deploy PENGO Token (Total Supply: 1 Billion)
     const pengoToken = m.contract("PengoToken", [1_000_000_000n * 10n ** 18n]);
@@ -50,7 +47,7 @@ export default buildModule("PengoEcosystemV2", (m) => {
     // 5. Deploy Bonding Curve
     // Using a valid Uniswap V2 Clone router on Sepolia instead of official Mainnet router
     const uniswapRouter = m.getParameter("uniswapRouter", "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008");
-    const targetLiquidity = m.getParameter("targetLiquidity", 1n * 10n ** 18n); // Default to 1 ETH for testnet flexibility
+    const targetLiquidity = m.getParameter("targetLiquidity", 10n * 10n ** 18n); // 10 ETH for Mainnet
     
     const bondingCurve = m.contract("PengoBondingCurve", [
         pengoToken,
@@ -62,5 +59,5 @@ export default buildModule("PengoEcosystemV2", (m) => {
     // 6. Setup Initial Configs (Transfer PENGO to Bonding Curve)
     m.call(pengoToken, "transfer", [bondingCurve, 1_000_000_000n * 10n ** 18n]);
 
-    return { pengoFactory, penguinOnchain, mockAAPL, mockNVIDIA, pengoToken, pengoStrategyProxy, bondingCurve };
+    return { pengoFactory, penguinOnchain, pengoToken, pengoStrategyProxy, bondingCurve };
 });
