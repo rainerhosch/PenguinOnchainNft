@@ -154,7 +154,7 @@ export default function GovernancePage() {
     // console.log(activeProposals)
 
     // Fetch dynamic RWA list from strategy
-    const { data: rewardTokensData } = useReadContract({
+    const { data: rewardTokensData, refetch: refetchRewardTokens } = useReadContract({
         address: strategyAddress,
         abi: strategyAbi,
         functionName: 'getRewardTokens',
@@ -179,7 +179,7 @@ export default function GovernancePage() {
         return { address, symbol, isValid: !!symbolResult };
     }).filter(rwa => rwa.isValid);
 
-    const { data: strategyBalancesData } = useReadContracts({
+    const { data: strategyBalancesData, refetch: refetchStrategyBalances } = useReadContracts({
         contracts: knownRWAs.map(rwa => ({
             address: rwa.address,
             abi: erc20Abi,
@@ -198,7 +198,7 @@ export default function GovernancePage() {
     // console.log(knownRWAs)
 
     // Fetch Active Buy List
-    const { data: activeBuyListData } = useReadContract({
+    const { data: activeBuyListData, refetch: refetchActiveBuyList } = useReadContract({
         address: strategyAddress,
         abi: strategyAbi,
         functionName: 'getActiveBuyList',
@@ -316,6 +316,9 @@ export default function GovernancePage() {
 
     useEffect(() => {
         const interval = setInterval(() => {
+            refetchRewardTokens();
+            refetchActiveBuyList();
+            refetchStrategyBalances();
             refetchTotalDividends();
             if (selectedNftToBurn) {
                 refetchClaimableDividends();
@@ -323,7 +326,7 @@ export default function GovernancePage() {
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [selectedNftToBurn, refetchTotalDividends, refetchClaimableDividends, refetchSharePowers]);
+    }, [selectedNftToBurn, refetchRewardTokens, refetchActiveBuyList, refetchStrategyBalances, refetchTotalDividends, refetchClaimableDividends, refetchSharePowers]);
 
     const userNFTs = userTokenIds.map((id, index) => {
         const rawPower = sharePowersData && sharePowersData[index] ? (sharePowersData[index].result as bigint || BigInt(0)) : BigInt(0);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ClaimableDividendsPanelProps {
     dividends: { rwa: string; address: string; amount: string; value: string; canClaim: boolean }[];
@@ -13,6 +13,15 @@ export default function ClaimableDividendsPanel({
     isClaiming,
     isConfirmingClaim
 }: ClaimableDividendsPanelProps) {
+    const [countdown, setCountdown] = useState(5);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCountdown((prev) => (prev <= 1 ? 5 : prev - 1));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
     return (
         <div className="glass-card p-4 sm:p-5 md:p-6">
             <div className="flex justify-between items-center mb-4 md:mb-6">
@@ -22,6 +31,12 @@ export default function ClaimableDividendsPanel({
                     </svg>
                     Claimable Dividends
                 </h2>
+                <div className="flex items-center gap-2 text-neutral-400 text-xs sm:text-sm bg-black/20 px-3 py-1.5 rounded-full border border-white/5">
+                    <svg className={`w-3.5 h-3.5 ${countdown === 5 ? 'animate-spin text-primary-400' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Update in {countdown}s</span>
+                </div>
             </div>
 
             <div className="space-y-3">
