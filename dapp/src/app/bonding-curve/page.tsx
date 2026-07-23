@@ -6,6 +6,7 @@ import { useReadContract, useWriteContract, useAccount, useBalance, useWaitForTr
 import { parseEther, formatEther } from 'viem';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
+import { useEthPrice } from '../../hooks/useEthPrice';
 
 const contractAddress = PengoEcosystem.addresses.sepolia.PengoBondingCurve as `0x${string}`;
 const abi = PengoEcosystem.abis.PengoBondingCurve;
@@ -87,6 +88,9 @@ export default function BondingCurvePage() {
         address,
     });
     const userEthBalance = userEthBalanceData ? Number(formatEther(userEthBalanceData.value)).toFixed(4) : "0.0000";
+
+    const ethPrice = useEthPrice();
+    const ethValueUsd = ethPrice && userEthBalance ? `(~$${(Number(userEthBalance) * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})` : "";
 
     // 5. Fetch EXACT Cost for Buy
     const estimatedPengoAmount = isEthTop && currentPrice > 0 
@@ -335,7 +339,7 @@ export default function BondingCurvePage() {
                                 <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                                     <div className="flex justify-between text-sm mb-2">
                                         <span className="text-neutral-400">You {isEthTop ? (tradeMode === 'buy' ? 'pay' : 'receive') : (tradeMode === 'buy' ? 'receive' : 'pay')}</span>
-                                        <span className="text-neutral-400">Balance: {isEthTop ? userEthBalance + " ETH" : userTokenBalance}</span>
+                                        <span className="text-neutral-400">Balance: {isEthTop ? `${userEthBalance} ETH ${ethValueUsd}` : userTokenBalance}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <input
@@ -394,7 +398,7 @@ export default function BondingCurvePage() {
                                 <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                                     <div className="flex justify-between text-sm mb-2">
                                         <span className="text-neutral-400">You {!isEthTop ? (tradeMode === 'buy' ? 'pay' : 'receive') : (tradeMode === 'buy' ? 'receive' : 'pay')}</span>
-                                        <span className="text-neutral-400">Balance: {!isEthTop ? userEthBalance + " ETH" : userTokenBalance}</span>
+                                        <span className="text-neutral-400">Balance: {!isEthTop ? `${userEthBalance} ETH ${ethValueUsd}` : userTokenBalance}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <input

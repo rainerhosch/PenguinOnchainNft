@@ -7,6 +7,7 @@ import { parseEther, formatEther } from 'viem';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import UniswapRouterAbi from '../../constants/UniswapRouterAbi.json';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useEthPrice } from '../../hooks/useEthPrice';
 
 // WETH used by the V2 Clone Router on Sepolia
 const WETH_ADDRESS = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9";
@@ -41,6 +42,9 @@ export default function SwapPage() {
         address,
     });
     const userEthBalance = userEthBalanceData ? Number(formatEther(userEthBalanceData.value)).toFixed(4) : "0.0000";
+
+    const ethPrice = useEthPrice();
+    const ethValueUsd = ethPrice && userEthBalance ? `(~$${(Number(userEthBalance) * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})` : "";
 
     // Read Bonding Curve Migration Status
     const { data: isMigratedData } = useReadContract({
@@ -219,7 +223,7 @@ export default function SwapPage() {
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-neutral-400">You Pay</span>
                                 <span className="text-neutral-400 font-medium">
-                                    {isEthTop ? userEthBalance : userTokenBalance}
+                                    {isEthTop ? `${userEthBalance} ETH ${ethValueUsd}` : userTokenBalance}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center gap-4">
@@ -279,7 +283,7 @@ export default function SwapPage() {
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-neutral-400">You Receive</span>
                                 <span className="text-neutral-400 font-medium">
-                                    {isEthTop ? userTokenBalance : userEthBalance}
+                                    {isEthTop ? userTokenBalance : `${userEthBalance} ETH ${ethValueUsd}`}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center gap-4">
