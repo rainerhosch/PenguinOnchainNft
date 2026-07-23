@@ -21,6 +21,41 @@ import EcosystemTreasuryPanel from '../../components/governance/EcosystemTreasur
 import ClaimableDividendsPanel from '../../components/governance/ClaimableDividendsPanel';
 import ActiveProposalsPanel from '../../components/governance/ActiveProposalsPanel';
 
+function useTransactionToast({
+    actionName,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+    hash,
+}: {
+    actionName: string;
+    isPending: boolean;
+    isConfirming: boolean;
+    isSuccess: boolean;
+    error: any;
+    hash: string | undefined;
+}) {
+    useEffect(() => {
+        const id = `${actionName.replace(/\s+/g, '-')}-tx`;
+        if (isPending) {
+            toast.loading(`Please confirm ${actionName} in your wallet...`, { id });
+        } else if (isConfirming) {
+            toast.loading(`Transaction submitted. Waiting for confirmation...`, { id });
+        } else if (isSuccess) {
+            toast.success(
+                <div>
+                    {actionName} successful!<br />
+                    <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer" className="underline text-emerald-400 font-bold">View on Etherscan</a>
+                </div>, 
+                { id }
+            );
+        } else if (error) {
+            toast.error(`Transaction failed: ${error.shortMessage || error.message.substring(0, 50)}...`, { id });
+        }
+    }, [isPending, isConfirming, isSuccess, error, hash, actionName]);
+}
+
 export default function GovernancePage() {
     const [burnAmount, setBurnAmount] = useState("");
     const { address } = useAccount();
@@ -208,12 +243,13 @@ export default function GovernancePage() {
     });
 
 
-    const { data: claimHash, writeContract: writeClaim, isPending: isClaiming } = useWriteContract();
+    const { data: claimHash, writeContract: writeClaim, isPending: isClaiming, error: claimError } = useWriteContract();
     const { isLoading: isConfirmingClaim, isSuccess: isConfirmedClaim } = useWaitForTransactionReceipt({ hash: claimHash });
+
+    useTransactionToast({ actionName: 'Claim Dividends', isPending: isClaiming, isConfirming: isConfirmingClaim, isSuccess: isConfirmedClaim, error: claimError, hash: claimHash });
 
     useEffect(() => {
         if (isConfirmedClaim) {
-            toast.success("Dividends claimed successfully!");
             refetchTotalDividends();
             refetchClaimableDividends();
         }
@@ -319,12 +355,13 @@ export default function GovernancePage() {
     });
     const totalPower = userNFTs.reduce((sum, nft) => sum + Number(formatEther(nft.rawPower)), 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-    const { data: burnHash, writeContract: writeBurn, isPending: isBurning } = useWriteContract();
+    const { data: burnHash, writeContract: writeBurn, isPending: isBurning, error: burnError } = useWriteContract();
     const { isLoading: isConfirmingBurn, isSuccess: isConfirmedBurn } = useWaitForTransactionReceipt({ hash: burnHash });
+
+    useTransactionToast({ actionName: 'Burn PENGO', isPending: isBurning, isConfirming: isConfirmingBurn, isSuccess: isConfirmedBurn, error: burnError, hash: burnHash });
 
     useEffect(() => {
         if (isConfirmedBurn) {
-            toast.success("Burn successful! Share Power updated.");
             refetchTokenBalance();
             refetchSharePowers();
             refetchUserTokens();
@@ -341,13 +378,14 @@ export default function GovernancePage() {
         });
     };
 
-    const { data: voteHash, writeContract: writeVote, isPending: isVoting } = useWriteContract();
+    const { data: voteHash, writeContract: writeVote, isPending: isVoting, error: voteError } = useWriteContract();
     const { isLoading: isConfirmingVote, isSuccess: isConfirmedVote } = useWaitForTransactionReceipt({ hash: voteHash });
     const [votingOnId, setVotingOnId] = useState<number | null>(null);
 
+    useTransactionToast({ actionName: 'Vote', isPending: isVoting, isConfirming: isConfirmingVote, isSuccess: isConfirmedVote, error: voteError, hash: voteHash });
+
     useEffect(() => {
         if (isConfirmedVote) {
-            toast.success("Vote cast successfully!");
             refetchProposals();
             refetchHasVoted();
         }
@@ -378,12 +416,15 @@ export default function GovernancePage() {
     const [newProposalRwa, setNewProposalRwa] = useState("");
     const [newProposalIsAdd, setNewProposalIsAdd] = useState(true);
 
-    const { data: proposeHash, writeContract: writePropose, isPending: isProposing } = useWriteContract();
+    const { data: proposeHash, writeContract: writePropose, isPending: isProposing, error: proposeError } = useWriteContract();
     const { isLoading: isConfirmingPropose, isSuccess: isConfirmedPropose } = useWaitForTransactionReceipt({ hash: proposeHash });
 
-    const { data: executeHash, writeContract: writeExecute, isPending: isExecuting } = useWriteContract();
+    const { data: executeHash, writeContract: writeExecute, isPending: isExecuting, error: executeError } = useWriteContract();
     const { isLoading: isConfirmingExecute, isSuccess: isConfirmedExecute } = useWaitForTransactionReceipt({ hash: executeHash });
     const [executingId, setExecutingId] = useState<number | null>(null);
+
+    useTransactionToast({ actionName: 'Create Proposal', isPending: isProposing, isConfirming: isConfirmingPropose, isSuccess: isConfirmedPropose, error: proposeError, hash: proposeHash });
+    useTransactionToast({ actionName: 'Execute Proposal', isPending: isExecuting, isConfirming: isConfirmingExecute, isSuccess: isConfirmedExecute, error: executeError, hash: executeHash });
 
     const isValidRwaAddress = newProposalRwa.length === 42 && newProposalRwa.startsWith('0x');
 
@@ -403,7 +444,6 @@ export default function GovernancePage() {
 
     useEffect(() => {
         if (isConfirmedPropose) {
-            toast.success("Proposal created successfully!");
             setIsProposalModalOpen(false);
             setNewProposalRwa("");
             refetchProposals();
@@ -412,7 +452,6 @@ export default function GovernancePage() {
 
     useEffect(() => {
         if (isConfirmedExecute) {
-            toast.success("Proposal executed successfully!");
             refetchProposals();
         }
     }, [isConfirmedExecute]);
