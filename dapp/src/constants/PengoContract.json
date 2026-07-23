@@ -3,8 +3,8 @@
     "contractName": "PenguinOnchain",
     "address": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
     "factoryAddress": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E",
-    "pengoConverter": "0xDb43874eEEB1cF1414a80b384C26674011020860",
-    "daoAddress": "0xC48e2B41f8AaDe7d3081d34FC6C20e9487EDE2A5",
+    "pengoConverter": "0x5c65A66806326b1857F7366C19350644F1725A91",
+    "daoAddress": "0x09577c7D42e1b3D26Aecb0183EE7b37068044E60",
     "constructorArgs": [],
     "txHash": "0xcd772371fb7c72173d0f2f2cfdf1cf5b0b1a04e47f8dfbfedab3a2378fb35550",
     "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -19,10 +19,10 @@
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://sepolia.etherscan.io/api",
             "currency": "ETH",
-            "PengoAddress": "0xADDe79C20ee78759D6902d368CEEdCA5f5e9D3CF",
-            "factoryAddress": "0xDd38b0B9CFCADEFBdA58d01461B3a2fB1a92B455",
-            "pengoConverter": "0xDb43874eEEB1cF1414a80b384C26674011020860",
-            "daoAddress": "0xC48e2B41f8AaDe7d3081d34FC6C20e9487EDE2A5",
+            "PengoAddress": "0xdB5785a7AF14B5948e10a36cfe6E18d9b59D4994",
+            "factoryAddress": "0x5a89C1eB2a90087E89b28d84F665e3724Dab498E",
+            "pengoConverter": "0x5c65A66806326b1857F7366C19350644F1725A91",
+            "daoAddress": "0x09577c7D42e1b3D26Aecb0183EE7b37068044E60",
             "abi": [
                 {
                     "inputs": [],
@@ -2276,7 +2276,7 @@
                     "type": "function"
                 }
             ],
-            "pengoTokenAddress": "0x99b3b9710e61301004Be21ff07dD7ecBb139b861"
+            "pengoTokenAddress": "0x89F1044f0d45b7e798F05e2f4A8372920d956e16"
         },
         {
             "name": "Robinhood Chain",
@@ -4411,7 +4411,1929 @@
                     "type": "function"
                 }
             ]
+        },
+        {
+            "name": "hardhat",
+            "chainId": "31337",
+            "currency": "ETH",
+            "explore": "https://sepolia.etherscan.io/",
+            "PengoAddress": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+            "factoryAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+            "daoAddress": "",
+            "pengoConverter": "",
+            "pengoTokenAddress": "",
+            "abi": [
+                {
+                    "inputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "inputs": [],
+                    "name": "AlreadyListed",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "ApprovalCallerNotOwnerNorApproved",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "ApprovalQueryForNonexistentToken",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "BalanceQueryForZeroAddress",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "InsufficientPayment",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "InvalidBeneficiary",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "InvalidPixelData",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "InvalidQueryRange",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "InvalidRecipient",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "MaxMintPerWalletReached",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "MintERC2309QuantityExceedsLimit",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "MintToZeroAddress",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "MintZeroQuantity",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NoActiveOffer",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NoWithdrawableFunds",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NotAccessoryOwner",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NotCompatibleWithSpotMints",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NotForSale",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NotTokenOwner",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "NotYourOffer",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "OfferTooLow",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "OwnerCannotOffer",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "OwnerQueryForNonexistentToken",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "OwnershipNotInitializedForExtraData",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "PartNotAllowed",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "SequentialMintExceedsLimit",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "SequentialUpToTooSmall",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "SlotFilled",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "SoldOut",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "SpotMintTokenIdTooSmall",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TokenAlreadyExists",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TokenDoesNotExist",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TransferCallerNotOwnerNorApproved",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TransferFailed",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TransferFromIncorrectOwner",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TransferToNonERC721ReceiverImplementer",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "TransferToZeroAddress",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "URIQueryForNonexistentToken",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "ZeroAddress",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "ZeroMintAmount",
+                    "type": "error"
+                },
+                {
+                    "inputs": [],
+                    "name": "ZeroPrice",
+                    "type": "error"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "trait_type",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessoryAdded",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessoryDeleted",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessoryListed",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "buyer",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessoryOfferCancelled",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "buyer",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessoryOfferMade",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "accessoryOwner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "AccessorySaleCancelled",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "accessoryType",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "seller",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "address",
+                            "name": "buyer",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "AccessorySold",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "approved",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "Approval",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "operator",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "bool",
+                            "name": "approved",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "ApprovalForAll",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "from",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "ConsecutiveTransfer",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "internalType": "uint256",
+                            "name": "_tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "MetadataUpdate",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "previousOwner",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "newOwner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "OwnershipTransferred",
+                    "type": "event"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "from",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "indexed": true,
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "Transfer",
+                    "type": "event"
+                },
+                {
+                    "inputs": [],
+                    "name": "BENEFICARY_ADDRESS",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "MAX_MINT_PER_WALLET",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "MAX_SUPPLY",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "MINT_PRICE",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "ROYALTY_ADDRESS",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "ROYALTY_PERCENT",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "accessories",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_type",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "bytePixel",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "sellingPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "lastPrice",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "forSale",
+                            "type": "bool"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "accessoriesForSale",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "accessoryId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_type",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "bytePixel",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "sellingPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "lastPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "owner",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "forSale",
+                                    "type": "bool"
+                                }
+                            ],
+                            "internalType": "struct IPenguinOnchain.Accessory",
+                            "name": "accessory",
+                            "type": "tuple"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "accessoryIds",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_type",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "trait_name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "byteCode",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "addAccessory",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "addSharePower",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "approve",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "approveOffer",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "balanceOf",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "cancelOffer",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "contractURI",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "explicitOwnershipOf",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "address",
+                                    "name": "addr",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint64",
+                                    "name": "startTimestamp",
+                                    "type": "uint64"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "burned",
+                                    "type": "bool"
+                                },
+                                {
+                                    "internalType": "uint24",
+                                    "name": "extraData",
+                                    "type": "uint24"
+                                }
+                            ],
+                            "internalType": "struct IERC721A.TokenOwnership",
+                            "name": "ownership",
+                            "type": "tuple"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "tokenIds",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "name": "explicitOwnershipsOf",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "address",
+                                    "name": "addr",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint64",
+                                    "name": "startTimestamp",
+                                    "type": "uint64"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "burned",
+                                    "type": "bool"
+                                },
+                                {
+                                    "internalType": "uint24",
+                                    "name": "extraData",
+                                    "type": "uint24"
+                                }
+                            ],
+                            "internalType": "struct IERC721A.TokenOwnership[]",
+                            "name": "",
+                            "type": "tuple[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "factory",
+                    "outputs": [
+                        {
+                            "internalType": "contract IPengoFactory",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "findAccessoryIndex",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getAllAccessoriesForSale",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "tokenId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "accessoryId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "components": [
+                                        {
+                                            "internalType": "uint256",
+                                            "name": "accessoryId",
+                                            "type": "uint256"
+                                        },
+                                        {
+                                            "internalType": "string",
+                                            "name": "trait_type",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "internalType": "string",
+                                            "name": "trait_name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "internalType": "string",
+                                            "name": "bytePixel",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "internalType": "uint256",
+                                            "name": "sellingPrice",
+                                            "type": "uint256"
+                                        },
+                                        {
+                                            "internalType": "uint256",
+                                            "name": "lastPrice",
+                                            "type": "uint256"
+                                        },
+                                        {
+                                            "internalType": "address",
+                                            "name": "owner",
+                                            "type": "address"
+                                        },
+                                        {
+                                            "internalType": "bool",
+                                            "name": "forSale",
+                                            "type": "bool"
+                                        }
+                                    ],
+                                    "internalType": "struct IPenguinOnchain.Accessory",
+                                    "name": "accessory",
+                                    "type": "tuple"
+                                }
+                            ],
+                            "internalType": "struct IPenguinOnchain.AccessoryForSale[]",
+                            "name": "",
+                            "type": "tuple[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getApproved",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getNFTDetails",
+                    "outputs": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "accessoryId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_type",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "trait_name",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "bytePixel",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "sellingPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "lastPrice",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "owner",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "bool",
+                                    "name": "forSale",
+                                    "type": "bool"
+                                }
+                            ],
+                            "internalType": "struct IPenguinOnchain.Accessory[]",
+                            "name": "",
+                            "type": "tuple[]"
+                        },
+                        {
+                            "components": [
+                                {
+                                    "internalType": "string",
+                                    "name": "category",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "networth",
+                                    "type": "string"
+                                }
+                            ],
+                            "internalType": "struct IPenguinOnchain.SpecialTrait",
+                            "name": "",
+                            "type": "tuple"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getNetWorth",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryValueWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "address[]",
+                            "name": "rwaAddresses",
+                            "type": "address[]"
+                        },
+                        {
+                            "internalType": "uint256[]",
+                            "name": "claimableAmounts",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getSeed",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "operator",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "isApprovedForAll",
+                    "outputs": [
+                        {
+                            "internalType": "bool",
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "listAccessoryForSale",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "makeOffer",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_mintAmount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "mintPengo",
+                    "outputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "mintedCount",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "name",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "nextAccessoryId",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "offerBalances",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "offers",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "buyer",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "price",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "active",
+                            "type": "bool"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "owner",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "ownerOf",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "pengoToken",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "fromTokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "toTokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "purchaseAccessory",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accessoryId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "removeAccesory",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "renounceOwnership",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "from",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "safeTransferFrom",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "from",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "bytes",
+                            "name": "_data",
+                            "type": "bytes"
+                        }
+                    ],
+                    "name": "safeTransferFrom",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "operator",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "bool",
+                            "name": "approved",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "setApprovalForAll",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_beneficiaryAddress",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setBeneficiaryAddress",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "contract IPengoFactory",
+                            "name": "_factoryAddress",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setFactory",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_pengoToken",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setPengoToken",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_royaltyAddress",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setRoyaltyAddress",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_strategy",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setStrategyContract",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "sharePower",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "specialTraits",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "category",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "networth",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "strategyContract",
+                    "outputs": [
+                        {
+                            "internalType": "contract IPengoStrategy",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "bytes4",
+                            "name": "interfaceId",
+                            "type": "bytes4"
+                        }
+                    ],
+                    "name": "supportsInterface",
+                    "outputs": [
+                        {
+                            "internalType": "bool",
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "symbol",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "tokenURI",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "tokensOfOwner",
+                    "outputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "start",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "stop",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "tokensOfOwnerIn",
+                    "outputs": [
+                        {
+                            "internalType": "uint256[]",
+                            "name": "",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "totalOfferBalance",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "totalSharePower",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "totalSupply",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "result",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "from",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "transferFrom",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "newOwner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "transferOwnership",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "withdraw",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ]
         }
     ],
-    "pengoTokenAddress": "0x99b3b9710e61301004Be21ff07dD7ecBb139b861"
+    "pengoTokenAddress": "0x89F1044f0d45b7e798F05e2f4A8372920d956e16"
 }
