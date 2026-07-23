@@ -73,7 +73,7 @@ export default function GovernancePage() {
     const rawPengoBalance = userTokenBalanceData ? (userTokenBalanceData as bigint) : BigInt(0);
 
     // 2. Read Proposal Count
-    const { data: proposalCountData } = useReadContract({
+    const { data: proposalCountData, refetch: refetchProposalCount } = useReadContract({
         address: strategyAddress,
         abi: strategyAbi,
         functionName: 'proposalCount',
@@ -258,15 +258,26 @@ export default function GovernancePage() {
 
 
     const handleClaim = (rwaAddress: `0x${string}`) => {
-        if (!selectedNftToBurn) {
-            toast.error("Please select an NFT to claim dividends.");
+        let tokenToUse = selectedNftToBurn;
+        
+        // Auto-select NFT with highest claimable dividends or power if none selected
+        if (!tokenToUse) {
+            const nftsWithPower = [...userNFTs].filter(nft => nft.rawPower > BigInt(0)).sort((a, b) => Number(b.rawPower) - Number(a.rawPower));
+            if (nftsWithPower.length > 0) {
+                tokenToUse = nftsWithPower[0].id;
+            }
+        }
+
+        if (!tokenToUse) {
+            toast.error("You don't have any NFT with Share Power to claim dividends.");
             return;
         }
+
         writeClaim({
             address: strategyAddress,
             abi: strategyAbi,
             functionName: 'claimDividends',
-            args: [rwaAddress, BigInt(selectedNftToBurn)]
+            args: [rwaAddress, BigInt(tokenToUse)]
         });
     };
 
@@ -320,13 +331,16 @@ export default function GovernancePage() {
             refetchActiveBuyList();
             refetchStrategyBalances();
             refetchTotalDividends();
+            refetchProposalCount();
+            refetchProposals();
             if (selectedNftToBurn) {
                 refetchClaimableDividends();
                 refetchSharePowers();
+                refetchHasVoted();
             }
         }, 5000);
         return () => clearInterval(interval);
-    }, [selectedNftToBurn, refetchRewardTokens, refetchActiveBuyList, refetchStrategyBalances, refetchTotalDividends, refetchClaimableDividends, refetchSharePowers]);
+    }, [selectedNftToBurn, refetchRewardTokens, refetchActiveBuyList, refetchStrategyBalances, refetchTotalDividends, refetchClaimableDividends, refetchSharePowers, refetchProposalCount, refetchProposals, refetchHasVoted]);
 
     const userNFTs = userTokenIds.map((id, index) => {
         const rawPower = sharePowersData && sharePowersData[index] ? (sharePowersData[index].result as bigint || BigInt(0)) : BigInt(0);
@@ -395,12 +409,22 @@ export default function GovernancePage() {
     }, [isConfirmedVote]);
 
     const handleVote = (proposalId: number, support: boolean) => {
-        if (!selectedNftToBurn) {
-            toast.error("Please select an NFT from 'Your Profile' to cast a vote.");
+        let tokenToUse = selectedNftToBurn;
+        
+        // Auto-select NFT with highest power if none selected
+        if (!tokenToUse) {
+            const nftsWithPower = [...userNFTs].filter(nft => nft.rawPower > BigInt(0)).sort((a, b) => Number(b.rawPower) - Number(a.rawPower));
+            if (nftsWithPower.length > 0) {
+                tokenToUse = nftsWithPower[0].id;
+            }
+        }
+
+        if (!tokenToUse) {
+            toast.error("You don't have any NFT with Share Power to cast a vote.");
             return;
         }
 
-        const selectedNftObj = userNFTs.find(nft => nft.id === selectedNftToBurn);
+        const selectedNftObj = userNFTs.find(nft => nft.id === tokenToUse);
         if (selectedNftObj && selectedNftObj.rawPower === BigInt(0)) {
             toast.error("Your selected NFT does not have any Share Power to vote.");
             return;
@@ -411,7 +435,7 @@ export default function GovernancePage() {
             address: strategyAddress,
             abi: strategyAbi,
             functionName: 'vote',
-            args: [BigInt(proposalId), BigInt(selectedNftToBurn), support]
+            args: [BigInt(proposalId), BigInt(tokenToUse), support]
         });
     };
 
@@ -449,6 +473,7 @@ export default function GovernancePage() {
         if (isConfirmedPropose) {
             setIsProposalModalOpen(false);
             setNewProposalRwa("");
+            refetchProposalCount();
             refetchProposals();
         }
     }, [isConfirmedPropose]);
@@ -464,12 +489,23 @@ export default function GovernancePage() {
             toast.error("Please enter an RWA token address.");
             return;
         }
-        if (!selectedNftToBurn) {
-            toast.error("Please select an NFT from 'Your Profile' to create a proposal.");
+        
+        let tokenToUse = selectedNftToBurn;
+        
+        // Auto-select NFT with highest power if none selected
+        if (!tokenToUse) {
+            const nftsWithPower = [...userNFTs].filter(nft => nft.rawPower > BigInt(0)).sort((a, b) => Number(b.rawPower) - Number(a.rawPower));
+            if (nftsWithPower.length > 0) {
+                tokenToUse = nftsWithPower[0].id;
+            }
+        }
+
+        if (!tokenToUse) {
+            toast.error("You don't have any NFT with Share Power. Burn PENGO first to get Share Power.");
             return;
         }
 
-        const selectedNftObj = userNFTs.find(nft => nft.id === selectedNftToBurn);
+        const selectedNftObj = userNFTs.find(nft => nft.id === tokenToUse);
         if (selectedNftObj && selectedNftObj.rawPower === BigInt(0)) {
             toast.error("Your selected NFT does not have any Share Power to create a proposal.");
             return;
@@ -479,7 +515,7 @@ export default function GovernancePage() {
             address: strategyAddress,
             abi: strategyAbi,
             functionName: 'propose',
-            args: [newProposalRwa as `0x${string}`, newProposalIsAdd, BigInt(selectedNftToBurn)]
+            args: [newProposalRwa as `0x${string}`, newProposalIsAdd, BigInt(tokenToUse)]
         });
     };
 
