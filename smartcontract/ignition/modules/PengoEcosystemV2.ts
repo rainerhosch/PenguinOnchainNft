@@ -36,6 +36,9 @@ export default buildModule("PengoEcosystemV2", (m) => {
     // Set NFT Contract in PENGO Token
     m.call(pengoToken, "setNftContract", [penguinOnchain]);
 
+    // Set PENGO Token in NFT Contract
+    m.call(penguinOnchain, "setPengoToken", [pengoToken]);
+
     // 4. Deploy UUPS Vault (PengoStrategy)
     const pengoStrategyImpl = m.contract("PengoStrategy");
     const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain]);
