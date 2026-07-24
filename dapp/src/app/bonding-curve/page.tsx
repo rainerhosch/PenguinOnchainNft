@@ -8,9 +8,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceD
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import { useEthPrice } from '../../hooks/useEthPrice';
-
-const contractAddress = PengoEcosystem.addresses.sepolia.PengoBondingCurve as `0x${string}`;
-const abi = PengoEcosystem.abis.PengoBondingCurve;
+import { getAddresses } from '../../utils/addresses';
 
 // Generate full curve points (x from 0 to 100)
 const curvePoints = Array.from({ length: 101 }, (_, i) => {
@@ -26,8 +24,11 @@ export default function BondingCurvePage() {
     const [inputValue, setInputValue] = useState<string>("");
     const [isEthTop, setIsEthTop] = useState(false);
     const [isClient, setIsClient] = useState(false);
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, chainId } = useAccount();
     const { openConnectModal } = useConnectModal();
+    const addresses = getAddresses(chainId);
+    const contractAddress = addresses.PengoBondingCurve as `0x${string}`;
+    const abi = PengoEcosystem.abis.PengoBondingCurve;
 
     // Slippage States
     const [slippageMode, setSlippageMode] = useState<"auto" | number>("auto");
@@ -96,7 +97,7 @@ export default function BondingCurvePage() {
 
     // 3. Read User Token Balance
     const { data: userTokenBalanceData, refetch: refetchUserTokenBalance } = useReadContract({
-        address: PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`,
+        address: addresses.PengoToken as `0x${string}`,
         abi: PengoEcosystem.abis.PengoToken,
         functionName: 'balanceOf',
         args: [address],
@@ -181,7 +182,7 @@ export default function BondingCurvePage() {
     const marketCapUsd = ethPrice ? marketCapEth * ethPrice : null;
 
     // 7. Check Token Allowance for Sell
-    const tokenAddress = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
+    const tokenAddress = addresses.PengoToken as `0x${string}`;
     const { data: tokenAllowanceData } = useReadContract({
         address: tokenAddress,
         abi: PengoEcosystem.abis.PengoToken,

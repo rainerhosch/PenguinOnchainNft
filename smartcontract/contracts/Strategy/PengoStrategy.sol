@@ -7,9 +7,14 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "../interfaces/IPenguinOnchain.sol";
 
-contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+import {IPositionManager} from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
+import {Actions} from "@uniswap/v4-periphery/src/libraries/Actions.sol";
+import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
+
+contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, IERC721Receiver {
     IPenguinOnchain public nftContract;
     
     struct Proposal {
@@ -38,21 +43,29 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     mapping(address => mapping(uint256 => uint256)) public rewardDebt; // rwaToken => tokenId => uint256
     mapping(address => mapping(uint256 => uint256)) public pendingDividends; // rwaToken => tokenId => uint256
     
+    // Uniswap V4 Integration
+    IPositionManager public positionManager;
+    
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
     
-    function initialize(address _nftContract) initializer public {
+    function initialize(address _nftContract, address _positionManager) initializer public {
         __Ownable_init();
         __UUPSUpgradeable_init();
         __ReentrancyGuard_init();
         
         nftContract = IPenguinOnchain(_nftContract);
+        positionManager = IPositionManager(_positionManager);
     }
 
     function setNftContract(address _nftContract) external onlyOwner {
         nftContract = IPenguinOnchain(_nftContract);
+    }
+
+    function setPositionManager(address _positionManager) external onlyOwner {
+        positionManager = IPositionManager(_positionManager);
     }
     
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -224,5 +237,32 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
 
     function getActiveBuyList() external view returns (address[] memory) {
         return activeBuyList;
+    }
+
+    // --- Uniswap V4 Integration ---
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+        return this.onERC721Received.selector;
+    }
+
+    function claimFeesFromPosition(uint256 lpTokenId, Currency currency0, Currency currency1) external nonReentrant onlyOwner {
+        // Prepare decreaseLiquidity parameters with 0 liquidity to collect fees
+        bytes memory actions = new bytes(2);
+        actions[0] = bytes1(uint8(Actions.DECREASE_LIQUIDITY));
+        actions[1] = bytes1(uint8(Actions.TAKE_PAIR));
+
+        bytes[] memory params = new bytes[](2);
+        params[0] = abi.encode(lpTokenId, 0, 0, 0, ""); // (tokenId, liquidity, amount0Min, amount1Min, hookData)
+        params[1] = abi.encode(currency0, currency1, address(this)); // (currency0, currency1, recipient)
+
+        // Modify liquidity and collect fees
+        positionManager.modifyLiquidities(
+            abi.encode(actions, params),
+            block.timestamp + 300
+        );
     }
 }

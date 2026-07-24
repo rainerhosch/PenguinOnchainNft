@@ -1,23 +1,28 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IUniswapV2Router02 {
-    function addLiquidityETH(
-        address token,
-        uint amountTokenDesired,
-        uint amountTokenMin,
-        uint amountETHMin,
-        address to,
-        uint deadline
-    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
-}
+import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
+import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
+import {Currency, CurrencyLibrary} from "@uniswap/v4-core/src/types/Currency.sol";
+import {TickMath} from "@uniswap/v4-core/src/libraries/TickMath.sol";
+import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
+import {FullMath} from "@uniswap/v4-core/src/libraries/FullMath.sol";
+
+import {IPositionManager} from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
+import {Actions} from "@uniswap/v4-periphery/src/libraries/Actions.sol";
+import {LiquidityAmounts} from "@uniswap/v4-periphery/src/libraries/LiquidityAmounts.sol";
+import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol";
+
+import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
 
 contract PengoBondingCurve is Ownable {
     IERC20 public pengoToken;
-    IUniswapV2Router02 public uniswapRouter;
+    IPoolManager public poolManager;
+    IPositionManager public positionManager;
+    IAllowanceTransfer public permit2;
     
     uint256 public immutable TARGET_LIQUIDITY; 
     uint256 public constant TOKENS_FOR_SALE = 800_000_000 * 1e18;
@@ -35,9 +40,18 @@ contract PengoBondingCurve is Ownable {
     event TokensSold(address indexed seller, uint256 amount, uint256 returnEth, uint256 taxEth);
     event LiquidityMigrated(uint256 ethAmount, uint256 tokenAmount, uint256 lpTokens);
 
-    constructor(address _pengoToken, address _uniswapRouter, address _strategyVault, uint256 _targetLiquidity) {
+    constructor(
+        address _pengoToken, 
+        address _poolManager, 
+        address _positionManager,
+        address _permit2,
+        address _strategyVault, 
+        uint256 _targetLiquidity
+    ) {
         pengoToken = IERC20(_pengoToken);
-        uniswapRouter = IUniswapV2Router02(_uniswapRouter);
+        poolManager = IPoolManager(_poolManager);
+        positionManager = IPositionManager(_positionManager);
+        permit2 = IAllowanceTransfer(_permit2);
         strategyVault = _strategyVault;
         TARGET_LIQUIDITY = _targetLiquidity;
 
@@ -140,19 +154,68 @@ contract PengoBondingCurve is Ownable {
         
         require(tokenBalance >= TOKENS_FOR_LIQUIDITY, "Not enough tokens for LP");
         
-        pengoToken.approve(address(uniswapRouter), TOKENS_FOR_LIQUIDITY);
+        // Setup PoolKey
+        Currency currency0 = CurrencyLibrary.ADDRESS_ZERO;
+        Currency currency1 = Currency.wrap(address(pengoToken));
         
-        // Add liquidity to Uniswap. LP tokens are sent directly to the Strategy Vault!
-        (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethBalance}(
-            address(pengoToken),
-            TOKENS_FOR_LIQUIDITY, // Only pair exactly the designated amount, ensuring perfect price jump
-            0, // accept any amount of token
-            0, // accept any amount of ETH
-            strategyVault,
-            block.timestamp + 300
+        uint24 fee = 3000; // 0.3%
+        int24 tickSpacing = 60;
+        
+        PoolKey memory poolKey = PoolKey({
+            currency0: currency0,
+            currency1: currency1,
+            fee: fee,
+            tickSpacing: tickSpacing,
+            hooks: IHooks(address(0))
+        });
+        
+        // Calculate sqrtPriceX96
+        // token0 is ETH, token1 is PENGO
+        // Price = token1 / token0 = TOKENS_FOR_LIQUIDITY / ethBalance
+        uint256 ratioX192 = FullMath.mulDiv(TOKENS_FOR_LIQUIDITY, 1 << 192, ethBalance);
+        uint160 sqrtPriceX96 = uint160(FixedPointMathLib.sqrt(ratioX192));
+        
+        // Initialize pool
+        poolManager.initialize(poolKey, sqrtPriceX96);
+        
+        // Full range ticks
+        int24 tickLower = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
+        int24 tickUpper = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
+        
+        // Calculate required liquidity amount
+        uint128 liquidity = LiquidityAmounts.getLiquidityForAmounts(
+            sqrtPriceX96,
+            TickMath.getSqrtPriceAtTick(tickLower),
+            TickMath.getSqrtPriceAtTick(tickUpper),
+            ethBalance,
+            TOKENS_FOR_LIQUIDITY
         );
         
-        emit LiquidityMigrated(amountETH, amountToken, liquidity);
+        // Approve Permit2
+        pengoToken.approve(address(permit2), type(uint256).max);
+        permit2.approve(address(pengoToken), address(positionManager), type(uint160).max, type(uint48).max);
+        
+        // Mint position
+        bytes memory actions = abi.encodePacked(uint8(Actions.MINT_POSITION), uint8(Actions.SETTLE_PAIR));
+        bytes[] memory params = new bytes[](2);
+        params[0] = abi.encode(
+            poolKey, 
+            tickLower, 
+            tickUpper, 
+            uint256(liquidity), 
+            uint128(ethBalance), 
+            uint128(TOKENS_FOR_LIQUIDITY), 
+            strategyVault, // receiver of the NFT
+            ""
+        );
+        params[1] = abi.encode(currency0, currency1); // For SETTLE_PAIR decodeCurrencyPair
+        
+        positionManager.modifyLiquidities{value: ethBalance}(
+            abi.encode(actions, params),
+            block.timestamp
+        );
+        
+        emit LiquidityMigrated(ethBalance, TOKENS_FOR_LIQUIDITY, liquidity);
 
         // Burn any remaining tokens (due to tax or early curve completion)
         uint256 remainingTokens = pengoToken.balanceOf(address(this));

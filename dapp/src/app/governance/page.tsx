@@ -6,12 +6,8 @@ import { useReadContract, useWriteContract, useAccount, useWaitForTransactionRec
 import { parseEther, formatEther, type Abi, erc20Abi } from 'viem';
 import { toast, Toaster } from 'react-hot-toast';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
+import { getAddresses } from '../../utils/addresses';
 
-const strategyAddress = PengoEcosystem.addresses.sepolia.PengoStrategyProxy as `0x${string}`;
-const strategyAbi = PengoEcosystem.abis.PengoStrategy as Abi;
-const tokenAddress = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
-const tokenAbi = PengoEcosystem.abis.PengoToken as Abi;
-const nftAddress = PengoEcosystem.addresses.sepolia.PenguinOnchain as `0x${string}`;
 import PenguinOnchainAbiRaw from '../../constants/PenguinOnchainAbi.json';
 const PenguinOnchainAbi = PenguinOnchainAbiRaw as Abi;
 
@@ -57,8 +53,17 @@ function useTransactionToast({
 }
 
 export default function GovernancePage() {
+    const { address, isConnected, chainId } = useAccount();
+    const addresses = getAddresses(chainId || 11155111);
+
+    const strategyAddress = addresses.PengoStrategyProxy as `0x${string}`;
+    const tokenAddress = addresses.PengoToken as `0x${string}`;
+    const nftAddress = addresses.PenguinOnchain as `0x${string}`;
+
+    const strategyAbi = PengoEcosystem.abis.PengoStrategy as Abi;
+    const tokenAbi = PengoEcosystem.abis.PengoToken as Abi;
+
     const [burnAmount, setBurnAmount] = useState("");
-    const { address } = useAccount();
     const [selectedNftToBurn, setSelectedNftToBurn] = useState("");
 
     // 1. Read User Token Balance

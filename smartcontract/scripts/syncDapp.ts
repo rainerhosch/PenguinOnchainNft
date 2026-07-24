@@ -39,6 +39,7 @@ async function main() {
   const dappConstantsPath = path.join(__dirname, "..", "..", "dapp", "src", "constants");
   const contractJsonPath = path.join(dappConstantsPath, "PengoContract.json");
   const abiJsonPath = path.join(dappConstantsPath, "PengoAbi.json");
+  const ecosystemJsonPath = path.join(dappConstantsPath, "PengoEcosystem.json");
 
   let contractJson: any = {};
   if (fs.existsSync(contractJsonPath)) {
@@ -93,6 +94,39 @@ async function main() {
   // 4. Update PengoAbi.json
   fs.writeFileSync(abiJsonPath, JSON.stringify(penguinArtifact.abi, null, 2));
   console.log(`✅ Updated ${abiJsonPath} successfully!`);
+
+  // 5. Update PengoEcosystem.json
+  if (fs.existsSync(ecosystemJsonPath)) {
+    const ecosystemJson = JSON.parse(fs.readFileSync(ecosystemJsonPath, "utf-8"));
+    if (!ecosystemJson.addresses) ecosystemJson.addresses = {};
+    
+    // Use the actual network name (e.g. 'mainnet', 'sepolia', 'robinhood')
+    const ecosystemNetworkName = networkName === 'localhost' ? 'hardhat' : networkName;
+    
+    if (!ecosystemJson.addresses[ecosystemNetworkName]) {
+      ecosystemJson.addresses[ecosystemNetworkName] = {};
+    }
+
+    if (factoryAddress) ecosystemJson.addresses[ecosystemNetworkName].PengoFactory = factoryAddress;
+    if (penguinAddress) ecosystemJson.addresses[ecosystemNetworkName].PenguinOnchain = penguinAddress;
+    if (daoAddress) ecosystemJson.addresses[ecosystemNetworkName].PengoStrategyProxy = daoAddress;
+    if (pengoConverter) ecosystemJson.addresses[ecosystemNetworkName].PengoBondingCurve = pengoConverter;
+    if (pengoToken) ecosystemJson.addresses[ecosystemNetworkName].PengoToken = pengoToken;
+    
+    // Also sync mock tokens if deployed (optional, mainly for testnets)
+    const mockAAPL = deployedAddresses["PengoEcosystemV2#MockAAPL"];
+    const mockGold = deployedAddresses["PengoEcosystemV2#MockGold"];
+    const mockGoogle = deployedAddresses["PengoEcosystemV2#MockGoogle"];
+    const mockNVIDIA = deployedAddresses["PengoEcosystemV2#MockNVIDIA"];
+    
+    if (mockAAPL) ecosystemJson.addresses[ecosystemNetworkName].MockAAPL = mockAAPL;
+    if (mockGold) ecosystemJson.addresses[ecosystemNetworkName].MockGold = mockGold;
+    if (mockGoogle) ecosystemJson.addresses[ecosystemNetworkName].MockGoogle = mockGoogle;
+    if (mockNVIDIA) ecosystemJson.addresses[ecosystemNetworkName].MockNVIDIA = mockNVIDIA;
+
+    fs.writeFileSync(ecosystemJsonPath, JSON.stringify(ecosystemJson, null, 2));
+    console.log(`✅ Updated ${ecosystemJsonPath} successfully for network '${ecosystemNetworkName}'!`);
+  }
 }
 
 main().catch((error) => {

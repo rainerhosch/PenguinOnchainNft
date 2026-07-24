@@ -32,7 +32,7 @@ describe("Pengo Ecosystem & Vault Strategy", function () {
     strategyImpl = await PengoStrategy.deploy();
     await strategyImpl.waitForDeployment();
 
-    const initData = strategyImpl.interface.encodeFunctionData("initialize", [await nft.getAddress()]);
+    const initData = strategyImpl.interface.encodeFunctionData("initialize", [await nft.getAddress(), ethers.ZeroAddress]);
     
     PengoProxy = await ethers.getContractFactory("PengoProxy");
     const proxy = await PengoProxy.deploy(await strategyImpl.getAddress(), initData);

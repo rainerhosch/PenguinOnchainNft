@@ -8,24 +8,24 @@ import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import UniswapRouterAbi from '../../constants/UniswapRouterAbi.json';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEthPrice } from '../../hooks/useEthPrice';
-
-// WETH used by the V2 Clone Router on Sepolia
-const WETH_ADDRESS = "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14";
-const ROUTER_ADDRESS = "0xeE567Fe1712Faf6149d80dA1E6934E354124CfE3" as `0x${string}`;
-const PENGO_ADDRESS = PengoEcosystem.addresses.sepolia.PengoToken as `0x${string}`;
-const BONDING_CURVE_ADDRESS = PengoEcosystem.addresses.sepolia.PengoBondingCurve as `0x${string}`;
+import { getAddresses, getDexAddresses } from '../../utils/addresses';
 
 export default function SwapPage() {
     const [inputValue, setInputValue] = useState("");
     const [isEthTop, setIsEthTop] = useState(true);
     const [isClient, setIsClient] = useState(false);
     
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, chainId } = useAccount();
     const { openConnectModal } = useConnectModal();
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    const { WETH_ADDRESS, ROUTER_ADDRESS } = getDexAddresses(chainId);
+    const addresses = getAddresses(chainId);
+    const PENGO_ADDRESS = addresses.PengoToken;
+    const BONDING_CURVE_ADDRESS = addresses.PengoBondingCurve;
 
     // 1. Read User Balances
     const { data: userTokenBalanceData, refetch: refetchUserTokenBalance } = useReadContract({
