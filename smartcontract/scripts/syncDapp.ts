@@ -3,7 +3,7 @@ import path from "path";
 import hre from "hardhat";
 
 async function main() {
-  const chainId = hre.network.config.chainId;
+  const chainId = hre.network.config.chainId || (hre.network.name === "localhost" ? 31337 : undefined);
   const networkName = hre.network.name;
 
   console.log(`Syncing DApp for network: ${networkName} (Chain ID: ${chainId})`);

@@ -99,7 +99,12 @@ contract PengoBondingCurve is Ownable {
 
     function buy(uint256 amount) external payable {
         require(!isMigrated, "Liquidity already migrated to DEX");
-        require(tokensSold + amount <= TOKENS_FOR_SALE, "Exceeds available tokens for sale");
+        
+        // Auto-Cap logic: adjust amount if it exceeds available tokens
+        if (tokensSold + amount > TOKENS_FOR_SALE) {
+            amount = TOKENS_FOR_SALE - tokensSold;
+        }
+        require(amount > 0, "No tokens available for sale");
         
         (uint256 totalCost, uint256 taxEth) = getCost(amount);
         require(msg.value >= totalCost, "Insufficient ETH sent");
@@ -114,8 +119,8 @@ contract PengoBondingCurve is Ownable {
             payable(msg.sender).transfer(msg.value - totalCost);
         }
         
-        // Check if target liquidity is reached
-        if (address(this).balance >= TARGET_LIQUIDITY) {
+        // Check if all tokens for sale are sold
+        if (tokensSold == TOKENS_FOR_SALE) {
             _migrateLiquidity();
         }
     }
@@ -138,12 +143,6 @@ contract PengoBondingCurve is Ownable {
         payable(msg.sender).transfer(returnEth);
         
         emit TokensSold(msg.sender, amount, returnEth, taxEth);
-        
-        // Note: the taxEth is naturally kept in address(this).balance.
-        // We check if target liquidity is reached from tax!
-        if (address(this).balance >= TARGET_LIQUIDITY) {
-            _migrateLiquidity();
-        }
     }
 
     function _migrateLiquidity() internal {

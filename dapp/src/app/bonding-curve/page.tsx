@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AppNavbar from "../../components/AppNavBar";
 import { useReadContract, useWriteContract, useAccount, useBalance, useWaitForTransactionReceipt, useWatchContractEvent } from 'wagmi';
 import { parseEther, formatEther, maxUint256 } from 'viem';
@@ -20,6 +21,7 @@ const curvePoints = Array.from({ length: 101 }, (_, i) => {
 });
 
 export default function BondingCurvePage() {
+    const router = useRouter();
     const [tradeMode, setTradeMode] = useState<"buy" | "sell">("buy");
     const [inputValue, setInputValue] = useState<string>("");
     const [isEthTop, setIsEthTop] = useState(false);
@@ -73,6 +75,13 @@ export default function BondingCurvePage() {
     });
     const isMigrated = isMigratedData ? Boolean(isMigratedData) : false;
 
+    // Redirect to swap page if bonding curve is complete
+    useEffect(() => {
+        if (isMigrated) {
+            router.push("/swap");
+        }
+    }, [isMigrated, router]);
+
     // Fetch Curve Parameters for Math Estimation
     const { data: basePriceData } = useReadContract({ address: contractAddress, abi, functionName: 'basePrice', query: { refetchInterval: 60000 } });
     const { data: priceIncData } = useReadContract({ address: contractAddress, abi, functionName: 'priceIncrement', query: { refetchInterval: 60000 } });
@@ -82,10 +91,14 @@ export default function BondingCurvePage() {
     const priceIncNum = priceIncData ? Number(formatEther(priceIncData as bigint)) : 0;
     const soldNum = tokensSoldData ? Number(formatEther(tokensSoldData as bigint)) : 0;
 
-    // If migrated, ethRaised is mathematically equal to targetLiquidity
     const displayEthRaised = isMigrated ? targetLiquidity : ethRaised;
-    const progress = isMigrated ? "100.00" : Math.min((displayEthRaised / (targetLiquidity > 0 ? targetLiquidity : 1)) * 100, 100).toFixed(2);
-
+    
+    // Calculate progress strictly based on tokens sold (invariant)
+    let rawProgress = (soldNum / 800_000_000) * 100;
+    if (!isMigrated && rawProgress >= 99.99) {
+        rawProgress = 99.99; // Cap at 99.99% if not yet migrated to prevent early 100% display
+    }
+    const progress = isMigrated ? "100.00" : rawProgress.toFixed(2);
     // Dynamic chart calculations based on progress
     const dotX = Number(progress);
     
