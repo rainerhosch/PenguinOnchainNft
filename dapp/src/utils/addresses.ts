@@ -75,16 +75,18 @@ export function getV4DexAddresses(chainId?: number) {
         return {
             POOL_MANAGER:   "0x8366a39CC670B4001A1121B8F6A443A643e40951" as `0x${string}`,
             V4_QUOTER:      "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94" as `0x${string}`,
-            POOL_SWAP_TEST: "0x0000000000000000000000000000000000000000" as `0x${string}`, // TODO: Replace with UniversalRouter when deployed on Robinhood Chain
+            UNIVERSAL_ROUTER: "0x8876789976decbfcbbbe364623c63652db8c0904" as `0x${string}`,
+            PERMIT2:        "0x000000000022D473030F116dDEE9F6B43aC78BA3" as `0x${string}`
         };
     }
 
     // Sepolia Testnet — Official Uniswap V4 Deployments
-    // Source: https://developers.uniswap.org/deployments?chain=Sepolia
+    // Source: https://developers.uniswap.org/docs/protocols/v4/deployments
     return {
-        POOL_MANAGER:   "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543" as `0x${string}`,
-        V4_QUOTER:      "0x61B3f2011A92d183C7dbaDBdA940a7555Ccf9227" as `0x${string}`,
-        POOL_SWAP_TEST: "0x9B6b46e2c869aa39918Db7f52f5557FE577B6eEe" as `0x${string}`,
+        POOL_MANAGER:     "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543" as `0x${string}`,
+        V4_QUOTER:        "0x61b3f2011a92d183c7dbadbda940a7555ccf9227" as `0x${string}`,
+        UNIVERSAL_ROUTER: "0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b" as `0x${string}`,
+        PERMIT2:          "0x000000000022D473030F116dDEE9F6B43aC78BA3" as `0x${string}`
     };
 }
 

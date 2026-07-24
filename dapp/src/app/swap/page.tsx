@@ -7,9 +7,12 @@ import { parseEther, formatEther, maxUint256 } from 'viem';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
 import UniswapV4QuoterAbi from '../../constants/UniswapV4QuoterAbi.json';
 import UniswapPoolSwapTestAbi from '../../constants/UniswapPoolSwapTestAbi.json';
+import Permit2Abi from '../../constants/Permit2Abi.json';
+import UniversalRouterAbi from '../../constants/UniversalRouterAbi.json';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEthPrice } from '../../hooks/useEthPrice';
 import { getAddresses, getV4DexAddresses } from '../../utils/addresses';
+import { encodeAbiParameters, parseAbiParameters } from 'viem';
 
 
 
@@ -25,7 +28,7 @@ export default function SwapPage() {
         setIsClient(true);
     }, []);
 
-    const { POOL_MANAGER, V4_QUOTER, POOL_SWAP_TEST } = getV4DexAddresses(chainId);
+    const { POOL_MANAGER, V4_QUOTER, UNIVERSAL_ROUTER, PERMIT2 } = getV4DexAddresses(chainId);
     const addresses = getAddresses(chainId);
     const PENGO_ADDRESS = addresses.PengoToken;
     const BONDING_CURVE_ADDRESS = addresses.PengoBondingCurve;
@@ -117,17 +120,27 @@ export default function SwapPage() {
     const swapEthAmount = isEthTop ? Number(inputValue || 0) : Number(outputValueFormatted || 0);
     const swapEthUsd = ethPrice && swapEthAmount > 0 ? `~$${(swapEthAmount * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "";
 
-    // 3. Check Token Allowance for Selling PENGO
-    //    In Uniswap V4, when using PoolSwapTest to swap, it calls transferFrom on the user.
-    //    User must approve POOL_SWAP_TEST to spend their PENGO.
+    // 3. Check Token Allowances for Selling PENGO via Universal Router
     const { data: tokenAllowanceData, refetch: refetchAllowance } = useReadContract({
         address: PENGO_ADDRESS,
         abi: PengoEcosystem.abis.PengoToken,
         functionName: 'allowance',
-        args: [address, POOL_SWAP_TEST],
+        args: [address, PERMIT2],
         query: { enabled: !!address && !isEthTop }
     });
-    const hasEnoughAllowance = tokenAllowanceData ? (tokenAllowanceData as bigint) >= inputAmountParsed : false;
+    const hasErc20Allowance = tokenAllowanceData ? (tokenAllowanceData as bigint) >= inputAmountParsed : false;
+
+    const { data: permit2AllowanceData, refetch: refetchPermit2Allowance } = useReadContract({
+        address: PERMIT2,
+        abi: Permit2Abi,
+        functionName: 'allowance',
+        args: [address, PENGO_ADDRESS, UNIVERSAL_ROUTER],
+        query: { enabled: !!address && !isEthTop }
+    });
+    
+    const permit2Amount = permit2AllowanceData ? (permit2AllowanceData as any)[0] as bigint : BigInt(0);
+    const permit2Expiration = permit2AllowanceData ? (permit2AllowanceData as any)[1] as number : 0;
+    const hasPermit2Allowance = permit2Amount >= inputAmountParsed && permit2Expiration > Math.floor(Date.now() / 1000);
 
     // 4. Write Contracts (Swap, Approve)
     const { data: hash, writeContract, isPending } = useWriteContract();
@@ -138,47 +151,112 @@ export default function SwapPage() {
             refetchUserTokenBalance();
             refetchUserEthBalance();
             refetchAllowance();
+            refetchPermit2Allowance();
             setInputValue(""); // Reset input on success
         }
-    }, [isConfirmed, refetchUserTokenBalance, refetchUserEthBalance, refetchAllowance]);
+    }, [isConfirmed, refetchUserTokenBalance, refetchUserEthBalance, refetchAllowance, refetchPermit2Allowance]);
 
     const handleSwap = () => {
         if (inputAmountParsed === BigInt(0) || expectedOutput === BigInt(0)) return;
 
-        // V4 SwapParams: negative amountSpecified = exact input mode
-        // sqrtPriceLimitX96: set to boundary values to allow swap without price limit
-        const MIN_SQRT = BigInt("4295128740");           // MIN_SQRT_PRICE + 1
-        const MAX_SQRT = BigInt("1461446703485210103287273052203988822378723970341"); // MAX_SQRT_PRICE - 1
-        const swapParams = {
-            zeroForOne: isEthTop,
-            amountSpecified: -BigInt(inputAmountParsed),
-            sqrtPriceLimitX96: isEthTop ? MIN_SQRT : MAX_SQRT
-        };
+        // UniversalRouter V4_SWAP encoding:
+        // commands = 0x10 (V4_SWAP)
+        // inputs[0] = abi.encode(bytes actions, bytes[] params)
+        //   actions: packed bytes of:
+        //     0x06 = SWAP_EXACT_IN_SINGLE
+        //     0x0c = SETTLE_ALL (pay input token to PoolManager)
+        //     0x0f = TAKE_ALL  (receive output token from PoolManager)
+
+        const SWAP_EXACT_IN_SINGLE = 0x06;
+        const SETTLE_ALL = 0x0c;
+        const TAKE_ALL = 0x0f;
+
+        // Pack actions as bytes
+        const actions = `0x${SWAP_EXACT_IN_SINGLE.toString(16).padStart(2,'0')}${SETTLE_ALL.toString(16).padStart(2,'0')}${TAKE_ALL.toString(16).padStart(2,'0')}` as `0x${string}`;
+
+        // Determine currencies for SETTLE_ALL and TAKE_ALL
+        const currencyIn  = isEthTop ? '0x0000000000000000000000000000000000000000' as `0x${string}` : PENGO_ADDRESS;
+        const currencyOut = isEthTop ? PENGO_ADDRESS : '0x0000000000000000000000000000000000000000' as `0x${string}`;
+
+        // param0: ExactInputSingleParams
+        const param0 = encodeAbiParameters(
+            [{ type: 'tuple', components: [
+                { type: 'tuple', name: 'poolKey', components: [
+                    { type: 'address', name: 'currency0' },
+                    { type: 'address', name: 'currency1' },
+                    { type: 'uint24',  name: 'fee' },
+                    { type: 'int24',   name: 'tickSpacing' },
+                    { type: 'address', name: 'hooks' }
+                ]},
+                { type: 'bool',    name: 'zeroForOne' },
+                { type: 'uint128', name: 'amountIn' },
+                { type: 'uint128', name: 'amountOutMinimum' },
+                { type: 'bytes',   name: 'hookData' }
+            ]}],
+            [{
+                poolKey: {
+                    currency0: poolKey.currency0,
+                    currency1: poolKey.currency1,
+                    fee: poolKey.fee,
+                    tickSpacing: poolKey.tickSpacing,
+                    hooks: poolKey.hooks
+                },
+                zeroForOne: isEthTop,
+                amountIn: inputAmountParsed,
+                amountOutMinimum: BigInt(0),
+                hookData: '0x'
+            }]
+        );
+
+        // param1: SETTLE_ALL — (Currency currency, uint256 maxAmount)
+        const param1 = encodeAbiParameters(
+            [{ type: 'address' }, { type: 'uint256' }],
+            [currencyIn, inputAmountParsed]
+        );
+
+        // param2: TAKE_ALL — (Currency currency, uint256 minAmount)
+        const param2 = encodeAbiParameters(
+            [{ type: 'address' }, { type: 'uint256' }],
+            [currencyOut, BigInt(0)]
+        );
+
+        // Encode the full V4_SWAP input
+        const v4SwapInput = encodeAbiParameters(
+            [{ type: 'bytes' }, { type: 'bytes[]' }],
+            [actions, [param0, param1, param2]]
+        );
 
         writeContract({
-            address: POOL_SWAP_TEST,
-            abi: UniswapPoolSwapTestAbi,
-            functionName: 'swap',
+            address: UNIVERSAL_ROUTER,
+            abi: UniversalRouterAbi,
+            functionName: 'execute',
             args: [
-                poolKey,
-                swapParams,
-                { takeClaims: false, settleUsingBurn: false },
-                '0x' as `0x${string}`
+                '0x10' as `0x${string}`,
+                [v4SwapInput]
             ],
-            // Send ETH value only when buying PENGO (zeroForOne = true)
             value: isEthTop ? inputAmountParsed : BigInt(0)
         });
     };
 
     const handleApprove = () => {
         if (inputAmountParsed === BigInt(0)) return;
-        // Approve PoolSwapTest (it pulls tokens from the user during swap)
-        writeContract({
-            address: PENGO_ADDRESS,
-            abi: PengoEcosystem.abis.PengoToken,
-            functionName: 'approve',
-            args: [POOL_SWAP_TEST, maxUint256],
-        });
+        
+        if (!hasErc20Allowance) {
+            writeContract({
+                address: PENGO_ADDRESS,
+                abi: PengoEcosystem.abis.PengoToken,
+                functionName: 'approve',
+                args: [PERMIT2, maxUint256],
+            });
+        } else if (!hasPermit2Allowance) {
+            const maxUint160 = BigInt("1461501637330902918203684832716283019655932542975");
+            writeContract({
+                address: PERMIT2,
+                abi: Permit2Abi,
+                functionName: 'approve',
+                args: [PENGO_ADDRESS, UNIVERSAL_ROUTER, maxUint160, Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30],
+            });
+        }
     };
 
     const handlePercentage = (percent: number) => {
@@ -390,7 +468,7 @@ export default function SwapPage() {
                                     Connect Wallet
                                 </button>
                             ) : (
-                                isEthTop || hasEnoughAllowance ? (
+                                isEthTop || (hasErc20Allowance && hasPermit2Allowance) ? (
                                     <button
                                         onClick={handleSwap}
                                         disabled={isPending || isConfirming || !inputValue || expectedOutput === BigInt(0) || (isEthTop ? inputAmountParsed > parseEther(userEthBalance) : inputAmountParsed > rawUserTokenBalance)}
@@ -404,7 +482,7 @@ export default function SwapPage() {
                                         disabled={isPending || isConfirming || !inputValue || inputAmountParsed > rawUserTokenBalance}
                                         className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-accent-500 to-purple-500 hover:opacity-90 transition-all disabled:opacity-50 disabled:bg-neutral-700 text-lg relative overflow-hidden"
                                     >
-                                        {isPending ? 'Confirming...' : isConfirming ? 'Approving...' : inputAmountParsed > rawUserTokenBalance ? 'Insufficient Balance' : 'Approve PENGO'}
+                                        {isPending ? 'Confirming...' : isConfirming ? 'Approving...' : inputAmountParsed > rawUserTokenBalance ? 'Insufficient Balance' : !hasErc20Allowance ? 'Approve PENGO (1/2)' : 'Approve Router (2/2)'}
                                     </button>
                                 )
                             )}

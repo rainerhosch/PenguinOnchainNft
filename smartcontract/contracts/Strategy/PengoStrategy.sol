@@ -32,6 +32,10 @@ interface IPoolSwapTest {
     ) external payable returns (BalanceDelta delta);
 }
 
+interface IUniversalRouter {
+    function execute(bytes calldata commands, bytes[] calldata inputs) external payable;
+}
+
 contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, IERC721Receiver {
     IPenguinOnchain public nftContract;
     
@@ -63,8 +67,19 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     
     // Uniswap V4 Integration
     IPositionManager public positionManager;
-    IPoolSwapTest public poolSwapTest;
+    IPoolSwapTest public poolSwapTest; // DEPRECATED - DO NOT USE
+    IUniversalRouter public universalRouter;
     
+    address public constant DEAD_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+
+    struct ExactInputSingleParams {
+        PoolKey poolKey;
+        bool zeroForOne;
+        uint128 amountIn;
+        uint128 amountOutMinimum;
+        bytes hookData;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -87,8 +102,13 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         positionManager = IPositionManager(_positionManager);
     }
     
+    // Deprecated
     function setPoolSwapTest(address _poolSwapTest) external onlyOwner {
         poolSwapTest = IPoolSwapTest(_poolSwapTest);
+    }
+
+    function setUniversalRouter(address _universalRouter) external onlyOwner {
+        universalRouter = IUniversalRouter(_universalRouter);
     }
     
     receive() external payable {}
@@ -303,20 +323,19 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         Currency currency0, 
         Currency currency1,
         PoolKey[] calldata rwaPoolKeys,
-        bool isEthToRwa,
-        uint160[] calldata sqrtPriceLimitX96s
+        uint128[] calldata amountOutMinimums
     ) external nonReentrant onlyOwner {
         require(rwaPoolKeys.length == activeBuyList.length, "Pool keys count must match active buy list");
-        require(rwaPoolKeys.length == sqrtPriceLimitX96s.length, "Limits count must match pool keys");
+        require(rwaPoolKeys.length == amountOutMinimums.length, "Min amounts count must match active buy list");
         require(activeBuyList.length > 0, "No active RWA in buy list");
-        require(address(poolSwapTest) != address(0), "PoolSwapTest not set");
+        require(address(universalRouter) != address(0), "UniversalRouter not set");
         
         uint256 totalPower = nftContract.totalSharePower();
         require(totalPower > 0, "No share power exists");
 
         uint256 ethBefore = address(this).balance;
-        uint256 pengoBefore = 0;
         address token1 = Currency.unwrap(currency1);
+        uint256 pengoBefore = 0;
         
         if (token1 != address(0)) {
             pengoBefore = IERC20(token1).balanceOf(address(this));
@@ -326,12 +345,17 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
 
         uint256 ethGained = address(this).balance - ethBefore;
         uint256 pengoGained = 0;
+
+        // Deflationary Fee Burn Mechanism:
+        // Any PENGO collected as fee is sent directly to the dead address
         if (token1 != address(0)) {
             pengoGained = IERC20(token1).balanceOf(address(this)) - pengoBefore;
+            if (pengoGained > 0) {
+                IERC20(token1).transfer(DEAD_ADDRESS, pengoGained);
+            }
         }
 
         uint256 ethPerRwa = ethGained / activeBuyList.length;
-        uint256 pengoPerRwa = pengoGained / activeBuyList.length;
 
         for (uint i = 0; i < activeBuyList.length; i++) {
             address rwaToken = activeBuyList[i];
@@ -345,26 +369,40 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
 
             uint256 rwaBefore = IERC20(rwaToken).balanceOf(address(this));
 
-            if (isEthToRwa && ethPerRwa > 0) {
-                SwapParams memory params = SwapParams({
-                    zeroForOne: Currency.unwrap(rwaPoolKey.currency0) == address(0),
-                    amountSpecified: int256(ethPerRwa),
-                    sqrtPriceLimitX96: sqrtPriceLimitX96s[i]
-                });
-                IPoolSwapTest.TestSettings memory testSettings = IPoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
+            if (ethPerRwa > 0) {
+                // UniversalRouter V4_SWAP encoding:
+                // commands = 0x10 (V4_SWAP)
+                // inputs[0] = abi.encode(bytes actions, bytes[] params)
+                // actions = SWAP_EXACT_IN_SINGLE(0x06) + SETTLE_ALL(0x0c) + TAKE_ALL(0x0f)
+                bytes memory commands = hex"10";
+                bytes[] memory inputs = new bytes[](1);
+
+                bytes memory actions = abi.encodePacked(uint8(0x06), uint8(0x0c), uint8(0x0f));
+                bytes[] memory params = new bytes[](3);
+
+                bool zeroForOne = Currency.unwrap(rwaPoolKey.currency0) == address(0);
                 
-                poolSwapTest.swap{value: ethPerRwa}(rwaPoolKey, params, testSettings, "");
-            } else if (!isEthToRwa && pengoPerRwa > 0 && token1 != address(0)) {
-                IERC20(token1).approve(address(poolSwapTest), pengoPerRwa);
-                
-                SwapParams memory params = SwapParams({
-                    zeroForOne: Currency.unwrap(rwaPoolKey.currency0) == token1,
-                    amountSpecified: int256(pengoPerRwa),
-                    sqrtPriceLimitX96: sqrtPriceLimitX96s[i]
-                });
-                IPoolSwapTest.TestSettings memory testSettings = IPoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
-                
-                poolSwapTest.swap(rwaPoolKey, params, testSettings, "");
+                // param0: SWAP_EXACT_IN_SINGLE params
+                params[0] = abi.encode(ExactInputSingleParams({
+                    poolKey: rwaPoolKey,
+                    zeroForOne: zeroForOne,
+                    amountIn: uint128(ethPerRwa),
+                    amountOutMinimum: amountOutMinimums[i],
+                    hookData: ""
+                }));
+
+                // param1: SETTLE_ALL (currency, maxAmount)
+                address currencyIn = zeroForOne ? address(0) : rwaToken;
+                params[1] = abi.encode(currencyIn, ethPerRwa);
+
+                // param2: TAKE_ALL (currency, minAmount)
+                address currencyOut = zeroForOne ? rwaToken : address(0);
+                params[2] = abi.encode(currencyOut, amountOutMinimums[i]);
+
+                inputs[0] = abi.encode(actions, params);
+
+                // Execute the swap on Universal Router, sending the ETH chunk
+                universalRouter.execute{value: ethPerRwa}(commands, inputs);
             }
 
             uint256 rwaGained = IERC20(rwaToken).balanceOf(address(this)) - rwaBefore;

@@ -18,6 +18,12 @@ async function main() {
     const upgradeTx = await strategyProxy.upgradeTo(implAddr);
     await upgradeTx.wait();
     console.log("Strategy Upgraded successfully!");
+
+    console.log("Setting Universal Router...");
+    const UNIVERSAL_ROUTER = "0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b"; // Sepolia V4 Universal Router
+    const setURTx = await strategyProxy.setUniversalRouter(UNIVERSAL_ROUTER);
+    await setURTx.wait();
+    console.log("Universal Router set to:", UNIVERSAL_ROUTER);
 }
 
 main().catch(console.error);

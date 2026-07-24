@@ -86,6 +86,8 @@ async function main() {
         limitPrices.push((isZeroForOne ? MIN_SQRT_PRICE : MAX_SQRT_PRICE).toString());
     }
 
+    const amountOutMinimums = new Array(activeBuyList.length).fill(0n);
+
     console.log("Calling claimAndSwapForRWA with split...");
     
     let ethC0 = ethAddress;
@@ -100,8 +102,7 @@ async function main() {
         ethC0,
         ethC1,
         poolKeys,
-        true, // isEthToRwa
-        limitPrices
+        amountOutMinimums
     );
 
     console.log("Waiting for confirmation...");
