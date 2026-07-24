@@ -168,53 +168,58 @@ contract PengoBondingCurve is Ownable {
             hooks: IHooks(address(0))
         });
         
-        // Calculate sqrtPriceX96
-        // token0 is ETH, token1 is PENGO
-        // Price = token1 / token0 = TOKENS_FOR_LIQUIDITY / ethBalance
-        uint256 ratioX192 = FullMath.mulDiv(TOKENS_FOR_LIQUIDITY, 1 << 192, ethBalance);
-        uint160 sqrtPriceX96 = uint160(FixedPointMathLib.sqrt(ratioX192));
-        
-        // Initialize pool
-        poolManager.initialize(poolKey, sqrtPriceX96);
-        
-        // Full range ticks
-        int24 tickLower = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
-        int24 tickUpper = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
-        
-        // Calculate required liquidity amount
-        uint128 liquidity = LiquidityAmounts.getLiquidityForAmounts(
-            sqrtPriceX96,
-            TickMath.getSqrtPriceAtTick(tickLower),
-            TickMath.getSqrtPriceAtTick(tickUpper),
-            ethBalance,
-            TOKENS_FOR_LIQUIDITY
-        );
-        
-        // Approve Permit2
-        pengoToken.approve(address(permit2), type(uint256).max);
-        permit2.approve(address(pengoToken), address(positionManager), type(uint160).max, type(uint48).max);
-        
-        // Mint position
-        bytes memory actions = abi.encodePacked(uint8(Actions.MINT_POSITION), uint8(Actions.SETTLE_PAIR));
-        bytes[] memory params = new bytes[](2);
-        params[0] = abi.encode(
-            poolKey, 
-            tickLower, 
-            tickUpper, 
-            uint256(liquidity), 
-            uint128(ethBalance), 
-            uint128(TOKENS_FOR_LIQUIDITY), 
-            strategyVault, // receiver of the NFT
-            ""
-        );
-        params[1] = abi.encode(currency0, currency1); // For SETTLE_PAIR decodeCurrencyPair
-        
-        positionManager.modifyLiquidities{value: ethBalance}(
-            abi.encode(actions, params),
-            block.timestamp
-        );
-        
-        emit LiquidityMigrated(ethBalance, TOKENS_FOR_LIQUIDITY, liquidity);
+        if (address(poolManager) != address(0) && address(positionManager) != address(0)) {
+            // Calculate sqrtPriceX96
+            // token0 is ETH, token1 is PENGO
+            // Price = token1 / token0 = TOKENS_FOR_LIQUIDITY / ethBalance
+            uint256 ratioX192 = FullMath.mulDiv(TOKENS_FOR_LIQUIDITY, 1 << 192, ethBalance);
+            uint160 sqrtPriceX96 = uint160(FixedPointMathLib.sqrt(ratioX192));
+            
+            // Initialize pool
+            poolManager.initialize(poolKey, sqrtPriceX96);
+            
+            // Full range ticks
+            int24 tickLower = (TickMath.MIN_TICK / tickSpacing) * tickSpacing;
+            int24 tickUpper = (TickMath.MAX_TICK / tickSpacing) * tickSpacing;
+            
+            // Calculate required liquidity amount
+            uint128 liquidity = LiquidityAmounts.getLiquidityForAmounts(
+                sqrtPriceX96,
+                TickMath.getSqrtPriceAtTick(tickLower),
+                TickMath.getSqrtPriceAtTick(tickUpper),
+                ethBalance,
+                TOKENS_FOR_LIQUIDITY
+            );
+            
+            // Approve Permit2
+            pengoToken.approve(address(permit2), type(uint256).max);
+            permit2.approve(address(pengoToken), address(positionManager), type(uint160).max, type(uint48).max);
+            
+            // Mint position
+            bytes memory actions = abi.encodePacked(uint8(Actions.MINT_POSITION), uint8(Actions.SETTLE_PAIR));
+            bytes[] memory params = new bytes[](2);
+            params[0] = abi.encode(
+                poolKey, 
+                tickLower, 
+                tickUpper, 
+                uint256(liquidity), 
+                uint128(ethBalance), 
+                uint128(TOKENS_FOR_LIQUIDITY), 
+                strategyVault, // receiver of the NFT
+                ""
+            );
+            params[1] = abi.encode(currency0, currency1); // For SETTLE_PAIR decodeCurrencyPair
+            
+            positionManager.modifyLiquidities{value: ethBalance}(
+                abi.encode(actions, params),
+                block.timestamp
+            );
+            
+            emit LiquidityMigrated(ethBalance, TOKENS_FOR_LIQUIDITY, liquidity);
+        } else {
+            // Mock migration for local testing without Uniswap V4 deployed
+            emit LiquidityMigrated(ethBalance, TOKENS_FOR_LIQUIDITY, 0);
+        }
 
         // Burn any remaining tokens (due to tax or early curve completion)
         uint256 remainingTokens = pengoToken.balanceOf(address(this));

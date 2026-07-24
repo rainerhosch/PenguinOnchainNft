@@ -81,34 +81,45 @@ async function main() {
 
   console.log("\n🚀 Starting Trading Simulation (Press Ctrl+C to stop)...\n");
 
-  const tradeAmountStr = process.env.TRADE_AMOUNT || "100";
-  const tradeAmountTokens = hre.ethers.parseEther(tradeAmountStr); // Buy/Sell X PENGO per trade
+  const minTradeAmount = parseFloat(process.env.MIN_TRADE_AMOUNT || "5587857");
+  const maxTradeAmount = parseFloat(process.env.MAX_TRADE_AMOUNT || "71587857");
+
+  const getRandomTradeAmount = () => {
+    // Generate a random amount between min and max
+    const randomAmount = Math.floor(Math.random() * (maxTradeAmount - minTradeAmount + 1)) + minTradeAmount;
+    return randomAmount.toString();
+  };
 
   let iteration = 1;
   while (true) {
     console.log(`\n--- 🔄 Iteration ${iteration} ---`);
     try {
       // 1. Wallet 1 Buys
-      const costResult = await PengoBondingCurve.getCost(tradeAmountTokens);
+      const tradeAmountStr1 = getRandomTradeAmount();
+      const tradeAmountTokens1 = hre.ethers.parseEther(tradeAmountStr1);
+      const costResult = await PengoBondingCurve.getCost(tradeAmountTokens1);
       const cost1 = costResult[0]; // totalCost is the first return value
-      console.log(`🟢 Wallet 1 Buying ${tradeAmountStr} PENGO (Cost: ${hre.ethers.formatEther(cost1)} ETH)...`);
-      const txBuy1 = await PengoBondingCurve.connect(wallet1).buy(tradeAmountTokens, { value: cost1 });
+      console.log(`🟢 Wallet 1 Buying ${tradeAmountStr1} PENGO (Cost: ${hre.ethers.formatEther(cost1)} ETH)...`);
+      const txBuy1 = await PengoBondingCurve.connect(wallet1).buy(tradeAmountTokens1, { value: cost1 });
       await txBuy1.wait();
       console.log(`✅ Wallet 1 Buy Success! Hash: ${txBuy1.hash}`);
 
       // 2. Wallet 2 Sells (if it has tokens)
+      const tradeAmountStr2 = getRandomTradeAmount();
+      const tradeAmountTokens2 = hre.ethers.parseEther(tradeAmountStr2);
       const tokenBal2 = await PengoToken.balanceOf(wallet2.address);
-      if (tokenBal2 >= tradeAmountTokens) {
-        console.log(`🔴 Wallet 2 Selling ${tradeAmountStr} PENGO...`);
-        const txSell2 = await PengoBondingCurve.connect(wallet2).sell(tradeAmountTokens);
+
+      if (tokenBal2 >= tradeAmountTokens2) {
+        console.log(`🔴 Wallet 2 Selling ${tradeAmountStr2} PENGO...`);
+        const txSell2 = await PengoBondingCurve.connect(wallet2).sell(tradeAmountTokens2);
         await txSell2.wait();
         console.log(`✅ Wallet 2 Sell Success! Hash: ${txSell2.hash}`);
       } else {
         // If wallet 2 doesn't have tokens, it buys instead
-        const costResult2 = await PengoBondingCurve.getCost(tradeAmountTokens);
+        const costResult2 = await PengoBondingCurve.getCost(tradeAmountTokens2);
         const cost2 = costResult2[0];
-        console.log(`🟢 Wallet 2 Buying ${tradeAmountStr} PENGO (Cost: ${hre.ethers.formatEther(cost2)} ETH)...`);
-        const txBuy2 = await PengoBondingCurve.connect(wallet2).buy(tradeAmountTokens, { value: cost2 });
+        console.log(`🟢 Wallet 2 Buying ${tradeAmountStr2} PENGO (Cost: ${hre.ethers.formatEther(cost2)} ETH)...`);
+        const txBuy2 = await PengoBondingCurve.connect(wallet2).buy(tradeAmountTokens2, { value: cost2 });
         await txBuy2.wait();
         console.log(`✅ Wallet 2 Buy Success! Hash: ${txBuy2.hash}`);
       }
@@ -116,9 +127,11 @@ async function main() {
       // 3. Wallet 1 Sells (Random chance to simulate chaos)
       if (Math.random() > 0.5) {
         const tokenBal1 = await PengoToken.balanceOf(wallet1.address);
-        if (tokenBal1 >= tradeAmountTokens) {
-          console.log(`🔴 Wallet 1 Randomly Selling ${tradeAmountStr} PENGO...`);
-          const txSell1 = await PengoBondingCurve.connect(wallet1).sell(tradeAmountTokens);
+        // Try to sell 50% of holding
+        const sellAmount = tokenBal1 / 2n;
+        if (sellAmount > 0n) {
+          console.log(`🔴 Wallet 1 Randomly Selling ${hre.ethers.formatEther(sellAmount)} PENGO...`);
+          const txSell1 = await PengoBondingCurve.connect(wallet1).sell(sellAmount);
           await txSell1.wait();
           console.log(`✅ Wallet 1 Sell Success! Hash: ${txSell1.hash}`);
         }

@@ -41,7 +41,7 @@ export default buildModule("PengoEcosystemV2", (m) => {
 
     // 4. Deploy UUPS Vault (PengoStrategy)
     const pengoStrategyImpl = m.contract("PengoStrategy");
-    const positionManagerAddr = m.getParameter("positionManager", "0x0000000000000000000000000000000000000000"); // Update with actual Sepolia address via params
+    const positionManagerAddr = m.getParameter("positionManager", "0x429ba70129df741B2Ca2a85BC3A2a3328e5c09b4"); // Sepolia PositionManager
     const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain, positionManagerAddr]);
     const pengoStrategyProxy = m.contract("ERC1967Proxy", [pengoStrategyImpl, initData], { id: "PengoStrategyProxy" });
 
@@ -50,7 +50,7 @@ export default buildModule("PengoEcosystemV2", (m) => {
 
     // 5. Deploy Bonding Curve
     // Uniswap V4 addresses
-    const poolManager = m.getParameter("poolManager", "0x0000000000000000000000000000000000000000"); // Update via params
+    const poolManager = m.getParameter("poolManager", "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543"); // Sepolia PoolManager
     const positionManager = positionManagerAddr;
     const permit2 = m.getParameter("permit2", "0x000000000022D473030F116dDEE9F6B43aC78BA3"); // Standard Permit2
     

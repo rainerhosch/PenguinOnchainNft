@@ -1,10 +1,10 @@
 {
     "sourceName": "contracts/ERC721/PenguinOnchain.sol",
     "contractName": "PenguinOnchain",
-    "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-    "factoryAddress": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
-    "pengoConverter": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-    "daoAddress": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
+    "address": "0x63FA62737f302e26DD8484618b7267108B62Feee",
+    "factoryAddress": "0x3568eac945C4aae0C4E1b9c964573a05cf38FF0a",
+    "pengoConverter": "0x1D1A4Da62A9A6c8C020B4D10b52B29245eE4CCf2",
+    "daoAddress": "0x0B33a8D32F13959693922cbc0222CA95C116422a",
     "constructorArgs": [],
     "txHash": "0xcd772371fb7c72173d0f2f2cfdf1cf5b0b1a04e47f8dfbfedab3a2378fb35550",
     "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -19,10 +19,10 @@
             "explore": "https://sepolia.etherscan.io/",
             "verifyUrl": "https://sepolia.etherscan.io/api",
             "currency": "ETH",
-            "PengoAddress": "0x44366F5018db1B91Fac216Fac78e41dA13002e72",
-            "factoryAddress": "0xafE713fCCa7978486843E3fb59d297263eB6F1c9",
-            "pengoConverter": "0x0aCa80b46Af0Ca01E3A033c0307E9f20AcCE5A10",
-            "daoAddress": "0xEe9eC4ab8165f36385ea210A15bEE953460633c1",
+            "PengoAddress": "0x63FA62737f302e26DD8484618b7267108B62Feee",
+            "factoryAddress": "0x3568eac945C4aae0C4E1b9c964573a05cf38FF0a",
+            "pengoConverter": "0x1D1A4Da62A9A6c8C020B4D10b52B29245eE4CCf2",
+            "daoAddress": "0x0B33a8D32F13959693922cbc0222CA95C116422a",
             "abi": [
                 {
                     "inputs": [],
@@ -2276,7 +2276,7 @@
                     "type": "function"
                 }
             ],
-            "pengoTokenAddress": "0x4595Dea569141bE3BdB28Cc6795ae4E924c6D803"
+            "pengoTokenAddress": "0xa4d68dAdE8FDa861207ce16aA83836B48bd59457"
         },
         {
             "name": "Robinhood Chain",
@@ -4413,15 +4413,15 @@
             ]
         },
         {
-            "name": "localhost",
+            "name": "hardhat",
             "chainId": "31337",
             "currency": "ETH",
             "explore": "https://sepolia.etherscan.io/",
-            "PengoAddress": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-            "factoryAddress": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
-            "daoAddress": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
-            "pengoConverter": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-            "pengoTokenAddress": "0x9A676e781A523b5d0C0e43731313A708CB607508",
+            "PengoAddress": "0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf",
+            "factoryAddress": "0x998abeb3E57409262aE5b751f60747921B33613E",
+            "daoAddress": "0x5f3f1dBD7B74C6B46e8c44f98792A1dAf8d69154",
+            "pengoConverter": "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
+            "pengoTokenAddress": "0x4826533B4897376654Bb4d4AD88B7faFD0C98528",
             "abi": [
                 {
                     "inputs": [],
@@ -6335,5 +6335,5 @@
             ]
         }
     ],
-    "pengoTokenAddress": "0x9A676e781A523b5d0C0e43731313A708CB607508"
+    "pengoTokenAddress": "0xa4d68dAdE8FDa861207ce16aA83836B48bd59457"
 }

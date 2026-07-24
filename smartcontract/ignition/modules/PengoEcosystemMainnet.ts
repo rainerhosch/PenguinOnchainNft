@@ -38,20 +38,26 @@ export default buildModule("PengoEcosystemMainnet", (m) => {
 
     // 4. Deploy UUPS Vault (PengoStrategy)
     const pengoStrategyImpl = m.contract("PengoStrategy");
-    const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain]);
+    // Uniswap V4 official addresses for Robinhood Chain (Mainnet)
+    const positionManagerAddr = m.getParameter("positionManager", "0x58daec3116aae6D93017bAAea7749052E8a04fA7"); // Robinhood Chain PositionManager
+    const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain, positionManagerAddr]);
     const pengoStrategyProxy = m.contract("ERC1967Proxy", [pengoStrategyImpl, initData], { id: "PengoStrategyProxy" });
 
     // Set Strategy in NFT Contract
     m.call(penguinOnchain, "setStrategyContract", [pengoStrategyProxy]);
 
     // 5. Deploy Bonding Curve
-    // Using official Uniswap V2 Router02 for Robinhood Chain
-    const uniswapRouter = m.getParameter("uniswapRouter", "0x89e5db8b5aa49aa85ac63f691524311aeb649eba");
-    const targetLiquidity = m.getParameter("targetLiquidity", 10n * 10n ** 18n); // 10 ETH for Mainnet
+    // Uniswap V4 official addresses for Robinhood Chain (Mainnet)
+    const poolManager = m.getParameter("poolManager", "0x8366a39CC670B4001A1121B8F6A443A643e40951");    // Robinhood Chain PoolManager
+    const positionManager = positionManagerAddr;
+    const permit2 = m.getParameter("permit2", "0x000000000022D473030F116dDEE9F6B43aC78BA3");           // Standard Permit2 (universal)
+    const targetLiquidity = m.getParameter("targetLiquidity", 10n * 10n ** 18n);                      // 10 ETH for Mainnet
     
     const bondingCurve = m.contract("PengoBondingCurve", [
         pengoToken,
-        uniswapRouter,
+        poolManager,
+        positionManager,
+        permit2,
         pengoStrategyProxy,
         targetLiquidity
     ]);

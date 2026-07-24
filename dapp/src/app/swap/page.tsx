@@ -2,13 +2,16 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import AppNavbar from "../../components/AppNavBar";
-import { useReadContract, useWriteContract, useAccount, useWaitForTransactionReceipt, useBalance } from 'wagmi';
+import { useReadContract, useSimulateContract, useWriteContract, useAccount, useWaitForTransactionReceipt, useBalance } from 'wagmi';
 import { parseEther, formatEther, maxUint256 } from 'viem';
 import PengoEcosystem from '../../constants/PengoEcosystem.json';
-import UniswapRouterAbi from '../../constants/UniswapRouterAbi.json';
+import UniswapV4QuoterAbi from '../../constants/UniswapV4QuoterAbi.json';
+import UniswapPoolSwapTestAbi from '../../constants/UniswapPoolSwapTestAbi.json';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useEthPrice } from '../../hooks/useEthPrice';
-import { getAddresses, getDexAddresses } from '../../utils/addresses';
+import { getAddresses, getV4DexAddresses } from '../../utils/addresses';
+
+
 
 export default function SwapPage() {
     const [inputValue, setInputValue] = useState("");
@@ -22,10 +25,21 @@ export default function SwapPage() {
         setIsClient(true);
     }, []);
 
-    const { WETH_ADDRESS, ROUTER_ADDRESS } = getDexAddresses(chainId);
+    const { POOL_MANAGER, V4_QUOTER, POOL_SWAP_TEST } = getV4DexAddresses(chainId);
     const addresses = getAddresses(chainId);
     const PENGO_ADDRESS = addresses.PengoToken;
     const BONDING_CURVE_ADDRESS = addresses.PengoBondingCurve;
+
+    // PoolKey must EXACTLY match what PengoBondingCurve used during migration:
+    //   currency0 = address(0) = ETH (native), currency1 = PengoToken
+    //   fee = 3000, tickSpacing = 60, hooks = address(0)
+    const poolKey = {
+        currency0: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+        currency1: PENGO_ADDRESS,
+        fee: 3000,
+        tickSpacing: 60,
+        hooks: '0x0000000000000000000000000000000000000000' as `0x${string}`
+    } as const;
 
     // 1. Read User Balances
     const { data: userTokenBalanceData, refetch: refetchUserTokenBalance } = useReadContract({
@@ -54,33 +68,63 @@ export default function SwapPage() {
     });
     const isMigrated = isMigratedData as boolean;
 
-    // 2. Fetch Quotes (getAmountsOut)
-    const inputAmountParsed = inputValue && !isNaN(Number(inputValue)) && Number(inputValue) > 0 ? parseEther(inputValue.toString()) : BigInt(0);
-    const path = isEthTop ? [WETH_ADDRESS, PENGO_ADDRESS] : [PENGO_ADDRESS, WETH_ADDRESS];
-    
-    const { data: amountsOutData } = useReadContract({
-        address: ROUTER_ADDRESS,
-        abi: UniswapRouterAbi,
-        functionName: 'getAmountsOut',
-        args: [inputAmountParsed, path],
-        query: { enabled: inputAmountParsed > BigInt(0) }
+    // 2. Fetch V4 Quote via quoteExactInputSingle
+    //    V4Quoter is nonpayable (uses revert-based simulation).
+    //    useSimulateContract calls eth_call which handles revert-return pattern correctly.
+    const inputAmountParsed = inputValue && !isNaN(Number(inputValue)) && Number(inputValue) > 0 
+        ? parseEther(inputValue.toString()) 
+        : BigInt(0);
+
+    const { data: simulateData } = useSimulateContract({
+        address: V4_QUOTER,
+        abi: UniswapV4QuoterAbi,
+        functionName: 'quoteExactInputSingle',
+        args: [{
+            poolKey,
+            zeroForOne: isEthTop,
+            exactAmount: inputAmountParsed,
+            hookData: '0x' as `0x${string}`
+        }],
+        query: { enabled: inputAmountParsed > BigInt(0) && isMigrated === true, retry: false }
     });
 
-    const expectedOutput = amountsOutData && Array.isArray(amountsOutData) ? (amountsOutData as any)[1] : BigInt(0);
+    // quoteExactInputSingle returns tuple: [amountOut, gasEstimate]
+    // simulateData.result contains the decoded return value
+    const quoteResult = simulateData?.result as readonly [bigint, bigint] | undefined;
+    const expectedOutput = quoteResult ? quoteResult[0] : BigInt(0);
     const outputValueFormatted = expectedOutput > BigInt(0) ? formatEther(expectedOutput) : "";
     
+    // Log simulation error to help debug
+    const { error: simulateError } = useSimulateContract({
+        address: V4_QUOTER,
+        abi: UniswapV4QuoterAbi,
+        functionName: 'quoteExactInputSingle',
+        args: [{
+            poolKey,
+            zeroForOne: isEthTop,
+            exactAmount: inputAmountParsed,
+            hookData: '0x' as `0x${string}`
+        }],
+        query: { enabled: inputAmountParsed > BigInt(0) && isMigrated === true, retry: false }
+    });
+    
+    useEffect(() => {
+        if (simulateError) {
+            console.error("V4 Quoter Simulation Error:", simulateError);
+        }
+    }, [simulateError]);
+
     const swapEthAmount = isEthTop ? Number(inputValue || 0) : Number(outputValueFormatted || 0);
     const swapEthUsd = ethPrice && swapEthAmount > 0 ? `~$${(swapEthAmount * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "";
-    
-    // Calculate amountOutMin with 1% slippage
-    const amountOutMin = expectedOutput > BigInt(0) ? (expectedOutput * BigInt(99)) / BigInt(100) : BigInt(0);
 
-    // 3. Check Token Allowance (for Selling PENGO)
+    // 3. Check Token Allowance for Selling PENGO
+    //    In Uniswap V4, when using PoolSwapTest to swap, it calls transferFrom on the user.
+    //    User must approve POOL_SWAP_TEST to spend their PENGO.
     const { data: tokenAllowanceData, refetch: refetchAllowance } = useReadContract({
         address: PENGO_ADDRESS,
         abi: PengoEcosystem.abis.PengoToken,
         functionName: 'allowance',
-        args: [address, ROUTER_ADDRESS],
+        args: [address, POOL_SWAP_TEST],
         query: { enabled: !!address && !isEthTop }
     });
     const hasEnoughAllowance = tokenAllowanceData ? (tokenAllowanceData as bigint) >= inputAmountParsed : false;
@@ -100,36 +144,40 @@ export default function SwapPage() {
 
     const handleSwap = () => {
         if (inputAmountParsed === BigInt(0) || expectedOutput === BigInt(0)) return;
-        
-        const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
 
-        if (isEthTop) {
-            // Buy PENGO with ETH
-            writeContract({
-                address: ROUTER_ADDRESS,
-                abi: UniswapRouterAbi,
-                functionName: 'swapExactETHForTokens',
-                args: [amountOutMin, path, address, deadline],
-                value: inputAmountParsed
-            });
-        } else {
-            // Sell PENGO for ETH
-            writeContract({
-                address: ROUTER_ADDRESS,
-                abi: UniswapRouterAbi,
-                functionName: 'swapExactTokensForETH',
-                args: [inputAmountParsed, amountOutMin, path, address, deadline],
-            });
-        }
+        // V4 SwapParams: negative amountSpecified = exact input mode
+        // sqrtPriceLimitX96: set to boundary values to allow swap without price limit
+        const MIN_SQRT = BigInt("4295128740");           // MIN_SQRT_PRICE + 1
+        const MAX_SQRT = BigInt("1461446703485210103287273052203988822378723970341"); // MAX_SQRT_PRICE - 1
+        const swapParams = {
+            zeroForOne: isEthTop,
+            amountSpecified: -BigInt(inputAmountParsed),
+            sqrtPriceLimitX96: isEthTop ? MIN_SQRT : MAX_SQRT
+        };
+
+        writeContract({
+            address: POOL_SWAP_TEST,
+            abi: UniswapPoolSwapTestAbi,
+            functionName: 'swap',
+            args: [
+                poolKey,
+                swapParams,
+                { takeClaims: false, settleUsingBurn: false },
+                '0x' as `0x${string}`
+            ],
+            // Send ETH value only when buying PENGO (zeroForOne = true)
+            value: isEthTop ? inputAmountParsed : BigInt(0)
+        });
     };
 
     const handleApprove = () => {
         if (inputAmountParsed === BigInt(0)) return;
+        // Approve PoolSwapTest (it pulls tokens from the user during swap)
         writeContract({
             address: PENGO_ADDRESS,
             abi: PengoEcosystem.abis.PengoToken,
             functionName: 'approve',
-            args: [ROUTER_ADDRESS, maxUint256],
+            args: [POOL_SWAP_TEST, maxUint256],
         });
     };
 
@@ -194,7 +242,7 @@ export default function SwapPage() {
                             Pengo <span className="gradient-text">Swap</span>
                         </h1>
                         <p className="text-neutral-400 text-sm">
-                            Trade instantly via our V2 Liquidity Pool
+                            Trade instantly via Uniswap V4 Liquidity Pool
                         </p>
                     </div>
 
