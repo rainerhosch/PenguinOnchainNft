@@ -41,20 +41,26 @@ export default buildModule("PengoEcosystemV2", (m) => {
 
     // 4. Deploy UUPS Vault (PengoStrategy)
     const pengoStrategyImpl = m.contract("PengoStrategy");
-    const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain]);
+    const positionManagerAddr = m.getParameter("positionManager", "0x0000000000000000000000000000000000000000"); // Update with actual Sepolia address via params
+    const initData = m.encodeFunctionCall(pengoStrategyImpl, "initialize", [penguinOnchain, positionManagerAddr]);
     const pengoStrategyProxy = m.contract("ERC1967Proxy", [pengoStrategyImpl, initData], { id: "PengoStrategyProxy" });
 
     // Set Strategy in NFT Contract
     m.call(penguinOnchain, "setStrategyContract", [pengoStrategyProxy]);
 
     // 5. Deploy Bonding Curve
-    // Using a valid Uniswap V2 Clone router on Sepolia instead of official Mainnet router
-    const uniswapRouter = m.getParameter("uniswapRouter", "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008");
+    // Uniswap V4 addresses
+    const poolManager = m.getParameter("poolManager", "0x0000000000000000000000000000000000000000"); // Update via params
+    const positionManager = positionManagerAddr;
+    const permit2 = m.getParameter("permit2", "0x000000000022D473030F116dDEE9F6B43aC78BA3"); // Standard Permit2
+    
     const targetLiquidity = m.getParameter("targetLiquidity", 1n * 10n ** 18n); // Default to 1 ETH for testnet flexibility
     
     const bondingCurve = m.contract("PengoBondingCurve", [
         pengoToken,
-        uniswapRouter,
+        poolManager,
+        positionManager,
+        permit2,
         pengoStrategyProxy,
         targetLiquidity
     ]);
