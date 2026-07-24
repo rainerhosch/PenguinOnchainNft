@@ -13,6 +13,24 @@ import "../interfaces/IPenguinOnchain.sol";
 import {IPositionManager} from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
 import {Actions} from "@uniswap/v4-periphery/src/libraries/Actions.sol";
 import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
+import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
+import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
+import {TickMath} from "@uniswap/v4-core/src/libraries/TickMath.sol";
+import {BalanceDelta, BalanceDeltaLibrary} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
+import {SwapParams} from "@uniswap/v4-core/src/types/PoolOperation.sol";
+
+interface IPoolSwapTest {
+    struct TestSettings {
+        bool takeClaims;
+        bool settleUsingBurn;
+    }
+    function swap(
+        PoolKey memory key,
+        SwapParams memory params,
+        TestSettings memory testSettings,
+        bytes memory hookData
+    ) external payable returns (BalanceDelta delta);
+}
 
 contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, IERC721Receiver {
     IPenguinOnchain public nftContract;
@@ -45,6 +63,7 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     
     // Uniswap V4 Integration
     IPositionManager public positionManager;
+    IPoolSwapTest public poolSwapTest;
     
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -67,6 +86,12 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     function setPositionManager(address _positionManager) external onlyOwner {
         positionManager = IPositionManager(_positionManager);
     }
+    
+    function setPoolSwapTest(address _poolSwapTest) external onlyOwner {
+        poolSwapTest = IPoolSwapTest(_poolSwapTest);
+    }
+    
+    receive() external payable {}
     
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
     
@@ -138,6 +163,11 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         require(totalPower > 0, "No share power exists");
         
         IERC20(rwaToken).transferFrom(msg.sender, address(this), amount);
+        
+        _internalDistributeYield(rwaToken, amount, totalPower);
+    }
+    
+    function _internalDistributeYield(address rwaToken, uint256 amount, uint256 totalPower) internal {
         totalDividendsPerPower[rwaToken] += (amount * 1e18) / totalPower;
         
         if (!isRewardToken[rwaToken]) {
@@ -250,7 +280,10 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
     }
 
     function claimFeesFromPosition(uint256 lpTokenId, Currency currency0, Currency currency1) external nonReentrant onlyOwner {
-        // Prepare decreaseLiquidity parameters with 0 liquidity to collect fees
+        _claimFees(lpTokenId, currency0, currency1);
+    }
+
+    function _claimFees(uint256 lpTokenId, Currency currency0, Currency currency1) internal {
         bytes memory actions = new bytes(2);
         actions[0] = bytes1(uint8(Actions.DECREASE_LIQUIDITY));
         actions[1] = bytes1(uint8(Actions.TAKE_PAIR));
@@ -259,10 +292,85 @@ contract PengoStrategy is Initializable, UUPSUpgradeable, OwnableUpgradeable, Re
         params[0] = abi.encode(lpTokenId, 0, 0, 0, ""); // (tokenId, liquidity, amount0Min, amount1Min, hookData)
         params[1] = abi.encode(currency0, currency1, address(this)); // (currency0, currency1, recipient)
 
-        // Modify liquidity and collect fees
         positionManager.modifyLiquidities(
             abi.encode(actions, params),
             block.timestamp + 300
         );
+    }
+
+    function claimAndSwapForRWA(
+        uint256 lpTokenId, 
+        Currency currency0, 
+        Currency currency1,
+        PoolKey[] calldata rwaPoolKeys,
+        bool isEthToRwa,
+        uint160[] calldata sqrtPriceLimitX96s
+    ) external nonReentrant onlyOwner {
+        require(rwaPoolKeys.length == activeBuyList.length, "Pool keys count must match active buy list");
+        require(rwaPoolKeys.length == sqrtPriceLimitX96s.length, "Limits count must match pool keys");
+        require(activeBuyList.length > 0, "No active RWA in buy list");
+        require(address(poolSwapTest) != address(0), "PoolSwapTest not set");
+        
+        uint256 totalPower = nftContract.totalSharePower();
+        require(totalPower > 0, "No share power exists");
+
+        uint256 ethBefore = address(this).balance;
+        uint256 pengoBefore = 0;
+        address token1 = Currency.unwrap(currency1);
+        
+        if (token1 != address(0)) {
+            pengoBefore = IERC20(token1).balanceOf(address(this));
+        }
+
+        _claimFees(lpTokenId, currency0, currency1);
+
+        uint256 ethGained = address(this).balance - ethBefore;
+        uint256 pengoGained = 0;
+        if (token1 != address(0)) {
+            pengoGained = IERC20(token1).balanceOf(address(this)) - pengoBefore;
+        }
+
+        uint256 ethPerRwa = ethGained / activeBuyList.length;
+        uint256 pengoPerRwa = pengoGained / activeBuyList.length;
+
+        for (uint i = 0; i < activeBuyList.length; i++) {
+            address rwaToken = activeBuyList[i];
+            PoolKey calldata rwaPoolKey = rwaPoolKeys[i];
+            
+            // Verify PoolKey corresponds to rwaToken
+            require(
+                Currency.unwrap(rwaPoolKey.currency0) == rwaToken || Currency.unwrap(rwaPoolKey.currency1) == rwaToken,
+                "PoolKey does not match RWA"
+            );
+
+            uint256 rwaBefore = IERC20(rwaToken).balanceOf(address(this));
+
+            if (isEthToRwa && ethPerRwa > 0) {
+                SwapParams memory params = SwapParams({
+                    zeroForOne: Currency.unwrap(rwaPoolKey.currency0) == address(0),
+                    amountSpecified: int256(ethPerRwa),
+                    sqrtPriceLimitX96: sqrtPriceLimitX96s[i]
+                });
+                IPoolSwapTest.TestSettings memory testSettings = IPoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
+                
+                poolSwapTest.swap{value: ethPerRwa}(rwaPoolKey, params, testSettings, "");
+            } else if (!isEthToRwa && pengoPerRwa > 0 && token1 != address(0)) {
+                IERC20(token1).approve(address(poolSwapTest), pengoPerRwa);
+                
+                SwapParams memory params = SwapParams({
+                    zeroForOne: Currency.unwrap(rwaPoolKey.currency0) == token1,
+                    amountSpecified: int256(pengoPerRwa),
+                    sqrtPriceLimitX96: sqrtPriceLimitX96s[i]
+                });
+                IPoolSwapTest.TestSettings memory testSettings = IPoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
+                
+                poolSwapTest.swap(rwaPoolKey, params, testSettings, "");
+            }
+
+            uint256 rwaGained = IERC20(rwaToken).balanceOf(address(this)) - rwaBefore;
+            if (rwaGained > 0) {
+                _internalDistributeYield(rwaToken, rwaGained, totalPower);
+            }
+        }
     }
 }

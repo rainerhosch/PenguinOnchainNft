@@ -184,17 +184,24 @@ export default function SwapPage() {
     const handlePercentage = (percent: number) => {
         if (!isEthTop) {
             // Selling PENGO
-            const bal = Number(userTokenBalance.replace(/,/g, ''));
-            const amount = Math.floor(bal * (percent / 100));
-            setInputValue(amount > 0 ? amount.toString() : "");
+            if (percent === 100) {
+                setInputValue(formatEther(rawUserTokenBalance));
+            } else {
+                const amount = (rawUserTokenBalance * BigInt(percent)) / BigInt(100);
+                setInputValue(formatEther(amount));
+            }
         } else {
             // Buying with ETH
-            let ethAvailable = Number(userEthBalance);
             if (percent === 100) {
-                ethAvailable = Math.max(0, ethAvailable - 0.005); // Gas buffer
+                const gasBuffer = parseEther("0.005");
+                let amount = userEthBalanceData ? userEthBalanceData.value : BigInt(0);
+                amount = amount > gasBuffer ? amount - gasBuffer : BigInt(0);
+                setInputValue(formatEther(amount));
+            } else {
+                let amount = userEthBalanceData ? userEthBalanceData.value : BigInt(0);
+                amount = (amount * BigInt(percent)) / BigInt(100);
+                setInputValue(formatEther(amount));
             }
-            const targetEth = ethAvailable * (percent / 100);
-            setInputValue(targetEth > 0 ? targetEth.toFixed(4).toString() : "");
         }
     };
 
@@ -389,7 +396,7 @@ export default function SwapPage() {
                                         disabled={isPending || isConfirming || !inputValue || expectedOutput === BigInt(0) || (isEthTop ? inputAmountParsed > parseEther(userEthBalance) : inputAmountParsed > rawUserTokenBalance)}
                                         className="w-full py-4 rounded-2xl font-bold text-primary-900 bg-gradient-to-r from-primary-400 to-accent-400 hover:from-primary-300 hover:to-accent-300 transition-all disabled:opacity-50 disabled:from-neutral-700 disabled:to-neutral-700 disabled:text-neutral-400 text-lg relative overflow-hidden"
                                     >
-                                        {isPending ? 'Confirming...' : isConfirming ? 'Swapping...' : expectedOutput === BigInt(0) ? 'Enter amount' : (isEthTop && inputAmountParsed > parseEther(userEthBalance)) || (!isEthTop && inputAmountParsed > rawUserTokenBalance) ? 'Insufficient Balance' : 'Swap'}
+                                        {isPending ? 'Confirming...' : isConfirming ? 'Swapping...' : inputAmountParsed === BigInt(0) ? 'Enter amount' : expectedOutput === BigInt(0) ? 'Insufficient Liquidity / High Impact' : (isEthTop && inputAmountParsed > parseEther(userEthBalance)) || (!isEthTop && inputAmountParsed > rawUserTokenBalance) ? 'Insufficient Balance' : 'Swap'}
                                     </button>
                                 ) : (
                                     <button
